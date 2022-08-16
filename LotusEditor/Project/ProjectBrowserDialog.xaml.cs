@@ -23,5 +23,26 @@ namespace LotusEditor.Project
         {
             InitializeComponent();
         }
+
+        private void OnToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(sender == createProjectButton)
+            {
+                if(openProjectButton.IsChecked == true)
+                {
+                    openProjectButton.IsChecked = false;
+                    browserContent.Margin = new Thickness(0);
+                }
+                createProjectButton.IsChecked = true;
+            }else if (sender == openProjectButton)
+            {
+                if (createProjectButton.IsChecked == true)
+                {
+                    createProjectButton.IsChecked = false;
+                    browserContent.Margin = new Thickness(-Width, 0, 0, 0);
+                }
+                openProjectButton.IsChecked = true;
+            }
+        }
     }
 }

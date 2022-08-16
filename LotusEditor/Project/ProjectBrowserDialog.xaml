@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LotusEditor.Project"
         mc:Ignorable="d" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
-        Title="ProjectBrowserDialog" Height="450" Width="800">
+        Title="Project Browser" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
@@ -14,19 +14,17 @@
       <!-- Open/Create buttons -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20">
             <ToggleButton Content="Create Project" x:Name="createProjectButton"
-                          FontSize="32"></ToggleButton>
+                          FontSize="32" IsChecked="True"
+                          Click="OnToggleButton_Click"></ToggleButton>
             <ToggleButton Content="Open Project" x:Name="openProjectButton"
-                          FontSize="32" Margin="30,0,0,0"></ToggleButton>
+                          FontSize="32" Margin="30,0,0,0" IsChecked="false"
+                          Click="OnToggleButton_Click"></ToggleButton>
         </StackPanel>
 
       <!-- Open/Create panels -->
-        <StackPanel Orientation="Horizontal" Grid.Row="1">
-            <Border Width="800" Background="DarkGray">
-              <TextBlock FontSize="72" Text="Create Project"/>
-            </Border>
-          <Border Width="800" Background="DarkGoldenrod">
-            <TextBlock FontSize="72" Text="Open Project"/>
-          </Border>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" x:Name="browserContent">
+          <local:NewProjectView/>
+          <local:OpenProjectView/>
         </StackPanel>
     </Grid>
 </Window>
