@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using LotusEditor.Project;
+
 namespace LotusEditor
 {
     /// <summary>
@@ -23,6 +25,26 @@ namespace LotusEditor
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += OnMainWindowLoaded;
         }
+
+        private void OnMainWindowLoaded(object sender, RoutedEventArgs evt)
+        {
+            Loaded -= OnMainWindowLoaded;
+            OpenProjectBrowserDialog();
+        }
+
+        private void OpenProjectBrowserDialog()
+        {
+            var projBrowser = new ProjectBrowserDialog();
+            if(projBrowser.ShowDialog() == false)
+            {
+                Application.Current.Shutdown();
+                return;
+            }
+
+            // Additional logic
+        }
+
     }
 }
