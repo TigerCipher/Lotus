@@ -37,20 +37,25 @@
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
                   Margin="0,30,0,0">
         <TextBlock Text="Name" Width="50"/>
-        <TextBox Width="550" Text="{Binding ProjectName}"/>
+        <TextBox Width="550" Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
       </StackPanel>
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
                   Margin="0,5,0,0">
         <TextBlock Text="Path" Width="50"/>
-        <TextBox Width="500" Text="{Binding ProjectPath}"/>
+        <TextBox Width="500" Text="{Binding ProjectPath, UpdateSourceTrigger=PropertyChanged}"/>
         <Button Content="Browse" Width="60" Margin="-10,0,0,0"/>
       </StackPanel>
-
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+      <TextBlock Text="{Binding ErrorMessage}"
+                 Margin="0,20,0,0"
+                 Foreground="Black"
+                 HorizontalAlignment="Center"></TextBlock>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
                   Margin="0,30,0,0">
-        <Button Content="Create" Width="90" IsDefault="True"/>
+        <Button Content="Create" Width="90" IsDefault="True"
+                IsEnabled="{Binding IsValid}"/>
         <Button Content="Exit" Width="90" Margin="30,0,0,0" IsCancel="True"/>
       </StackPanel>
+      
 
     </StackPanel>
 </UserControl>
