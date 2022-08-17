@@ -34,7 +34,7 @@ namespace LotusEditor.Utility
                 using var fs = new FileStream(path, FileMode.Open);
                 var serializer = new DataContractSerializer(typeof(T));
 
-                T instance = (T)serializer.ReadObject(fs);
+                T instance = (T)serializer.ReadObject(fs)!;
 
                 return instance;
             }
@@ -42,7 +42,7 @@ namespace LotusEditor.Utility
             {
                 // #TODO Logging
                 Debug.WriteLine(ex.Message);
-                return default(T);
+                return default(T)!;
             }
         }
     }

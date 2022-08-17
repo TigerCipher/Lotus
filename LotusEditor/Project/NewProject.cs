@@ -15,18 +15,18 @@ namespace LotusEditor.Project
     public class ProjectTemplate
     {
         [DataMember]
-        public string ProjectType { get; set; }
+        public string? ProjectType { get; set; }
         [DataMember]
-        public string ProjectFile { get; set; }
+        public string? ProjectFile { get; set; }
         [DataMember]
-        public List<string> Folders { get; set; }
+        public List<string>? Folders { get; set; }
 
-        public byte[] Icon { get; set; }
-        public byte[] Screenshot { get; set; }
+        public byte[]? Icon { get; set; }
+        public byte[]? Screenshot { get; set; }
 
-        public string IconFilePath { get; set; }
-        public string ScreenshotFilePath { get; set; }
-        public string ProjectFilePath { get; set; }
+        public string? IconFilePath { get; set; }
+        public string? ScreenshotFilePath { get; set; }
+        public string? ProjectFilePath { get; set; }
     }
 
     class NewProject : ViewModelBase
@@ -52,11 +52,11 @@ namespace LotusEditor.Project
                 foreach (var file in templates)
                 {
                     var template = Serializer.FromFile<ProjectTemplate>(file);
-                    template.IconFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "icon.png"));
+                    template.IconFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file)!, "icon.png"));
                     template.Icon = File.ReadAllBytes(template.IconFilePath);
-                    template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "screenshot.png"));
+                    template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file)!, "screenshot.png"));
                     template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
-                    template.ProjectFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), template.ProjectFile));
+                    template.ProjectFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file)!, template.ProjectFile!));
 
                     _projectTemplates.Add(template);
                 }

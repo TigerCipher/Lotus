@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="..">
+      <UniqueIdentifier>{61705900-4DFC-870B-B6AA-880BA255880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Lotus">
+      <UniqueIdentifier>{070CBF37-F3D8-1943-1CF2-07EB081E4FD1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Dependencies.lua">
+      <Filter>..</Filter>
+    </None>
+    <None Include="..\..\Lotus\premake5.lua">
+      <Filter>..\Lotus</Filter>
+    </None>
+    <None Include="..\..\premake5.lua">
+      <Filter>..</Filter>
+    </None>
+    <None Include="premake5.lua" />
+    <None Include="solution_items.lua" />
+  </ItemGroup>
+</Project>
