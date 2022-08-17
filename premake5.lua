@@ -2,9 +2,7 @@ include "vendor/premake/solution_items.lua"
 include "Dependencies.lua"
 
 workspace "Lotus"
-	architecture "x86_64"
 	startproject "LotusEditor"
-
 
 	configurations
 	{
@@ -19,7 +17,7 @@ workspace "Lotus"
 
 	solution_items
 	{
-		--".editorconfig",
+		".editorconfig",
 		".gitignore",
 		"README.md"
 	}

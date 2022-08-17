@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace LotusEditor.Project
+namespace LotusEditor.GameProject
 {
     [DataContract]
     public class Scene : ViewModelBase
@@ -27,6 +22,19 @@ namespace LotusEditor.Project
 
         [DataMember]
         public Project Project { get; private set; }
+
+        private bool _isActive;
+        [DataMember]
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                if (_isActive == value) return;
+                _isActive = value;
+                OnPropertyChanged(nameof(IsActive));
+            }
+        }
 
         public Scene(Project proj, string name)
         {

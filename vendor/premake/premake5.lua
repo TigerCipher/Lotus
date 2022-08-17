@@ -1,6 +1,6 @@
 project "Premake"
 	kind "Utility"
-
+	architecture "x86_64"
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/obj/" .. outputdir .. "/%{prj.name}")
 

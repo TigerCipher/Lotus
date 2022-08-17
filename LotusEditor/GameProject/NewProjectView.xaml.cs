@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace LotusEditor.Project
+namespace LotusEditor.GameProject
 {
     /// <summary>
     /// Interaction logic for NewProjectView.xaml
@@ -28,13 +16,15 @@ namespace LotusEditor.Project
         private void Create_ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as NewProject;
-            var projPath = vm.CreateProject((templateListBox.SelectedItem as ProjectTemplate)!);
+            var projPath = vm.CreateProject(templateListBox.SelectedItem as ProjectTemplate);
             bool dialogResult = false;
             var win = Window.GetWindow(this);
 
             if (!string.IsNullOrEmpty(projPath))
             {
                 dialogResult = true;
+                var proj = OpenProject.Open(new ProjectData() { ProjectName = vm.ProjectName, ProjectPath = projPath });
+                win.DataContext = proj;
             }
 
             win.DialogResult = dialogResult;

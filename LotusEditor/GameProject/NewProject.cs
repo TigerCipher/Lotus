@@ -5,11 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using LotusEditor.Utility;
 
-namespace LotusEditor.Project
+namespace LotusEditor.GameProject
 {
     [DataContract]
     public class ProjectTemplate
@@ -43,6 +41,7 @@ namespace LotusEditor.Project
         private bool _isValid;
 
         private string _errorMessage = null!;
+
 
         public string ProjectName
         {
@@ -109,11 +108,13 @@ namespace LotusEditor.Project
                 foreach (var file in templates)
                 {
                     var template = Serializer.FromFile<ProjectTemplate>(file);
-                    template.IconFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file)!, "icon.png"));
+                    var dirName = Path.GetDirectoryName(file);
+                    if (dirName == null) throw new NullReferenceException($"Directory name for {file} came back null");
+                    template.IconFilePath = Path.GetFullPath(Path.Combine(dirName, "icon.png"));
                     template.Icon = File.ReadAllBytes(template.IconFilePath);
-                    template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file)!, "screenshot.png"));
+                    template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(dirName, "screenshot.png"));
                     template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
-                    template.ProjectFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file)!, template.ProjectFile!));
+                    template.ProjectFilePath = Path.GetFullPath(Path.Combine(dirName, template.ProjectFile));
 
                     _projectTemplates.Add(template);
                 }
@@ -191,7 +192,7 @@ namespace LotusEditor.Project
                 File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "screenshot.png")));
 
                 var projXml = File.ReadAllText(template.ProjectFilePath);
-                projXml = string.Format(projXml, ProjectName, ProjectPath);
+                projXml = string.Format(projXml, ProjectName);
                 var projPath = Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
                 File.WriteAllText(projPath, projXml);
 

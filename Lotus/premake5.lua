@@ -1,6 +1,7 @@
 project "Lotus"
 	kind "StaticLib"
 	language "C++"
+	architecture "x86_64"
 	cppdialect "C++17"
 	staticruntime "off"
 

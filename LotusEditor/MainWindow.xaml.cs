@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,8 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
-using LotusEditor.Project;
+using LotusEditor.GameProject;
 
 namespace LotusEditor
 {
@@ -26,6 +26,13 @@ namespace LotusEditor
         {
             InitializeComponent();
             Loaded += OnMainWindowLoaded;
+            Closing += OnMainWindowClosing;
+        }
+
+        private void OnMainWindowClosing(object sender, CancelEventArgs e)
+        {
+            Closing -= OnMainWindowClosing;
+            Project.Current?.Unload();
         }
 
         private void OnMainWindowLoaded(object sender, RoutedEventArgs evt)
@@ -37,13 +44,14 @@ namespace LotusEditor
         private void OpenProjectBrowserDialog()
         {
             var projBrowser = new ProjectBrowserDialog();
-            if(projBrowser.ShowDialog() == false)
+            if(projBrowser.ShowDialog() == false || projBrowser.DataContext == null)
             {
                 Application.Current.Shutdown();
                 return;
             }
 
-            // Additional logic
+            Project.Current?.Unload();
+            DataContext = projBrowser.DataContext;
         }
 
     }
