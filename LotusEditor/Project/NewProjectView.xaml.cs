@@ -24,5 +24,21 @@ namespace LotusEditor.Project
         {
             InitializeComponent();
         }
+
+        private void Create_ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            var vm = DataContext as NewProject;
+            var projPath = vm.CreateProject((templateListBox.SelectedItem as ProjectTemplate)!);
+            bool dialogResult = false;
+            var win = Window.GetWindow(this);
+
+            if (!string.IsNullOrEmpty(projPath))
+            {
+                dialogResult = true;
+            }
+
+            win.DialogResult = dialogResult;
+            win.Close();
+        }
     }
 }

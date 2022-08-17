@@ -12,6 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="ProjectTemplates\EmptyProject\project.lproj" />
+    <None Include="ProjectTemplates\FirstPersonProject\project.lproj" />
+    <None Include="ProjectTemplates\ThirdPersonProject\project.lproj" />
+    <None Include="ProjectTemplates\TopDownProject\project.lproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Include="App.xaml" />
   </ItemGroup>
 
