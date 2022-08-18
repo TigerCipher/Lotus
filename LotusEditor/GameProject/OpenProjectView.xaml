@@ -46,6 +46,8 @@
                 Margin="0,30,0,0">
       <Button Content="Open" Width="90" IsDefault="True"
               Click="Open_Button_Click"/>
+      <Button Content="Add Existing" Width="90" Margin="30,0,0,0"
+              Click="AddExisting_Button_Click"/>
       <Button Content="Exit" Width="90" Margin="30,0,0,0" IsCancel="True"/>
     </StackPanel>
 

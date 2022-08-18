@@ -83,7 +83,14 @@ namespace LotusEditor.GameProject
             return Project.Load(proj);
         }
 
-        private static void WriteProjectData()
+        public static void AddExistingProject(ProjectData projData)
+        {
+            ReadProjectData();
+            _projects.Add(projData);
+            WriteProjectData();
+        }
+
+        public static void WriteProjectData()
         {
             var projects = _projects.OrderBy(x => x.Date).ToList();
             Serializer.ToFile(new ProjectDataList() { Projects = projects }, ProjDataPath);

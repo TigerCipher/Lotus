@@ -1,6 +1,10 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace LotusEditor.GameProject
 {
@@ -41,5 +45,29 @@ namespace LotusEditor.GameProject
         }
 
 
+        private void AddExisting_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Filter = "Lotus Files|*.lproj";
+            dialog.InitialDirectory =
+                $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\LotusProjects\";
+            dialog.Title = "Please select a Lotus project file to add";
+            DialogResult res = dialog.ShowDialog();
+            if (res == DialogResult.OK)
+            {
+                var f = dialog.FileName;
+                var projPath = Path.GetDirectoryName(f);
+                var projName = Path.GetFileNameWithoutExtension(f);
+
+                var projData = new ProjectData
+                {
+                    ProjectName = projName, ProjectPath = $@"{projPath}\",
+                    Date = DateTime.Now
+                };
+                projData.Icon = File.ReadAllBytes($@"{projData.ProjectPath}\.Lotus\icon.png");
+                projData.Screenshot = File.ReadAllBytes($@"{projData.ProjectPath}\.Lotus\screenshot.png");
+                OpenProject.AddExistingProject(projData);
+            }
+        }
     }
 }

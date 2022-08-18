@@ -1,5 +1,7 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using System.Windows.Forms;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace LotusEditor.GameProject
 {
@@ -29,6 +31,20 @@ namespace LotusEditor.GameProject
 
             win.DialogResult = dialogResult;
             win.Close();
+        }
+
+        private void Browse_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new FolderBrowserDialog();
+            dialog.InitialDirectory = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\LotusProjects\";
+            dialog.ShowNewFolderButton = true;
+            dialog.Description = "Select the location to create the Lotus Project folder at";
+            dialog.UseDescriptionForTitle = true;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var vm = DataContext as NewProject;
+                vm.ProjectPath = dialog.SelectedPath;
+            }
         }
     }
 }
