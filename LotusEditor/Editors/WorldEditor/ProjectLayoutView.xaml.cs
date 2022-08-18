@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LotusEditor.Components;
 using LotusEditor.GameProject;
 
 namespace LotusEditor.Editors
@@ -24,6 +25,22 @@ namespace LotusEditor.Editors
         public ProjectLayoutView()
         {
             InitializeComponent();
+        }
+
+        private void AddEntity_OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            var scene = btn.DataContext as Scene;
+            scene.AddEntityCmd.Execute(new GameEntity(scene)
+            {
+                Name = "Empty Entity"
+            });
+        }
+
+        private void GameEntities_OnListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var entity = (sender as ListBox).SelectedItems[0];
+            GameEntityView.Instance.DataContext = entity;
         }
     }
 }

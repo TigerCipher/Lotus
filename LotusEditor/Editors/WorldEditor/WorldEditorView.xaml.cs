@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LotusEditor.GameProject;
 
 namespace LotusEditor.Editors
 {
@@ -23,6 +25,14 @@ namespace LotusEditor.Editors
         public WorldEditorView()
         {
             InitializeComponent();
+            Loaded += OnWorldEditorViewLoaded;
+        }
+
+        private void OnWorldEditorViewLoaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= OnWorldEditorViewLoaded;
+            Focus();
+            ((INotifyCollectionChanged)Project.HistoryManager.UndoList).CollectionChanged += (s, e) => Focus();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace LotusEditor.Utility
 {
@@ -17,8 +18,10 @@ namespace LotusEditor.Utility
             {
                 using var fs = new FileStream(path, FileMode.Create);
                 var serializer = new DataContractSerializer(typeof(T));
+                var settings = new XmlWriterSettings() { Indent = true };
 
-                serializer.WriteObject(fs, instance);
+                using var w = XmlWriter.Create(fs, settings);
+                serializer.WriteObject(w, instance);
             }
             catch (Exception ex)
             {
