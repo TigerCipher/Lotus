@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace LotusEditor.GameProject
 {
     [DataContract]
-    public class Scene : ViewModelBase
+    internal class Scene : ViewModelBase
     {
         private string _name;
         [DataMember]

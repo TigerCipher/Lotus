@@ -4,12 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows;
+using System.Windows.Input;
 using LotusEditor.Utility;
 
 namespace LotusEditor.GameProject
 {
     [DataContract(Name = "Game")]
-    public class Project : ViewModelBase
+    internal class Project : ViewModelBase
     {
         public static string Extension { get; } = ".lproj";
         [DataMember] public string Name { get; private set; } = "New Project";
@@ -35,6 +36,14 @@ namespace LotusEditor.GameProject
 
 
         public static Project Current => Application.Current.MainWindow!.DataContext as Project;
+
+        public static History HistoryManager { get; } = new History();
+
+        public ICommand AddScene { get; private set; }
+        public ICommand RemoveScene { get; private set; }
+
+        public ICommand Undo { get; private set; }
+        public ICommand Redo { get; private set; }
 
         public Project(string name, string path)
         {
@@ -79,16 +88,39 @@ namespace LotusEditor.GameProject
             }
 
             ActiveScene = Scenes.FirstOrDefault(x => x.IsActive);
+
+            AddScene = new RelayCommand<object>(x =>
+            {
+                AddSceneInternal($"New Scene {_scenes.Count}");
+                var newScene = _scenes.Last();
+                var index = _scenes.Count - 1;
+                HistoryManager.AddUndoRedoAction(new UndoRedoAction(
+                    $"Add {newScene.Name}",
+                    () => RemoveSceneInternal(newScene),
+                    () => _scenes.Insert(index, newScene)));
+            });
+
+            RemoveScene = new RelayCommand<Scene>(x =>
+            {
+                var index = _scenes.IndexOf(x);
+                RemoveSceneInternal(x);
+
+                HistoryManager.AddUndoRedoAction(new UndoRedoAction($"Remove {x.Name}",
+                    () => _scenes.Insert(index, x),
+                    () => RemoveSceneInternal(x)));
+            }, x => !x.IsActive);
+
+            Undo = new RelayCommand<object>(x => HistoryManager.Undo());
+            Redo = new RelayCommand<object>(x => HistoryManager.Redo());
         }
 
-
-        public void AddScene(string sceneName)
+        private void AddSceneInternal(string sceneName)
         {
             Debug.Assert(!string.IsNullOrEmpty(sceneName.Trim()));
             _scenes.Add(new Scene(this, sceneName)); 
         }
 
-        public void RemoveScene(Scene scene)
+        private void RemoveSceneInternal(Scene scene)
         {
             Debug.Assert(_scenes.Contains(scene));
             _scenes.Remove(scene);

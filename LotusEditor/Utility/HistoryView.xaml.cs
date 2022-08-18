@@ -12,16 +12,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using LotusEditor.GameProject;
 
-namespace LotusEditor.Editors
+namespace LotusEditor.Utility
 {
     /// <summary>
-    /// Interaction logic for ProjectLayoutView.xaml
+    /// Interaction logic for HistoryView.xaml
     /// </summary>
-    public partial class ProjectLayoutView : UserControl
+    public partial class HistoryView : UserControl
     {
-        public ProjectLayoutView()
+        public HistoryView()
         {
             InitializeComponent();
         }
