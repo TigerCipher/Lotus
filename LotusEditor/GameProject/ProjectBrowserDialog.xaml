@@ -15,18 +15,18 @@
         </Grid.RowDefinitions>
       <!-- Open/Create buttons -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <ToggleButton Content="Create Project" x:Name="createProjectButton"
+            <ToggleButton Content="Open Project" x:Name="openProjectButton"
                           FontSize="32" IsChecked="True"
                           Click="OnToggleButton_Click"></ToggleButton>
-            <ToggleButton Content="Open Project" x:Name="openProjectButton"
-                          FontSize="32" Margin="30,0,0,0" IsChecked="false"
+            <ToggleButton Content="Create Project" x:Name="createProjectButton"
+                          FontSize="32" IsChecked="False" Margin="30,0,0,0"
                           Click="OnToggleButton_Click"></ToggleButton>
         </StackPanel>
 
       <!-- Open/Create panels -->
         <StackPanel Orientation="Horizontal" Grid.Row="1" x:Name="browserContent" Margin="20">
-          <gameProject:NewProjectView/>
           <gameProject:OpenProjectView/>
+          <gameProject:NewProjectView/>
         </StackPanel>
     </Grid>
 </Window>

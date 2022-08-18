@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using UserControl = System.Windows.Controls.UserControl;
@@ -16,6 +17,14 @@ namespace LotusEditor.GameProject
         public OpenProjectView()
         {
             InitializeComponent();
+            Loaded += (s, e) =>
+            {
+                var item =
+                    projectsListBox.ItemContainerGenerator.ContainerFromIndex(projectsListBox.SelectedIndex) as
+                        ListBoxItem;
+                item?.Focus();
+
+            };
         }
 
         private void Open_Button_Click(object sender, RoutedEventArgs e)
