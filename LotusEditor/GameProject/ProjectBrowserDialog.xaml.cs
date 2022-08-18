@@ -19,7 +19,7 @@ namespace LotusEditor.GameProject
                 if(openProjectButton.IsChecked == true)
                 {
                     openProjectButton.IsChecked = false;
-                    browserContent.Margin = new Thickness(0);
+                    browserContent.Margin = new Thickness(20);
                 }
                 createProjectButton.IsChecked = true;
             }else if (Equals(sender, openProjectButton))
@@ -27,7 +27,7 @@ namespace LotusEditor.GameProject
                 if (createProjectButton.IsChecked == true)
                 {
                     createProjectButton.IsChecked = false;
-                    browserContent.Margin = new Thickness(-Width, 0, 0, 0);
+                    browserContent.Margin = new Thickness(-Width + 20, 20,20,20);
                 }
                 openProjectButton.IsChecked = true;
             }
