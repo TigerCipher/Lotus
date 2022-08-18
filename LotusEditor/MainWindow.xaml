@@ -4,9 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LotusEditor"
+        xmlns:editors="clr-namespace:LotusEditor.Editors"
         mc:Ignorable="d"
-        Title="Lotus Editor" Height="450" Width="800">
+        Title="Lotus Editor"
+        WindowState="Maximized"
+        d:DesignWidth="800"
+        d:DesignHeight="450"
+        >
     <Grid>
-
+        <editors:WorldEditorView/>
     </Grid>
 </Window>
