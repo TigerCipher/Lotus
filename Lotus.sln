@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32602.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35C24609-2151-D0D2-CA6F-E4CDB6DDE078}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LotusEditor", "LotusEditor\LotusEditor.csproj", "{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lotus", "Lotus\Lotus.vcxproj", "{7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Debug|x64.Build.0 = Debug|Any CPU
+		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Release|x64.ActiveCfg = Release|Any CPU
+		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Release|x64.Build.0 = Release|Any CPU
+		{7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF}.Debug|x64.ActiveCfg = Debug|x64
+		{7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF}.Debug|x64.Build.0 = Debug|x64
+		{7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF}.Release|x64.ActiveCfg = Release|x64
+		{7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {26FD20CF-FEE4-47BD-84D5-E1BCB3546E86}
+	EndGlobalSection
+EndGlobal
