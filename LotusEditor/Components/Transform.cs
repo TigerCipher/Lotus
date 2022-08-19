@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace LotusEditor.Components
 {
     [DataContract]
-    internal class Transform : GameComponent
+    internal class Transform : Component
     {
         private Vector3 _position;
         [DataMember]
@@ -23,7 +23,7 @@ namespace LotusEditor.Components
         [DataMember]
         public Vector3 Scale { get => _scale; set { if(_scale == value) return; _scale = value; OnPropertyChanged(nameof(Scale)); } }
 
-        public Transform(GameEntity owner) : base(owner)
+        public Transform(Entity owner) : base(owner)
         {
         }
     }

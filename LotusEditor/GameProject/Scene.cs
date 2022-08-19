@@ -40,9 +40,9 @@ namespace LotusEditor.GameProject
             }
         }
 
-        [DataMember(Name = nameof(GameEntities))]
-        private readonly ObservableCollection<GameEntity> _gameEntities = new();
-        public ReadOnlyObservableCollection<GameEntity> GameEntities { get; private set; }
+        [DataMember(Name = nameof(Entities))]
+        private readonly ObservableCollection<Entity> _entities = new();
+        public ReadOnlyObservableCollection<Entity> Entities { get; private set; }
 
         public ICommand AddEntityCmd { get; private set; }
         public ICommand RemoveEntityCmd { get; private set; }
@@ -59,45 +59,45 @@ namespace LotusEditor.GameProject
         [OnDeserialized]
         private void OnDeserialized(StreamingContext ctx)
         {
-            if (_gameEntities != null)
+            if (_entities != null)
             {
-                GameEntities = new ReadOnlyObservableCollection<GameEntity>(_gameEntities);
-                OnPropertyChanged(nameof(GameEntities));
+                Entities = new ReadOnlyObservableCollection<Entity>(_entities);
+                OnPropertyChanged(nameof(Entities));
             }
 
-            AddEntityCmd = new RelayCommand<GameEntity>(x =>
+            AddEntityCmd = new RelayCommand<Entity>(x =>
             {
                 AddEntity(x);
-                var index = _gameEntities.Count - 1;
+                var index = _entities.Count - 1;
                 Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(
                     $"Add Entity {x.Name} to Scene {Name}",
                     () => RemoveEntity(x),
-                    () => _gameEntities.Insert(index, x)));
+                    () => _entities.Insert(index, x)));
             });
 
-            RemoveEntityCmd = new RelayCommand<GameEntity>(x =>
+            RemoveEntityCmd = new RelayCommand<Entity>(x =>
             {
-                var index = _gameEntities.IndexOf(x);
+                var index = _entities.IndexOf(x);
                 RemoveEntity(x);
 
                 Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(
                     $"Remove Entity {x.Name} from Scene {Name}",
-                    () => _gameEntities.Insert(index, x),
+                    () => _entities.Insert(index, x),
                     () => RemoveEntity(x)));
             });
 
         }
 
-        private void AddEntity(GameEntity entity)
+        private void AddEntity(Entity entity)
         {
-            Debug.Assert(!_gameEntities.Contains(entity));
-            _gameEntities.Add(entity);
+            Debug.Assert(!_entities.Contains(entity));
+            _entities.Add(entity);
         }
 
-        private void RemoveEntity(GameEntity entity)
+        private void RemoveEntity(Entity entity)
         {
-            Debug.Assert(_gameEntities.Contains(entity));
-            _gameEntities.Remove(entity);
+            Debug.Assert(_entities.Contains(entity));
+            _entities.Remove(entity);
         }
     }
 }

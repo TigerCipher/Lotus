@@ -32,7 +32,7 @@ namespace LotusEditor.Editors
         {
             var btn = sender as Button;
             var scene = btn.DataContext as Scene;
-            scene.AddEntityCmd.Execute(new GameEntity(scene)
+            scene.AddEntityCmd.Execute(new Entity(scene)
             {
                 Name = "Empty Entity"
             });
@@ -40,16 +40,10 @@ namespace LotusEditor.Editors
 
         private void GameEntities_OnListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            GameEntityView.Instance.DataContext = null;
             var listbox = sender as ListBox;
-            if (e.AddedItems.Count > 0)
-            {
-                GameEntityView.Instance.DataContext = listbox.SelectedItems[0];
-            }
-
-            var newSelection = listbox.SelectedItems.Cast<GameEntity>().ToList();
-            var prevSelection = newSelection.Except(e.AddedItems.Cast<GameEntity>())
-                .Concat(e.RemovedItems.Cast<GameEntity>()).ToList();
+            var newSelection = listbox.SelectedItems.Cast<Entity>().ToList();
+            var prevSelection = newSelection.Except(e.AddedItems.Cast<Entity>())
+                .Concat(e.RemovedItems.Cast<Entity>()).ToList();
 
             Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(
                 "Selection changed",
@@ -64,6 +58,14 @@ namespace LotusEditor.Editors
                     newSelection.ForEach(x => (listbox.ItemContainerGenerator.ContainerFromItem(x) as ListBoxItem).IsSelected = true);
                 }
             ));
+
+            MSGameEntity msEnt = null;
+            if (newSelection.Any())
+            {
+                msEnt = new MSGameEntity(newSelection);
+            }
+
+            GameEntityView.Instance.DataContext = msEnt;
 
         }
     }

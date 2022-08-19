@@ -8,16 +8,28 @@ using System.Threading.Tasks;
 
 namespace LotusEditor.Components
 {
+
+    interface IMSComponent
+    {
+        
+    }
+
     [DataContract]
-    internal class GameComponent : ViewModelBase
+    internal abstract class Component : ViewModelBase
     {
         [DataMember]
-        public GameEntity Owner { get; set; }
+        public Entity Owner { get; set; }
 
-        public GameComponent(GameEntity owner)
+        public Component(Entity owner)
         {
             Debug.Assert(owner != null);
             Owner = owner;
         }
+    }
+
+
+    abstract class MSComponent<T> : ViewModelBase, IMSComponent where T : Component
+    {
+
     }
 }
