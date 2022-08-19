@@ -57,8 +57,9 @@ namespace LotusEditor.GameProject
             }
             catch (Exception ex)
             {
-                // #TODO: Logging!!
+                Logger.Error($"Failed to read project registry {ProjDataPath}");
                 Debug.WriteLine(ex.Message);
+                throw;
             }
         }
 

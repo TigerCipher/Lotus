@@ -25,8 +25,9 @@ namespace LotusEditor.Utility
             }
             catch (Exception ex)
             {
+                Logger.Error($"Failed to serialize {instance} to {path}");
                 Debug.WriteLine(ex.Message);
-                // #TODO Logging
+                throw;
             }
         }
 
@@ -43,9 +44,9 @@ namespace LotusEditor.Utility
             }
             catch (Exception ex)
             {
-                // #TODO Logging
+                Logger.Error($"Failed to deserialize {path}");
                 Debug.WriteLine(ex.Message);
-                return default(T)!;
+                throw;
             }
         }
     }

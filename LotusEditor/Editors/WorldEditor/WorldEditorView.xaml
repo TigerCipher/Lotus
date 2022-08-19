@@ -50,8 +50,14 @@
                 <GridSplitter Grid.Row="1" Height="5"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Top"/>
-                <util:HistoryView DataContext="{Binding HistoryManager}"
-                                  Grid.Row="1"/>
+                <TabControl Grid.Row="1">
+                    <TabItem Header="History">
+                        <util:HistoryView DataContext="{Binding HistoryManager}"/>
+                    </TabItem>
+                    <TabItem Header="Console">
+                        <util:LoggerView/>
+                    </TabItem>
+                </TabControl>
             </Grid>
         </Grid>
     </Grid>

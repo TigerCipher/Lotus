@@ -122,8 +122,9 @@ namespace LotusEditor.GameProject
             }
             catch (Exception ex)
             {
+                Logger.Error($"Failed to read project templates");
                 Debug.WriteLine(ex.Message);
-                // #TODO: Log console msgs
+                throw;
             }
         }
 
@@ -200,8 +201,9 @@ namespace LotusEditor.GameProject
             }
             catch (Exception ex)
             {
+                Logger.Error($"Failed to create project {ProjectName}");
                 Debug.WriteLine(ex.Message);
-                return string.Empty;
+                throw;
             }
 
         }

@@ -73,11 +73,12 @@ namespace LotusEditor.GameProject
         public static void Save(Project proj)
         {
             Serializer.ToFile(proj, proj.FullPath);
+            Logger.Info($"Saved project {proj.Name} to {proj.FullPath}");
         }
 
         public void Unload()
         {
-
+            HistoryManager.Reset();
         }
 
         [OnDeserialized]
