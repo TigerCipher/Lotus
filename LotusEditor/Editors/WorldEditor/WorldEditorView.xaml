@@ -20,7 +20,7 @@
         <StackPanel Orientation="Horizontal">
             <Button Content="Undo"
                     Command="{Binding UndoCmd}"/>
-            <Button Content="RedoCmd"
+            <Button Content="Redo"
                     Command="{Binding RedoCmd}" Margin="20,0,0,0"/>
         </StackPanel>
         <Grid Grid.Row="1">

@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using LotusEditor.Components;
 using LotusEditor.GameProject;
+using LotusEditor.Utility;
 
 namespace LotusEditor.Editors
 {
@@ -39,8 +40,31 @@ namespace LotusEditor.Editors
 
         private void GameEntities_OnListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var entity = (sender as ListBox).SelectedItems[0];
-            GameEntityView.Instance.DataContext = entity;
+            GameEntityView.Instance.DataContext = null;
+            var listbox = sender as ListBox;
+            if (e.AddedItems.Count > 0)
+            {
+                GameEntityView.Instance.DataContext = listbox.SelectedItems[0];
+            }
+
+            var newSelection = listbox.SelectedItems.Cast<GameEntity>().ToList();
+            var prevSelection = newSelection.Except(e.AddedItems.Cast<GameEntity>())
+                .Concat(e.RemovedItems.Cast<GameEntity>()).ToList();
+
+            Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(
+                "Selection changed",
+                () =>
+                {
+                    listbox.UnselectAll();
+                    prevSelection.ForEach(x=> (listbox.ItemContainerGenerator.ContainerFromItem(x) as ListBoxItem).IsSelected = true);
+                },
+                () =>
+                {
+                    listbox.UnselectAll();
+                    newSelection.ForEach(x => (listbox.ItemContainerGenerator.ContainerFromItem(x) as ListBoxItem).IsSelected = true);
+                }
+            ));
+
         }
     }
 }
