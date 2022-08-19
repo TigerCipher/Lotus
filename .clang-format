@@ -1,0 +1,47 @@
+# Format Style Options - Created with Clang Power Tools
+---
+BasedOnStyle: WebKit
+AlignAfterOpenBracket: Align
+AlignConsecutiveMacros: Consecutive
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AlignOperands: AlignAfterOperator
+AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: Always
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeBraces: Custom
+BraceWrapping: 
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterFunction: true
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+BreakBeforeBinaryOperators: None
+BreakInheritanceList: BeforeComma
+BreakConstructorInitializers: AfterColon
+ColumnLimit: 120
+CompactNamespaces: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+# ContinuationIndentWidth: 2
+FixNamespaceComments: true
+IncludeBlocks: Regroup
+IndentPPDirectives: BeforeHash
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 2
+ReflowComments: false
+SortIncludes: false
+SpaceAfterCStyleCast: true
+SpacesInSquareBrackets: true
+SpaceBeforeSquareBrackets: true
+UseTab: Never
+IndentWidth: 4
+...
