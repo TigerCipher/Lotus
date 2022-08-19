@@ -38,8 +38,8 @@ namespace LotusEditor.Utility
         public UndoRedoAction(string name, string property, object instance, object oldValue, object newValue) :
             this(
                 name,
-                () => instance.GetType().GetProperty(property).SetValue(instance, newValue),
-                () => instance.GetType().GetProperty(property).SetValue(instance, oldValue)
+                () => instance.GetType().GetProperty(property).SetValue(instance, oldValue),
+                () => instance.GetType().GetProperty(property).SetValue(instance, newValue)
                 )
         {
 

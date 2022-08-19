@@ -7,7 +7,16 @@
              mc:Ignorable="d"
              d:Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <ScrollViewer.Style>
+            <Style TargetType="ScrollViewer">
+                <Style.Triggers>
+                    <Trigger Property="DataContext" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ScrollViewer.Style>
         <StackPanel>
             <Border Height="32">
                 <ToggleButton x:Name="addComponent" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0">
@@ -26,10 +35,11 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Name" Grid.Column="0" Margin="5,0,0,0"/>
-                <TextBox Text="{Binding Name}" Grid.Column="1"/>
+                <TextBox Text="{Binding Name}" Grid.Column="1" Tag="{Binding RenameCmd}"/>
                 <StackPanel Orientation="Horizontal" Grid.Column="2">
                     <TextBlock Text="Enabled" Margin="5,0,0,0"/>
-                    <CheckBox IsChecked="{Binding IsEnabled}" Margin="5,0" VerticalAlignment="Center"/>
+                    <CheckBox IsChecked="{Binding IsEnabled, Mode=OneWay}" Margin="5,0" VerticalAlignment="Center"
+                              Command="{Binding EnableCmd}" CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"/>
                 </StackPanel>
 
             </Grid>
@@ -41,5 +51,5 @@
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

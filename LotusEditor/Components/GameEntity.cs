@@ -57,6 +57,13 @@ namespace LotusEditor.Components
                 Name = x;
                 Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction($"Rename entity '{oldName}' to '{x}'", nameof(Name), this, oldName, x));
             }, x => x != _name);
+
+            EnableCmd = new RelayCommand<bool>(x =>
+            {
+                var oldValue = _isEnabled;
+                IsEnabled = x;
+                Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(x ? $"Enabled '{Name}'" : $"Disabled {Name}", nameof(IsEnabled), this, oldValue, x));
+            });
         }
 
     }
