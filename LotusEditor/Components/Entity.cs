@@ -30,9 +30,6 @@ namespace LotusEditor.Components
         private readonly ObservableCollection<Component> _components = new();
         public ReadOnlyObservableCollection<Component> Components { get; private set; }
 
-        public ICommand RenameCmd { get; private set; }
-        public ICommand EnableCmd { get; private set; }
-
         public Entity(Scene scene)
         {
             Debug.Assert(scene != null);
@@ -50,20 +47,7 @@ namespace LotusEditor.Components
                 Components = new ReadOnlyObservableCollection<Component>(_components);
                 OnPropertyChanged(nameof(Components));
             }
-
-            RenameCmd = new RelayCommand<string>(x =>
-            {
-                var oldName = _name;
-                Name = x;
-                Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction($"Rename entity '{oldName}' to '{x}'", nameof(Name), this, oldName, x));
-            }, x => x != _name);
-
-            EnableCmd = new RelayCommand<bool>(x =>
-            {
-                var oldValue = _isEnabled;
-                IsEnabled = x;
-                Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(x ? $"Enabled '{Name}'" : $"Disabled {Name}", nameof(IsEnabled), this, oldValue, x));
-            });
+            
         }
 
     }
