@@ -23,6 +23,26 @@ namespace LotusEditor.Utility
         public LoggerView()
         {
             InitializeComponent();
+            Loaded += (s, e) =>
+            {
+                Logger.Info("Test info msg");
+                Logger.Warn("Test warn msg");
+                Logger.Error("Test error msg");
+            };
+        }
+
+        private void Clear_OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            Logger.Clear();
+        }
+
+        private void MessageFilter_OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            var filter = 0x0;
+            if (toggleInfo.IsChecked == true) filter |= (int)Level.Info;
+            if (toggleWarn.IsChecked == true) filter |= (int)Level.Warning;
+            if (toggleError.IsChecked == true) filter |= (int)Level.Error;
+            Logger.SetMessageFilter(filter);
         }
     }
 }
