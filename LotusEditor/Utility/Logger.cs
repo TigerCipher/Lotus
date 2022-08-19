@@ -46,8 +46,7 @@ namespace LotusEditor.Utility
     {
         private static readonly ObservableCollection<LogMessage> _messages = new();
 
-        public static ReadOnlyObservableCollection<LogMessage> Messages { get; } =
-            new ReadOnlyObservableCollection<LogMessage>(_messages);
+        public static ReadOnlyObservableCollection<LogMessage> Messages { get; } = new(_messages);
 
         public static CollectionViewSource FilteredMessages { get; } = new() { Source = Messages };
 

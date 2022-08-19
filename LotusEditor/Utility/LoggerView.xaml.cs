@@ -23,12 +23,6 @@ namespace LotusEditor.Utility
         public LoggerView()
         {
             InitializeComponent();
-            Loaded += (s, e) =>
-            {
-                Logger.Info("Test info msg");
-                Logger.Warn("Test warn msg");
-                Logger.Error("Test error msg");
-            };
         }
 
         private void Clear_OnButtonClick(object sender, RoutedEventArgs e)
