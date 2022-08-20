@@ -31,26 +31,39 @@ namespace lotus::id
 
 using id_type = uint32;
 
-constexpr uint32  GenerationBits = 8;
-constexpr uint32  IndexBits      = sizeof(id_type) * 8 - GenerationBits;
-constexpr id_type IndexMask      = (id_type { 1 } << IndexBits) - 1;
-constexpr id_type GenerationMask = (id_type { 1 } << GenerationBits) - 1;
-constexpr id_type IdMask         = -1;
+namespace internal
+{
+    constexpr uint32  GenerationBits = 8;
+    constexpr uint32  IndexBits      = sizeof(id_type) * 8 - GenerationBits;
+    constexpr id_type IndexMask      = (id_type { 1 } << IndexBits) - 1;
+    constexpr id_type GenerationMask = (id_type { 1 } << GenerationBits) - 1;
+} // namespace internal
 
-using gen_type = std::conditional_t<GenerationBits <= 16, std::conditional_t<GenerationBits <= 8, u8, u16>, u32>;
+constexpr id_type InvalidId          = -1;
+constexpr uint32  MinDeletedElements = 1024;
 
-static_assert(sizeof(gen_type) * 8 >= GenerationBits);
+using gen_type =
+    std::conditional_t<internal::GenerationBits <= 16, std::conditional_t<internal::GenerationBits <= 8, u8, u16>, u32>;
+
+static_assert(sizeof(gen_type) * 8 >= internal::GenerationBits);
 static_assert(sizeof(id_type) - sizeof(gen_type) > 0);
 
-inline bool    IsValid(const id_type id) { return id != IdMask; }
-inline id_type Index(const id_type id) { return id & IndexMask; }
-inline id_type Generation(const id_type id) { return (id >> IndexBits) & GenerationMask; }
+constexpr  bool IsValid(const id_type id) { return id != InvalidId; }
 
-inline id_type NewGeneration(const id_type id)
+constexpr id_type Index(const id_type id)
 {
-    const id_type gen = Generation(id);
-    assert(gen < 255);
-    return Index(id) | (gen << IndexBits);
+    id_type i = id & internal::IndexMask;
+    LASSERT(i != internal::IndexMask);
+    return id & internal::IndexMask;
+}
+
+constexpr id_type Generation(const id_type id) { return (id >> internal::IndexBits) & internal::GenerationMask; }
+
+constexpr id_type NewGeneration(const id_type id)
+{
+    const id_type gen = Generation(id) + 1;
+    LASSERT(gen < ((u64) 1 << internal::GenerationBits) - 1);
+    return Index(id) | (gen << internal::IndexBits);
 }
 
 
@@ -71,7 +84,7 @@ namespace internal
         struct name final : id::internal::IdBase                                                                       \
         {                                                                                                              \
             constexpr explicit name(id::id_type id) : IdBase(id) { }                                                   \
-            constexpr name() : IdBase(id::IdMask) { }                                                                  \
+            constexpr name() : IdBase(0) { }                                                                           \
         };
 
 #else

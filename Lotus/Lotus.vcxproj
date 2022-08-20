@@ -115,10 +115,15 @@
     <ClInclude Include="src\Lotus\Components\Transform.h" />
     <ClInclude Include="src\Lotus\Core\Common.h" />
     <ClInclude Include="src\Lotus\Core\Id.h" />
+    <ClInclude Include="src\Lotus\EngineApi\GameEntity.h" />
+    <ClInclude Include="src\Lotus\EngineApi\TransformComponent.h" />
+    <ClInclude Include="src\Lotus\Util\MathUtil.h" />
+    <ClInclude Include="src\Lotus\Util\Util.h" />
     <ClInclude Include="src\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lotus\Components\Entity.cpp" />
+    <ClCompile Include="src\Lotus\Components\Transform.cpp" />
     <ClCompile Include="src\pch.cpp">
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>

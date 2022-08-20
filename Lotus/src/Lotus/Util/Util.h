@@ -15,31 +15,30 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: Entity.h
-// Date File Created: 08/19/2022
+// File Name: Util.h
+// Date File Created: 08/20/2022
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "Components.h"
+#define USE_STL_VECTOR 1
+#define USE_STL_DEQUE  1
 
-
-namespace lotus
+#if USE_STL_VECTOR
+    #include <vector>
+namespace lotus::utl
 {
+template<typename T>
+using vector = std::vector<T>;
+} // namespace lotus::utl
+#endif
 
-namespace ecs
+#if USE_STL_DEQUE
+    #include <deque>
+namespace lotus::utl
 {
-    struct TransformDesc;
-    struct EntityDesc
-    {
-        TransformDesc* transform = nullptr;
-    };
-
-    Entity CreateGameEntity(const EntityDesc& desc);
-    void   RemoveEntity(Entity ent);
-    bool   IsAlive(Entity ent);
-} // namespace ecs
-
-
-} // namespace lotus
+template<typename T>
+using deque = std::deque<T>;
+} // namespace lotus::utl
+#endif

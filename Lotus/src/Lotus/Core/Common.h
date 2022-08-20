@@ -28,6 +28,17 @@
 #include <cstdint>
 #include <memory>
 
+#ifdef _WIN64
+    #define WIN32_LEAN_AND_MEAN
+    #include <Windows.h>
+#else
+    #error Currently only Windows x64 is supported. No current plans to change this
+#endif
+
+
+// Disable warnings
+#pragma warning(disable : 4530)
+
 // Macro helpers
 #define LEXPAND_MACRO(x)    x
 #define LSTRINGIFY_MACRO(x) #x
@@ -39,11 +50,9 @@
     (x) = nullptr;
 
 #ifdef L_DEBUG
-    #define something
-#endif
-
-#ifdef L_DEBUG
-    #define mokney
+    #define LASSERT(condition) assert(condition)
+#else
+    #define LASSERT(condition)
 #endif
 
 

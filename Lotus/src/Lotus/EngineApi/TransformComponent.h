@@ -15,31 +15,33 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: Entity.h
-// Date File Created: 08/19/2022
+// File Name: TransformComponent.h
+// Date File Created: 8/20/2022
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
 #pragma once
+#include "Lotus/Components/Components.h"
 
-#include "Components.h"
-
-
-namespace lotus
+namespace lotus::ecs
 {
+L_TYPED_ID(TransformId)
 
-namespace ecs
+class TransformComponent final
 {
-    struct TransformDesc;
-    struct EntityDesc
-    {
-        TransformDesc* transform = nullptr;
-    };
+public:
+    constexpr explicit TransformComponent(const TransformId id) : mId(id) { }
+    constexpr TransformComponent() : mId(id::InvalidId) { }
 
-    Entity CreateGameEntity(const EntityDesc& desc);
-    void   RemoveEntity(Entity ent);
-    bool   IsAlive(Entity ent);
-} // namespace ecs
+    constexpr TransformId GetId() const { return mId; }
 
+    constexpr bool IsValid() const { return id::IsValid(mId); }
 
-} // namespace lotus
+    vec3 Position() const;
+    vec4 Rotation() const;
+    vec3 Scale() const;
+
+private:
+    TransformId mId;
+};
+} // namespace lotus::ecs

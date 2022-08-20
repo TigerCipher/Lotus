@@ -25,7 +25,6 @@
 
 #include <cstdint>
 #include <cassert>
-#include <vector>
 #include <array>
 #include <map>
 #include <unordered_map>
@@ -37,5 +36,7 @@
 #include <sstream>
 
 #include "Lotus/Core/Common.h"
+#include "Lotus/Util/Util.h"
+#include "Lotus/Util/MathUtil.h"
 
 #endif //LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3

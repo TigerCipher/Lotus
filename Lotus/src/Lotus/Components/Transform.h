@@ -24,9 +24,9 @@
 
 #include "Components.h"
 
-namespace lotus
+namespace lotus::ecs
 {
-L_TYPED_ID(TransformId)
+
 struct TransformDesc
 {
     f32 position [ 3 ] {};
@@ -34,7 +34,7 @@ struct TransformDesc
     f32 scale [ 3 ] { 1.0f, 1.0f, 1.0f };
 };
 
-TransformId CreateTransform(const TransformDesc& desc, EntityId entityId);
-void        RemoveTransform(TransformId id);
+TransformComponent CreateTransform(const TransformDesc& desc, Entity entity);
+void               RemoveTransform(TransformComponent comp);
 
-} // namespace lotus
+} // namespace lotus::ecs
