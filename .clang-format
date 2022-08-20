@@ -29,9 +29,9 @@ BreakBeforeBinaryOperators: None
 BreakInheritanceList: BeforeComma
 BreakConstructorInitializers: AfterColon
 ColumnLimit: 120
+#NamespaceIndentation: All
 CompactNamespaces: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-# ContinuationIndentWidth: 2
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IndentPPDirectives: BeforeHash
@@ -42,6 +42,11 @@ SortIncludes: false
 SpaceAfterCStyleCast: true
 SpacesInSquareBrackets: true
 SpaceBeforeSquareBrackets: true
+SpaceAfterTemplateKeyword: false
 UseTab: Never
 IndentWidth: 4
+TabWidth: 4
+#IndentAccessModifiers: true
+#AccessModifierOffset: -4
+ContinuationIndentWidth: 4
 ...

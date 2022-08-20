@@ -82,38 +82,38 @@ using s32 = int32_t;
 using s64 = int64_t;
 
 
-constexpr uint64 InvalidIdU64 { 0xffff'ffff'ffff'ffffui64 };
-constexpr uint32 InvalidIdU32 { 0xffff'ffffui32 };
-constexpr uint16 InvalidIdU16 { 0xffffui16 };
-constexpr uint8  InvalidIdU8 { 0xffui8 };
+constexpr uint8  InvalidIdU8  = 0xffui8;
+constexpr uint16 InvalidIdU16 = 0xffffui16;
+constexpr uint32 InvalidIdU32 = 0xffff'ffffui32;
+constexpr uint64 InvalidIdU64 = 0xffff'ffff'ffff'ffffui64;
 
 
 using f32 = float;
 using f64 = double;
 
 
-template <typename T>
+template<typename T>
 using UniquePtr = std::unique_ptr<T>;
 
 // Scope as well as above in case I decide to make my own version of unique ptr
-template <typename T>
+template<typename T>
 using Scope = std::unique_ptr<T>;
 
-template <typename T>
+template<typename T>
 using SharedPtr = std::shared_ptr<T>;
 
 // Ref as well as above in case I decide to make my own version of shared ptr
-template <typename T>
+template<typename T>
 using Ref = std::shared_ptr<T>;
 
 
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 constexpr Scope<T> CreateScope(Args&&... args)
 {
     return std::make_unique<T>(std::forward<Args>(args)...);
 }
 
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 constexpr Ref<T> CreateRef(Args&&... args)
 {
     return std::make_shared<T>(std::forward<Args>(args)...);

@@ -15,27 +15,32 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: pch.h
+// File Name: Entity.h
 // Date File Created: 08/19/2022
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
-#ifndef LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3
-#define LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3
+#pragma once
 
-#include <cstdint>
-#include <cassert>
-#include <vector>
-#include <array>
-#include <map>
-#include <unordered_map>
-#include <functional>
-#include <memory>
-#include <utility>
-#include <algorithm>
-#include <string>
-#include <sstream>
+#include "Components.h"
 
-#include "Lotus/Core/Common.h"
+#define COMPONENT_DESCRIPTOR(name) struct name##Desc;
 
-#endif //LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3
+
+namespace lotus
+{
+COMPONENT_DESCRIPTOR(Transform)
+// more components
+#undef COMPONENT_DESCRIPTOR
+
+struct EntityInfo
+{
+    TransformDesc* transform = nullptr;
+};
+
+EntityId CreateGameEntity(const EntityInfo& info);
+void     RemoveEntity(EntityId id);
+bool     IsAlive(EntityId id);
+
+
+} // namespace lotus

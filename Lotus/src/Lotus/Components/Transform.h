@@ -15,27 +15,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: pch.h
-// Date File Created: 08/19/2022
+// File Name: Transform.h
+// Date File Created: 8/20/2022
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
-#ifndef LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3
-#define LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3
+#pragma once
 
-#include <cstdint>
-#include <cassert>
-#include <vector>
-#include <array>
-#include <map>
-#include <unordered_map>
-#include <functional>
-#include <memory>
-#include <utility>
-#include <algorithm>
-#include <string>
-#include <sstream>
+#include "Components.h"
 
-#include "Lotus/Core/Common.h"
+namespace lotus
+{
+L_TYPED_ID(TransformId)
+struct TransformDesc
+{
+    f32 position [ 3 ] {};
+    f32 rotation [ 4 ] {};
+    f32 scale [ 3 ] { 1.0f, 1.0f, 1.0f };
+};
 
-#endif //LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3
+TransformId CreateTransform(const TransformDesc& desc, EntityId entityId);
+void        RemoveTransform(TransformId id);
+
+} // namespace lotus

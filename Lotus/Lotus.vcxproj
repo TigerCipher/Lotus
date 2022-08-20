@@ -110,10 +110,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\lotus\common\Common.h" />
+    <ClInclude Include="src\Lotus\Components\Components.h" />
+    <ClInclude Include="src\Lotus\Components\Entity.h" />
+    <ClInclude Include="src\Lotus\Components\Transform.h" />
+    <ClInclude Include="src\Lotus\Core\Common.h" />
+    <ClInclude Include="src\Lotus\Core\Id.h" />
     <ClInclude Include="src\pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Lotus\Components\Entity.cpp" />
     <ClCompile Include="src\pch.cpp">
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
