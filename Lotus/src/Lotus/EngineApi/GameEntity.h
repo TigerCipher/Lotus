@@ -21,13 +21,14 @@
 //
 // ------------------------------------------------------------------------------
 #pragma once
-
-#include "Lotus/Components/Components.h"
+#include "Lotus/Core/Common.h"
 #include "TransformComponent.h"
 
 namespace lotus::ecs
 {
+
 L_TYPED_ID(EntityId)
+
 class Entity
 {
 public:

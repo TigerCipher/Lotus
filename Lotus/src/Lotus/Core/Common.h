@@ -25,6 +25,10 @@
 // ReSharper disable CppInconsistentNaming
 #pragma once
 
+// Disable warnings
+#pragma warning(disable : 4530)
+
+
 #include <cstdint>
 #include <memory>
 
@@ -35,9 +39,17 @@
     #error Currently only Windows x64 is supported. No current plans to change this
 #endif
 
+#include "Lotus/Util/Util.h"
+#include "Lotus/Util/MathUtil.h"
 
-// Disable warnings
-#pragma warning(disable : 4530)
+
+
+
+// Make sure L_DEBUG is defined for debug builds
+#if !defined(L_DEBUG) && defined(_DEBUG)
+    #define L_DEBUG
+#endif
+
 
 // Macro helpers
 #define LEXPAND_MACRO(x)    x

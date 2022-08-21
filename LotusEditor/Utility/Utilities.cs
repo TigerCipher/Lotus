@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,5 +20,11 @@ namespace LotusEditor.Utility
             if (!value.HasValue || !other.HasValue) return false;
             return Math.Abs(value.Value - other.Value) < Epsilon;
         }
+    }
+
+    internal static class ID
+    {
+        public static int INVALID_ID => -1; // int because entity ids are currently u32's. This will not work for u64
+        public static bool IsValid(int id) => id != INVALID_ID;
     }
 }

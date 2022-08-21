@@ -41,14 +41,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\bin\Debug\</OutDir>
-    <IntDir>..\obj\Debug\Lotus\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>Lotus</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\bin\Release\</OutDir>
-    <IntDir>..\obj\Release\Lotus\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>Lotus</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
@@ -110,13 +110,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Lotus\Components\Components.h" />
     <ClInclude Include="src\Lotus\Components\Entity.h" />
     <ClInclude Include="src\Lotus\Components\Transform.h" />
     <ClInclude Include="src\Lotus\Core\Common.h" />
     <ClInclude Include="src\Lotus\Core\Id.h" />
     <ClInclude Include="src\Lotus\EngineApi\GameEntity.h" />
     <ClInclude Include="src\Lotus\EngineApi\TransformComponent.h" />
+    <ClInclude Include="src\Lotus\Lotus.h" />
     <ClInclude Include="src\Lotus\Util\MathUtil.h" />
     <ClInclude Include="src\Lotus\Util\Util.h" />
     <ClInclude Include="src\pch.h" />

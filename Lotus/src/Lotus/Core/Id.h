@@ -31,57 +31,57 @@ namespace lotus::id
 
 using id_type = uint32;
 
-namespace internal
+namespace detail
 {
-    constexpr uint32  GenerationBits = 8;
+    constexpr uint32  GenerationBits = 10;
     constexpr uint32  IndexBits      = sizeof(id_type) * 8 - GenerationBits;
     constexpr id_type IndexMask      = (id_type { 1 } << IndexBits) - 1;
     constexpr id_type GenerationMask = (id_type { 1 } << GenerationBits) - 1;
-} // namespace internal
+} // namespace detail
 
 constexpr id_type InvalidId          = -1;
 constexpr uint32  MinDeletedElements = 1024;
 
 using gen_type =
-    std::conditional_t<internal::GenerationBits <= 16, std::conditional_t<internal::GenerationBits <= 8, u8, u16>, u32>;
+    std::conditional_t<detail::GenerationBits <= 16, std::conditional_t<detail::GenerationBits <= 8, u8, u16>, u32>;
 
-static_assert(sizeof(gen_type) * 8 >= internal::GenerationBits);
+static_assert(sizeof(gen_type) * 8 >= detail::GenerationBits);
 static_assert(sizeof(id_type) - sizeof(gen_type) > 0);
 
-constexpr  bool IsValid(const id_type id) { return id != InvalidId; }
+constexpr bool IsValid(const id_type id) { return id != InvalidId; }
 
 constexpr id_type Index(const id_type id)
 {
-    id_type i = id & internal::IndexMask;
-    LASSERT(i != internal::IndexMask);
-    return id & internal::IndexMask;
+    id_type i = id & detail::IndexMask;
+    LASSERT(i != detail::IndexMask);
+    return id & detail::IndexMask;
 }
 
-constexpr id_type Generation(const id_type id) { return (id >> internal::IndexBits) & internal::GenerationMask; }
+constexpr id_type Generation(const id_type id) { return (id >> detail::IndexBits) & detail::GenerationMask; }
 
 constexpr id_type NewGeneration(const id_type id)
 {
     const id_type gen = Generation(id) + 1;
-    LASSERT(gen < ((u64) 1 << internal::GenerationBits) - 1);
-    return Index(id) | (gen << internal::IndexBits);
+    LASSERT(gen < ((u64) 1 << detail::GenerationBits) - 1);
+    return Index(id) | (gen << detail::IndexBits);
 }
 
 
 #ifdef L_DEBUG
-namespace internal
+namespace detail
 {
     struct IdBase
     {
-        constexpr explicit IdBase(const id_type id) : mId(id) { }
+        constexpr explicit IdBase(id_type id) : mId(id) { }
         constexpr operator id_type() const { return mId; }
 
     private:
         id_type mId;
     };
-} // namespace internal
+} // namespace detail
 
     #define L_TYPED_ID(name)                                                                                           \
-        struct name final : id::internal::IdBase                                                                       \
+        struct name final : id::detail::IdBase                                                                         \
         {                                                                                                              \
             constexpr explicit name(id::id_type id) : IdBase(id) { }                                                   \
             constexpr name() : IdBase(0) { }                                                                           \

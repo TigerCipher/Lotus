@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 using System.Windows.Input;
@@ -65,6 +65,11 @@ namespace LotusEditor.GameProject
                 OnPropertyChanged(nameof(Entities));
             }
 
+            foreach (var entity in _entities)
+            {
+                entity.IsActive = IsActive;
+            }
+
             AddEntityCmd = new RelayCommand<Entity>(x =>
             {
                 AddEntity(x);
@@ -72,7 +77,7 @@ namespace LotusEditor.GameProject
                 Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(
                     $"Add Entity {x.Name} to Scene {Name}",
                     () => RemoveEntity(x),
-                    () => _entities.Insert(index, x)));
+                    () => AddEntity(x, index)));
             });
 
             RemoveEntityCmd = new RelayCommand<Entity>(x =>
@@ -82,21 +87,30 @@ namespace LotusEditor.GameProject
 
                 Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(
                     $"Remove Entity {x.Name} from Scene {Name}",
-                    () => _entities.Insert(index, x),
+                    () => AddEntity(x, index),
                     () => RemoveEntity(x)));
             });
 
         }
 
-        private void AddEntity(Entity entity)
+        private void AddEntity(Entity entity, int index = -1)
         {
             Debug.Assert(!_entities.Contains(entity));
-            _entities.Add(entity);
+            entity.IsActive = IsActive;
+            Logger.Info("Adding entity with id " + entity.EntityId);
+            if (index == -1)
+                _entities.Add(entity);
+            else
+            {
+                _entities.Insert(index, entity);
+            }
         }
 
         private void RemoveEntity(Entity entity)
         {
             Debug.Assert(_entities.Contains(entity));
+            entity.IsActive = false;
+            Logger.Info("Removing entity with id " + entity.EntityId);
             _entities.Remove(entity);
         }
     }

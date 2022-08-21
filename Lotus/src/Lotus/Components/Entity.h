@@ -22,24 +22,21 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "Components.h"
+#include "Lotus/EngineApi/GameEntity.h"
 
 
-namespace lotus
+namespace lotus::ecs
 {
 
-namespace ecs
+struct TransformData;
+struct EntityData
 {
-    struct TransformDesc;
-    struct EntityDesc
-    {
-        TransformDesc* transform = nullptr;
-    };
+    TransformData* transform = nullptr;
+};
 
-    Entity CreateGameEntity(const EntityDesc& desc);
-    void   RemoveEntity(Entity ent);
-    bool   IsAlive(Entity ent);
-} // namespace ecs
+Entity CreateEntity(const EntityData& desc);
+void   RemoveEntity(Entity ent);
+bool   IsAlive(Entity ent);
 
 
-} // namespace lotus
+} // namespace lotus::ecs

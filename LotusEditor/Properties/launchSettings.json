@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LotusEditor": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

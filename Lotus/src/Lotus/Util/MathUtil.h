@@ -27,6 +27,8 @@
 
 // Math types
 
+using vec = DirectX::XMVECTOR;
+
 // hlsl style naming
 using float2  = DirectX::XMFLOAT2;
 using float2a = DirectX::XMFLOAT2A;

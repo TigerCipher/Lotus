@@ -21,20 +21,22 @@
 //
 // ------------------------------------------------------------------------------
 #pragma once
+#include "Lotus/EngineApi/GameEntity.h"
+#include "Lotus/EngineApi/TransformComponent.h"
 
-#include "Components.h"
 
 namespace lotus::ecs
 {
 
-struct TransformDesc
+// #CONSIDER Using other "descriptors" for the editor interface... maybe I should follow a lotus::ecs::transform, lotus::ecs::entity type of namespace system?
+struct TransformData
 {
     f32 position [ 3 ] {};
     f32 rotation [ 4 ] {};
     f32 scale [ 3 ] { 1.0f, 1.0f, 1.0f };
 };
 
-TransformComponent CreateTransform(const TransformDesc& desc, Entity entity);
+TransformComponent CreateTransform(const TransformData& desc, Entity entity);
 void               RemoveTransform(TransformComponent comp);
 
 } // namespace lotus::ecs

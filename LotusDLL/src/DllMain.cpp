@@ -15,35 +15,30 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: TransformComponent.h
-// Date File Created: 8/20/2022
+// File Name: dllmain.cpp
+// Date File Created: 08/20/2022
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
-#pragma once
-#include "Lotus/Core/Id.h"
-#include "Lotus/Core/Common.h"
 
-namespace lotus::ecs
+#pragma comment(lib, "lotus.lib")
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+#include <crtdbg.h>
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-L_TYPED_ID(TransformId)
-
-
-class TransformComponent final
-{
-public:
-    constexpr explicit TransformComponent(const TransformId id) : mId(id) { }
-    constexpr TransformComponent() : mId(id::InvalidId) { }
-
-    constexpr TransformId GetId() const { return mId; }
-
-    constexpr bool IsValid() const { return id::IsValid(mId); }
-
-    vec3 Position() const;
-    vec4 Rotation() const;
-    vec3 Scale() const;
-
-private:
-    TransformId mId;
-};
-} // namespace lotus::ecs
+#if L_DEBUG
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH:
+    case DLL_THREAD_ATTACH:
+    case DLL_THREAD_DETACH:
+    case DLL_PROCESS_DETACH: break;
+    }
+    return TRUE;
+}
