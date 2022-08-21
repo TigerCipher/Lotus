@@ -24,16 +24,16 @@
 #include "Lotus/Core/Id.h"
 #include "Lotus/Core/Common.h"
 
-namespace lotus::transform
+namespace lotus
 {
 L_TYPED_ID(TransformId)
 
 
-class Component final
+class TransformComponent final
 {
 public:
-    constexpr explicit Component(const TransformId id) : mId(id) { }
-    constexpr Component() : mId(id::InvalidId) { }
+    constexpr explicit TransformComponent(const TransformId id) : mId(id) { }
+    constexpr TransformComponent() : mId(id::InvalidId) { }
 
     constexpr TransformId GetId() const { return mId; }
 

@@ -25,16 +25,16 @@
 #include "Transform.h"
 
 
-namespace lotus::entity
+namespace lotus
 {
 namespace
 {
-    utl::vector<id::gen_type>         generations;
-    utl::deque<EntityId>              freeIds;
-    utl::vector<transform::Component> transforms;
+    utl::vector<id::gen_type>       generations;
+    utl::deque<EntityId>            freeIds;
+    utl::vector<TransformComponent> transforms;
 } // namespace
 
-Entity CreateEntity(const Data& desc)
+Entity CreateEntity(const EntityInfo& desc)
 {
     LASSERT(desc.transform);
     if (!desc.transform) return {};
@@ -60,7 +60,7 @@ Entity CreateEntity(const Data& desc)
     const id::id_type index = id::Index(ident);
 
     LASSERT(!transforms [ index ].IsValid());
-    transforms [ index ] = lotus::transform::CreateTransform(*desc.transform, newEnt);
+    transforms [ index ] = CreateTransform(*desc.transform, newEnt);
     if (!transforms [ index ].IsValid()) return {};
 
     return newEnt;
@@ -71,7 +71,7 @@ void RemoveEntity(const Entity ent)
     const EntityId    ident = ent.GetId();
     const id::id_type index = id::Index(ident);
     LASSERT(IsAlive(ent));
-    lotus::transform::RemoveTransform(transforms [ index ]);
+    RemoveTransform(transforms [ index ]);
     transforms [ index ] = {};
     freeIds.push_back(ident);
 }
@@ -92,7 +92,7 @@ bool IsAlive(const Entity ent)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-transform::Component Entity::Transform() const
+TransformComponent Entity::Transform() const
 {
     LASSERT(IsAlive(*this));
     const id::id_type index = id::Index(mId);
@@ -100,4 +100,4 @@ transform::Component Entity::Transform() const
 }
 
 
-} // namespace lotus::entity
+} // namespace lotus

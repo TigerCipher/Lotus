@@ -23,7 +23,7 @@
 #include "pch.h"
 #include "Transform.h"
 
-namespace lotus::transform
+namespace lotus
 {
 
 namespace
@@ -33,7 +33,7 @@ namespace
     utl::vector<vec3> scales;
 } // namespace
 
-Component CreateTransform(const Data& desc, entity::Entity entity)
+TransformComponent CreateTransform(const TransformInfo& desc, Entity entity)
 {
     LASSERT(entity.IsValid());
     const id::id_type entIndex = id::Index(entity.GetId());
@@ -51,10 +51,10 @@ Component CreateTransform(const Data& desc, entity::Entity entity)
         scales.emplace_back(desc.scale);
     }
 
-    return Component(TransformId { (id::id_type) positions.size() - 1 });
+    return TransformComponent(TransformId { (id::id_type) positions.size() - 1 });
 }
 
-void RemoveTransform(const Component comp) { LASSERT(comp.IsValid()); }
+void RemoveTransform(const TransformComponent comp) { LASSERT(comp.IsValid()); }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,17 +64,17 @@ void RemoveTransform(const Component comp) { LASSERT(comp.IsValid()); }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-vec3 Component::Position() const
+vec3 TransformComponent::Position() const
 {
     LASSERT(IsValid());
     return positions [ id::Index(mId) ];
 }
-vec4 Component::Rotation() const
+vec4 TransformComponent::Rotation() const
 {
     LASSERT(IsValid());
     return rotations [ id::Index(mId) ];
 }
-vec3 Component::Scale() const
+vec3 TransformComponent::Scale() const
 {
     LASSERT(IsValid());
     return scales [ id::Index(mId) ];

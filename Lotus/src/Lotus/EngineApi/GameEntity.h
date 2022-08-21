@@ -24,7 +24,7 @@
 #include "Lotus/Core/Common.h"
 #include "TransformComponent.h"
 
-namespace lotus::entity
+namespace lotus
 {
 
 L_TYPED_ID(EntityId)
@@ -39,7 +39,7 @@ public:
 
     constexpr bool IsValid() const { return id::IsValid(mId); }
 
-    transform::Component Transform() const;
+    TransformComponent Transform() const;
 
 private:
     EntityId mId;

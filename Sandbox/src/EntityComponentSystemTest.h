@@ -61,18 +61,18 @@ private:
     {
         uint32 count = rand() % 20;
         if (mEntities.empty()) count = 1000;
-        ecs::TransformData transformDesc {};
-        ecs::EntityData    entityDesc {
+        TransformInfo transformDesc {};
+        EntityInfo    entityDesc {
             &transformDesc,
         };
 
         while (count > 0)
         {
             ++mAdded;
-            ecs::Entity ent = ecs::CreateEntity(entityDesc);
+            Entity ent = CreateEntity(entityDesc);
             LASSERT(ent.IsValid());
             mEntities.push_back(ent);
-            LASSERT(ecs::IsAlive(ent));
+            LASSERT(IsAlive(ent));
             --count;
         }
     }
@@ -84,13 +84,13 @@ private:
         while (count > 0)
         {
             const uint32      index = (uint32) rand() % (uint32) mEntities.size();
-            const ecs::Entity ent   = mEntities [ index ];
+            const Entity ent   = mEntities [ index ];
             LASSERT(ent.IsValid());
             if (ent.IsValid())
             {
-                ecs::RemoveEntity(ent);
+                RemoveEntity(ent);
                 mEntities.erase(mEntities.begin() + index);
-                LASSERT(!ecs::IsAlive(ent));
+                LASSERT(!IsAlive(ent));
                 ++mRemoved;
             }
             --count;
@@ -104,7 +104,7 @@ private:
     }
 
 private:
-    utl::vector<ecs::Entity> mEntities;
+    utl::vector<Entity> mEntities;
 
     uint32 mAdded { 0 };
     uint32 mRemoved { 0 };
