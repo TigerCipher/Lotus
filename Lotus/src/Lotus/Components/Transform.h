@@ -25,18 +25,18 @@
 #include "Lotus/EngineApi/TransformComponent.h"
 
 
-namespace lotus::ecs
+namespace lotus::transform
 {
 
 // #CONSIDER Using other "descriptors" for the editor interface... maybe I should follow a lotus::ecs::transform, lotus::ecs::entity type of namespace system?
-struct TransformData
+struct Data
 {
     f32 position [ 3 ] {};
     f32 rotation [ 4 ] {};
     f32 scale [ 3 ] { 1.0f, 1.0f, 1.0f };
 };
 
-TransformComponent CreateTransform(const TransformData& desc, Entity entity);
-void               RemoveTransform(TransformComponent comp);
+Component CreateTransform(const Data& desc, entity::Entity entity);
+void      RemoveTransform(Component comp);
 
 } // namespace lotus::ecs

@@ -39,6 +39,7 @@ namespace detail
     constexpr id_type GenerationMask = (id_type { 1 } << GenerationBits) - 1;
 } // namespace detail
 
+#pragma warning(disable : 4245)
 constexpr id_type InvalidId          = -1;
 constexpr uint32  MinDeletedElements = 1024;
 

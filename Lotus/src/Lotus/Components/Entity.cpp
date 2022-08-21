@@ -24,18 +24,17 @@
 #include "Entity.h"
 #include "Transform.h"
 
-#include <format>
 
-namespace lotus::ecs
+namespace lotus::entity
 {
 namespace
 {
-    utl::vector<id::gen_type>       generations;
-    utl::deque<EntityId>            freeIds;
-    utl::vector<TransformComponent> transforms;
+    utl::vector<id::gen_type>         generations;
+    utl::deque<EntityId>              freeIds;
+    utl::vector<transform::Component> transforms;
 } // namespace
 
-Entity CreateEntity(const EntityData& desc)
+Entity CreateEntity(const Data& desc)
 {
     LASSERT(desc.transform);
     if (!desc.transform) return {};
@@ -61,7 +60,7 @@ Entity CreateEntity(const EntityData& desc)
     const id::id_type index = id::Index(ident);
 
     LASSERT(!transforms [ index ].IsValid());
-    transforms [ index ] = CreateTransform(*desc.transform, newEnt);
+    transforms [ index ] = lotus::transform::CreateTransform(*desc.transform, newEnt);
     if (!transforms [ index ].IsValid()) return {};
 
     return newEnt;
@@ -72,7 +71,7 @@ void RemoveEntity(const Entity ent)
     const EntityId    ident = ent.GetId();
     const id::id_type index = id::Index(ident);
     LASSERT(IsAlive(ent));
-    RemoveTransform(transforms [ index ]);
+    lotus::transform::RemoveTransform(transforms [ index ]);
     transforms [ index ] = {};
     freeIds.push_back(ident);
 }
@@ -84,7 +83,7 @@ bool IsAlive(const Entity ent)
     const id::id_type index = id::Index(ident);
     LASSERT(index < generations.size());
     LASSERT(generations [ index ] == id::Generation(ident));
-    return generations [ index ] == id::Generation(ident) && transforms [index].IsValid();
+    return generations [ index ] == id::Generation(ident) && transforms [ index ].IsValid();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,11 +92,12 @@ bool IsAlive(const Entity ent)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TransformComponent Entity::Transform() const
+transform::Component Entity::Transform() const
 {
     LASSERT(IsAlive(*this));
     const id::id_type index = id::Index(mId);
     return transforms [ index ];
 }
 
-} // namespace lotus::ecs
+
+} // namespace lotus::entity

@@ -24,19 +24,24 @@
 
 #include "Lotus/EngineApi/GameEntity.h"
 
+#define COMPONENT_DATA(name) namespace name { struct Data; }
 
-namespace lotus::ecs
+namespace lotus
 {
 
-struct TransformData;
-struct EntityData
+COMPONENT_DATA(transform)
+#undef COMPONENT_DATA
+
+namespace entity
 {
-    TransformData* transform = nullptr;
-};
+    struct Data
+    {
+        transform::Data* transform = nullptr;
+    };
 
-Entity CreateEntity(const EntityData& desc);
-void   RemoveEntity(Entity ent);
-bool   IsAlive(Entity ent);
+    Entity CreateEntity(const Data& desc);
+    void   RemoveEntity(Entity ent);
+    bool   IsAlive(Entity ent);
 
-
-} // namespace lotus::ecs
+} // namespace entity
+} // namespace lotus
