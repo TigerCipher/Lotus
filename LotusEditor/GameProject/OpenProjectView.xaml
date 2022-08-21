@@ -17,7 +17,7 @@
                x:Name="projectsListBox"
                SelectedIndex="0">
                     <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItemStyle}">
                             <EventSetter Event="MouseDoubleClick"
                                Handler="OnListBoxItem_DoubleClick">
 
@@ -26,12 +26,16 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="{Binding Icon}" 
-                             Width="24"
-                             Height="24"
-                             Margin="0,0,5,0"></Image>
-                                <TextBlock Text="{Binding ProjectName}"></TextBlock>
+                            <StackPanel Width="180">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="{Binding Icon}" 
+                                            Width="24"
+                                            Height="24"
+                                            Margin="0,0,5,0"/>
+                                    <TextBlock Text="{Binding ProjectName}" VerticalAlignment="Center" FontSize="24" FontFamily="Bahnschrift condensed"></TextBlock>
+                                </StackPanel>
+                                <TextBlock Text="{Binding ProjectPath}" FontSize="12" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding Date}" FontSize="10"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
