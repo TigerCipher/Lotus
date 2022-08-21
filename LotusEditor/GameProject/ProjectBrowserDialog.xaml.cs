@@ -1,5 +1,9 @@
-﻿using System.Linq;
+using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Animation;
 
 namespace LotusEditor.GameProject
 {
@@ -8,6 +12,10 @@ namespace LotusEditor.GameProject
     /// </summary>
     public partial class ProjectBrowserDialog : Window
     {
+
+        private readonly CubicEase _easing = new CubicEase() { EasingMode = EasingMode.EaseInOut };
+
+
         public ProjectBrowserDialog()
         {
             InitializeComponent();
@@ -32,7 +40,9 @@ namespace LotusEditor.GameProject
                 if (createProjectButton.IsChecked == true)
                 {
                     createProjectButton.IsChecked = false;
-                    browserContent.Margin = new Thickness(20);
+                    AnimateOpenProject();
+                    openProjectView.IsEnabled = true;
+                    newProjectView.IsEnabled = false;
                 }
                 openProjectButton.IsChecked = true;
             }
@@ -41,10 +51,42 @@ namespace LotusEditor.GameProject
                 if (openProjectButton.IsChecked == true)
                 {
                     openProjectButton.IsChecked = false;
-                    browserContent.Margin = new Thickness(-Width + 20, 20, 20, 20);
+                    AnimateNewProject();
+                    openProjectView.IsEnabled = false;
+                    newProjectView.IsEnabled = true;
                 }
                 createProjectButton.IsChecked = true;
             }
+        }
+
+        private void AnimateNewProject()
+        {
+            var highlightAnim = new DoubleAnimation(200, 400, new Duration(TimeSpan.FromSeconds(0.2)));
+            highlightAnim.EasingFunction = _easing;
+            highlightAnim.Completed += (s, e) =>
+            {
+                var anim = new ThicknessAnimation(new Thickness(0), new Thickness(-1600, 0, 0, 0), new Duration(TimeSpan.FromSeconds(0.5)))
+                    {
+                        EasingFunction = _easing
+                    };
+                browserContent.BeginAnimation(MarginProperty, anim);
+            };
+            highlightRect.BeginAnimation(Canvas.LeftProperty, highlightAnim);
+        }
+
+        private void AnimateOpenProject()
+        {
+            var highlightAnim = new DoubleAnimation(400, 200, new Duration(TimeSpan.FromSeconds(0.2)));
+            highlightAnim.EasingFunction = _easing;
+            highlightAnim.Completed += (s, e) =>
+            {
+                var anim = new ThicknessAnimation(new Thickness(-1600, 0, 0, 0), new Thickness(0), new Duration(TimeSpan.FromSeconds(0.5)))
+                    {
+                        EasingFunction = _easing
+                    };
+                browserContent.BeginAnimation(MarginProperty, anim);
+            };
+            highlightRect.BeginAnimation(Canvas.LeftProperty, highlightAnim);
         }
     }
 }
