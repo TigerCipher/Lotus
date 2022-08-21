@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,6 +35,24 @@ namespace LotusEditor.Dictionaries
                 exp.UpdateTarget();
                 Keyboard.ClearFocus();
             }
+        }
+
+        private void Close_OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            var win = (Window)((FrameworkElement)sender).TemplatedParent;
+            win.Close();
+        }
+
+        private void MaximizeRestore_OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            var win = (Window)((FrameworkElement)sender).TemplatedParent;
+            win.WindowState = win.WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+        }
+
+        private void Minimize_OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            var win = (Window)((FrameworkElement)sender).TemplatedParent;
+            win.WindowState = WindowState.Minimized;
         }
     }
 }
