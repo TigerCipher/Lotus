@@ -39,15 +39,6 @@ namespace LotusEditor.Utility.Controls
             set => SetValue(MultiplierProperty, value);
         }
 
-        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
-    nameof(Label), typeof(string), typeof(NumberBox), new PropertyMetadata());
-
-        public string Label
-        {
-            get => (string)GetValue(LabelProperty);
-            set => SetValue(LabelProperty, value);
-        }
-
         static NumberBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(NumberBox), new FrameworkPropertyMetadata(typeof(NumberBox)));
@@ -59,7 +50,6 @@ namespace LotusEditor.Utility.Controls
 
             if (GetTemplateChild("PART_textBlock") is not TextBlock textBlock) return;
 
-            if (!string.IsNullOrEmpty(Label)) textBlock.Margin = new Thickness(10, 0, 0, 0);
             textBlock.MouseLeftButtonDown += TextBlock_OnMouseLeftDown;
             textBlock.MouseLeftButtonUp += TextBlock_OnMouseLeftUp;
             textBlock.MouseMove += TextBlock_OnMouseMove;

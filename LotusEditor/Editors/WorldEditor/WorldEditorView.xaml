@@ -52,6 +52,7 @@
                 <Border Background="{StaticResource Editor.Selected.BackgroundColorBrush}">
                     <StackPanel VerticalAlignment="Center">
                         <ctrl:NumberBox VerticalAlignment="Center" HorizontalAlignment="Center" Value="0"/>
+                        <ctrl:ScalarBox Value="10" Multiplier="10"/>
                         <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC2"/>
                         <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC3"/>
                         <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC4"/>
