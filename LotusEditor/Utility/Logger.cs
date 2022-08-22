@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -60,6 +60,16 @@ namespace LotusEditor.Utility
                 var level = (int)(args.Item as LogMessage).MsgLevel;
                 args.Accepted = (level & _messageFilter) != 0;
             };
+
+            Info("Test info msg");
+            Warn("Warn info msg");
+            Error("Error info msg");
+            Error("Error info msg");
+            Warn("Warn info msg");
+            Info("Test info msg");
+            Info("Test info msg");
+            Warn("Test info msg");
+            Info("Test info msg");
         }
 
         public static async void Log(Level level, string msg, [CallerFilePath]string file="", [CallerMemberName]string caller="", [CallerLineNumber]int line=0)
