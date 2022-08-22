@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="LotusEditor.Editors.ProjectLayoutView"
+<UserControl x:Class="LotusEditor.Editors.ProjectLayoutView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -30,7 +30,7 @@
                             <Expander.Header>
                                 <Grid>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Name}"/>
+                                        <TextBlock Text="{Binding Name}" Style="{StaticResource LightTextBlockStyle}"/>
                                         <Button Content="Remove"
                                                 Command="{Binding DataContext.RemoveSceneCmd, 
                                                     RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -44,7 +44,7 @@
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Name}"/>
+                                            <TextBlock Text="{Binding Name}" Style="{StaticResource LightTextBlockStyle}"/>
                                             <Button Content="Remove" Command="{Binding ParentScene.RemoveEntityCmd}" CommandParameter="{Binding}"/>
                                         </StackPanel>
                                     </DataTemplate>

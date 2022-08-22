@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LotusEditor.Editors"
              mc:Ignorable="d"
-             d:Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <ScrollViewer.Style>
@@ -34,12 +33,12 @@
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Name" Grid.Column="0" Margin="5,0,0,0"/>
+                <TextBlock Text="Name" Grid.Column="0" Margin="5,0,0,0" Style="{StaticResource LightTextBlockStyle}"/>
                 <TextBox Text="{Binding Name, UpdateSourceTrigger=Explicit}" Grid.Column="1"
                          GotKeyboardFocus="Name_OnTextBoxKeyboardFocus"
                          LostKeyboardFocus="Name_OnTextBoxKeyboardFocusLost"/>
                 <StackPanel Orientation="Horizontal" Grid.Column="2">
-                    <TextBlock Text="Enabled" Margin="5,0,0,0"/>
+                    <TextBlock Text="Enabled" Margin="5,0,0,0" Style="{StaticResource LightTextBlockStyle}"/>
                     <CheckBox IsChecked="{Binding IsEnabled, Mode=OneWay}" Margin="5,0" VerticalAlignment="Center"
                               Click="IsEnabled_OnCheckboxClick"/>
                 </StackPanel>
