@@ -24,7 +24,7 @@
                                    Width="24"
                                    Height="24"
                                    Margin="0,0,5,0"></Image>
-                                <TextBlock Text="{Binding ProjectType}" VerticalAlignment="Center" FontSize="24" FontFamily="Bahnschrift condensed"/>
+                                <TextBlock Text="{Binding ProjectType}" VerticalAlignment="Center" FontSize="18" FontFamily="{StaticResource Editor.Fonts.Mont}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

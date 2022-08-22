@@ -12,7 +12,8 @@
     <Window.Resources>
         <Style TargetType="{x:Type ToggleButton}">
             <Setter Property="FontSize" Value="32"/>
-            <Setter Property="FontFamily" Value="Bahnschrift condensed"/>
+            <!-- <Setter Property="FontFamily" Value="Bahnschrift condensed"/> -->
+            <Setter Property="FontFamily" Value="{StaticResource Editor.Fonts.Title}"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="Foreground" Value="{StaticResource Editor.Disabled.FontColorBrush}"/>
