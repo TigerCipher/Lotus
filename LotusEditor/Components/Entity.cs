@@ -33,9 +33,10 @@ namespace LotusEditor.Components
                     EntityId = EngineAPI.CreateEntity(this);
                     Debug.Assert(ID.IsValid(_entityId));
                 }
-                else
+                else if(ID.IsValid(EntityId))
                 {
                     EngineAPI.RemoveEntity(this);
+                    EntityId = ID.INVALID_ID;
                 }
 
                 OnPropertyChanged(nameof(IsActive));
@@ -118,6 +119,11 @@ namespace LotusEditor.Components
             };
         }
 
+        public T GetMSComponent<T>() where T : IMSComponent
+        {
+            return (T)Components.FirstOrDefault(x => x.GetType() == typeof(T));
+        }
+
         protected virtual bool UpdateEntities(string propName)
         {
             switch (propName)
@@ -131,47 +137,57 @@ namespace LotusEditor.Components
 
         public void Refresh()
         {
+            Debug.WriteLine("Refreshing MSEntity");
             _enableUpdates = false;
             UpdateMSGameEntity();
+            CreateComponentList();
             _enableUpdates = true;
+        }
+
+        private void CreateComponentList()
+        {
+            Debug.WriteLine("Creating comp list");
+            _components.Clear();
+            var firstEnt = SelectedEntities.FirstOrDefault();
+            if (firstEnt == null) return;
+
+            foreach (var comp in firstEnt.Components)
+            {
+                var type = comp.GetType();
+                if (!SelectedEntities.Skip(1).Any(ent => ent.GetComponent(type) == null))
+                {
+                    Debug.WriteLine("Adding comp");
+                    Debug.Assert(Components.FirstOrDefault(x=>x.GetType() == type) == null);
+                    _components.Add(comp.GetMSComponent(this));
+                }
+            }
         }
 
         protected virtual bool UpdateMSGameEntity()
         {
-            IsEnabled = GetMixedValue(SelectedEntities, new Func<Entity, bool>(x => x.IsEnabled));
-            Name = GetMixedValue(SelectedEntities, new Func<Entity, string>(x => x.Name));
+            IsEnabled = GetMixedValue(SelectedEntities, x => x.IsEnabled);
+            Name = GetMixedValue(SelectedEntities, x => x.Name);
 
             return true;
         }
 
-        public static float? GetMixedValue(List<Entity> entities, Func<Entity, float> getProperty)
+        public static float? GetMixedValue<T>(List<T> objects, Func<T, float> getProperty)
         {
-            var value = getProperty(entities.First());
-            foreach (var entity in entities.Skip(1))
-            {
-                if (!value.IsEqual(getProperty(entity))) return null;
-            }
-            return value;
+            var value = getProperty(objects.First());
+            return objects.Skip(1).Any(x=> !getProperty(x).IsEqual(value)) ? null : value;
         }
 
-        public static bool? GetMixedValue(List<Entity> entities, Func<Entity, bool> getProperty)
+
+        public static bool? GetMixedValue<T>(List<T> objects, Func<T, bool> getProperty)
         {
-            var value = getProperty(entities.First());
-            foreach (var entity in entities.Skip(1))
-            {
-                if (value != getProperty(entity)) return null;
-            }
-            return value;
+            var value = getProperty(objects.First());
+            return objects.Skip(1).Any(x => getProperty(x) != value) ? null : value;
         }
 
-        public static string GetMixedValue(List<Entity> entities, Func<Entity, string> getProperty)
+        public static string GetMixedValue<T>(List<T> objects, Func<T, string> getProperty)
         {
-            var value = getProperty(entities.First());
-            foreach (var entity in entities.Skip(1))
-            {
-                if (value != getProperty(entity)) return null;
-            }
-            return value;
+            var value = getProperty(objects.First());
+            return objects.Skip(1).Any(x => getProperty(x) != value) ? null : value;
         }
     }
 

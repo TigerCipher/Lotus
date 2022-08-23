@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -55,6 +55,7 @@ namespace LotusEditor.Editors
 
         private void Name_OnTextBoxKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
+            _propertyName = string.Empty;
             _undo = GetRenameAction();
         }
 

@@ -96,6 +96,7 @@ namespace LotusEditor.Utility.Controls
             _valueChanged = false;
             e.Handled = true;
             _mouseXStart = e.GetPosition(this).X;
+            Focus();
         }
     }
 }

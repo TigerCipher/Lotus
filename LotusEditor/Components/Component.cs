@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -25,11 +25,34 @@ namespace LotusEditor.Components
             Debug.Assert(owner != null);
             Owner = owner;
         }
+
+        public abstract IMSComponent GetMSComponent(MSEntity msEnt);
     }
 
 
     abstract class MSComponent<T> : ViewModelBase, IMSComponent where T : Component
     {
+        private bool _enableUpdates = true;
+        public List<T> SelectedComponents { get; }
 
+        public MSComponent(MSEntity msEnt)
+        {
+            Debug.Assert(msEnt?.SelectedEntities?.Any() == true);
+            SelectedComponents = msEnt.SelectedEntities.Select(ent => ent.GetComponent<T>()).ToList();
+            PropertyChanged += (s, e) =>
+            {
+                if (_enableUpdates) UpdateComponents(e.PropertyName);
+            };
+        }
+
+        protected abstract bool UpdateComponents(string propertyName);
+        protected abstract bool UpdateMSComponent();
+
+        public void Refresh()
+        {
+            _enableUpdates = false;
+            UpdateMSComponent();
+            _enableUpdates = true;
+        }
     }
 }

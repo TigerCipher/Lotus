@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -32,7 +32,7 @@ namespace LotusEditor.Editors
         {
             Loaded -= OnWorldEditorViewLoaded;
             Focus();
-            ((INotifyCollectionChanged)Project.HistoryManager.UndoList).CollectionChanged += (s, e) => Focus();
+            // ((INotifyCollectionChanged)Project.HistoryManager.UndoList).CollectionChanged += (s, e) => Focus();
         }
     }
 }

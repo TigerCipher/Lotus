@@ -819,7 +819,7 @@
                                 <RowDefinition x:Name="rowDefinition2"/>
                                 <RowDefinition x:Name="rowDefinition3"/>
                             </Grid.RowDefinitions>
-                            <!-- #TODO Either get rid of labels or add toggleable labels for vector controls -->
+
                             <util:NumberBox x:Name="nbX" Foreground="{StaticResource Editor.RedBrush}"
                                             Value="{Binding X, RelativeSource={RelativeSource TemplatedParent}}" ToolTip="X value"/>
                             <util:NumberBox x:Name="nbY" Foreground="{StaticResource Editor.GreenBrush}"

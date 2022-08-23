@@ -85,10 +85,11 @@ namespace LotusEditor.Dictionaries
         private void TextBoxRename_OnFocusLost(object sender, RoutedEventArgs e)
         {
             var textBox = sender as TextBox;
+            if (!textBox.IsVisible) return;
             var exp = textBox.GetBindingExpression(TextBox.TextProperty);
             if (exp == null) return;
             exp.UpdateTarget();
-            textBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Previous));
+            // textBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Previous));
             textBox.Visibility = Visibility.Collapsed;
         }
     }
