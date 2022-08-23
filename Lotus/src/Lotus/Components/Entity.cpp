@@ -23,33 +23,35 @@
 #include "pch.h"
 #include "Entity.h"
 #include "Transform.h"
+#include "Script.h"
 
 
-namespace lotus
+namespace lotus::entity
 {
 namespace
 {
-    utl::vector<id::gen_type>       generations;
-    utl::deque<EntityId>            freeIds;
-    utl::vector<TransformComponent> transforms;
+    utl::vector<id::gen_type>         generations;
+    utl::deque<entity_id>             freeIds;
+    utl::vector<transform::Component> transforms;
+    utl::vector<script::Component>    scripts;
 } // namespace
 
-Entity CreateEntity(const EntityInfo& desc)
+Entity CreateEntity(const create_info& info)
 {
-    LASSERT(desc.transform);
-    if (!desc.transform) return {};
+    LASSERT(info.transform);
+    if (!info.transform) return {};
 
-    EntityId ident;
+    entity_id ident;
     if (freeIds.size() > id::MinDeletedElements)
     {
         ident = freeIds.front();
-        LASSERT(!IsAlive(Entity(ident)));
+        LASSERT(!IsAlive(ident));
         freeIds.pop_front();
-        ident = EntityId { id::NewGeneration(ident) };
-        ++generations [ id::Index(ident) ];
+        ident = entity_id { id::new_generation(ident) };
+        ++generations [ id::index(ident) ];
     } else
     {
-        ident = EntityId { (id::id_type) generations.size() };
+        ident = entity_id { (id::id_type) generations.size() };
         generations.push_back(0);
 
         // transforms.resize(generations.size()) // --> more memory allocations than emplace_back
@@ -57,33 +59,39 @@ Entity CreateEntity(const EntityInfo& desc)
     }
 
     const Entity      newEnt(ident);
-    const id::id_type index = id::Index(ident);
+    const id::id_type index = id::index(ident);
 
     LASSERT(!transforms [ index ].IsValid());
-    transforms [ index ] = CreateTransform(*desc.transform, newEnt);
+    transforms [ index ] = transform::create(*info.transform, newEnt);
     if (!transforms [ index ].IsValid()) return {};
+
+    // Script
+    if (info.script && info.script->scriptCreator)
+    {
+        LASSERT(!scripts [ index ].IsValid());
+        scripts [ index ] = script::create(*info.script, newEnt);
+        LASSERT(scripts [ index ].IsValid());
+    }
 
     return newEnt;
 }
 
-void RemoveEntity(const Entity ent)
+void RemoveEntity(const entity_id id)
 {
-    const EntityId    ident = ent.GetId();
-    const id::id_type index = id::Index(ident);
-    LASSERT(IsAlive(ent));
-    RemoveTransform(transforms [ index ]);
+    const id::id_type index = id::index(id);
+    LASSERT(IsAlive(id));
+    transform::remove(transforms [ index ]);
     transforms [ index ] = {};
-    freeIds.push_back(ident);
+    freeIds.push_back(id);
 }
 
-bool IsAlive(const Entity ent)
+bool IsAlive(const entity_id id)
 {
-    LASSERT(ent.IsValid());
-    const EntityId    ident = ent.GetId();
-    const id::id_type index = id::Index(ident);
+    LASSERT(id::is_valid(id));
+    const id::id_type index = id::index(id);
     LASSERT(index < generations.size());
-    LASSERT(generations [ index ] == id::Generation(ident));
-    return generations [ index ] == id::Generation(ident) && transforms [ index ].IsValid();
+    LASSERT(generations [ index ] == id::generation(id));
+    return generations [ index ] == id::generation(id) && transforms [ index ].IsValid();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,12 +100,20 @@ bool IsAlive(const Entity ent)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TransformComponent Entity::Transform() const
+transform::Component Entity::Transform() const
 {
-    LASSERT(IsAlive(*this));
-    const id::id_type index = id::Index(mId);
+    LASSERT(IsAlive(mId));
+    const id::id_type index = id::index(mId);
     return transforms [ index ];
 }
 
 
-} // namespace lotus
+script::Component Entity::Script() const
+{
+    LASSERT(IsAlive(mId));
+    const id::id_type index = id::index(mId);
+    return scripts [ index ];
+}
+
+
+} // namespace lotus::entity

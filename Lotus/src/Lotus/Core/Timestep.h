@@ -15,24 +15,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 // 
-// File Name: Lotus.h
-// Date File Created: 08/20/2022
+// File Name: Timestep.h
+// Date File Created: 8/23/2022
 // Author: Matt
 // 
 // ------------------------------------------------------------------------------
 #pragma once
 
-// Core
-#include "Lotus/Core/Common.h"
-#include "Lotus/Core/Id.h"
+namespace lotus
+{
+class Timestep
+{
+public:
+    Timestep(const float time = 0.0f) : mTime(time) { }
 
-// Util
-#include "Lotus/Util/Util.h"
-#include "Lotus/Util/MathUtil.h"
+    operator float() const { return mTime; }
+    float Seconds() const { return mTime; }
+    float Milliseconds() const { return mTime * 1000.0f; }
 
-// Public API
-#include "Lotus/EngineApi/GameEntity.h"
-#include "Lotus/EngineApi/TransformComponent.h"
+private:
+    float mTime;
+};
+}
 
-#include "Lotus/Components/Entity.h"
-#include "Lotus/Components/Transform.h"

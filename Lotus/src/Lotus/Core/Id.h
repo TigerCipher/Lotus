@@ -49,31 +49,31 @@ using gen_type =
 static_assert(sizeof(gen_type) * 8 >= detail::GenerationBits);
 static_assert(sizeof(id_type) - sizeof(gen_type) > 0);
 
-constexpr bool IsValid(const id_type id) { return id != InvalidId; }
+constexpr bool is_valid(const id_type id) { return id != InvalidId; }
 
-constexpr id_type Index(const id_type id)
+constexpr id_type index(const id_type id)
 {
     id_type i = id & detail::IndexMask;
     LASSERT(i != detail::IndexMask);
     return id & detail::IndexMask;
 }
 
-constexpr id_type Generation(const id_type id) { return (id >> detail::IndexBits) & detail::GenerationMask; }
+constexpr id_type generation(const id_type id) { return (id >> detail::IndexBits) & detail::GenerationMask; }
 
-constexpr id_type NewGeneration(const id_type id)
+constexpr id_type new_generation(const id_type id)
 {
-    const id_type gen = Generation(id) + 1;
+    const id_type gen = generation(id) + 1;
     LASSERT(gen < ((u64) 1 << detail::GenerationBits) - 1);
-    return Index(id) | (gen << detail::IndexBits);
+    return index(id) | (gen << detail::IndexBits);
 }
 
 
 #ifdef L_DEBUG
 namespace detail
 {
-    struct IdBase
+    struct id_base
     {
-        constexpr explicit IdBase(id_type id) : mId(id) { }
+        constexpr explicit id_base(const id_type id) : mId(id) { }
         constexpr operator id_type() const { return mId; }
 
     private:
@@ -82,10 +82,10 @@ namespace detail
 } // namespace detail
 
     #define L_TYPED_ID(name)                                                                                           \
-        struct name final : id::detail::IdBase                                                                         \
+        struct name final : id::detail::id_base                                                                        \
         {                                                                                                              \
-            constexpr explicit name(id::id_type id) : IdBase(id) { }                                                   \
-            constexpr name() : IdBase(0) { }                                                                           \
+            constexpr explicit name(const id::id_type id) : id_base(id) { }                                            \
+            constexpr name() : id_base(0) { }                                                                          \
         };
 
 #else

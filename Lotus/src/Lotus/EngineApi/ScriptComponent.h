@@ -15,34 +15,32 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: TransformComponent.h
-// Date File Created: 8/20/2022
+// File Name: ScriptComponent.h
+// Date File Created: 8/23/2022
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
 #pragma once
+
 #include "../Components/Components.h"
 
-namespace lotus::transform
+namespace lotus::script
 {
-L_TYPED_ID(transform_id)
+L_TYPED_ID(script_id)
 
 
 class Component final
 {
 public:
-    constexpr explicit Component(const transform_id id) : mId(id) { }
+    constexpr explicit Component(const script_id id) : mId(id) { }
     constexpr Component() : mId(id::InvalidId) { }
 
-    constexpr transform_id GetId() const { return mId; }
+    constexpr script_id GetId() const { return mId; }
 
     constexpr bool IsValid() const { return id::is_valid(mId); }
 
-    vec3 Position() const;
-    vec4 Rotation() const;
-    vec3 Scale() const;
 
 private:
-    transform_id mId;
+    script_id mId;
 };
 } // namespace lotus

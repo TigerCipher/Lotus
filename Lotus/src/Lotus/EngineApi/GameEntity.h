@@ -21,27 +21,72 @@
 //
 // ------------------------------------------------------------------------------
 #pragma once
-#include "Lotus/Core/Common.h"
+#include "../Components/Components.h"
+#include "../Core/Timestep.h"
 #include "TransformComponent.h"
+#include "ScriptComponent.h"
 
 namespace lotus
 {
-
-L_TYPED_ID(EntityId)
-
-class Entity
+namespace entity
 {
-public:
-    constexpr explicit Entity(const EntityId id) : mId(id) { }
-    constexpr Entity() : mId(id::InvalidId) { }
+    L_TYPED_ID(entity_id)
 
-    constexpr EntityId GetId() const { return mId; }
+    class Entity
+    {
+    public:
+        constexpr explicit Entity(const entity_id id) : mId(id) { }
+        constexpr Entity() : mId(id::InvalidId) { }
 
-    constexpr bool IsValid() const { return id::IsValid(mId); }
+        constexpr entity_id GetId() const { return mId; }
 
-    TransformComponent Transform() const;
+        constexpr bool IsValid() const { return id::is_valid(mId); }
 
-private:
-    EntityId mId;
-};
-} // namespace lotus::ecs
+        transform::Component Transform() const;
+        script::Component    Script() const;
+
+    private:
+        entity_id mId;
+    };
+} // namespace entity
+
+namespace script
+{
+    class ScriptEntity : public entity::Entity
+    {
+    public:
+        virtual ~ScriptEntity() = default;
+
+        virtual void OnStart() { }
+        virtual void Update(Timestep ts) { }
+
+    protected:
+        constexpr explicit ScriptEntity(const Entity entity) : Entity(entity.GetId()) { }
+    };
+
+    namespace detail
+    {
+        using ScriptPtr     = Scope<ScriptEntity>;
+        using ScriptCreator = ScriptPtr (*)(entity::Entity entity);
+
+        byte register_script(size_t tag, ScriptCreator func);
+
+        template<class T>
+        ScriptPtr create_script(entity::Entity entity)
+        {
+            LASSERT(entity.IsValid());
+            return CreateScope<T>(entity);
+        }
+
+#define LOTUS_REGISTER_SCRIPT(Type)                                                                                    \
+    class Type;                                                                                                       \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        const uint8 reg_##Type =                                                                                       \
+            lotus::script::detail::register_script(string_hash()(#Type), &lotus::script::detail::create_script<Type>); \
+    }
+    } // namespace detail
+} // namespace script
+
+
+} // namespace lotus

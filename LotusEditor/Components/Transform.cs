@@ -15,15 +15,15 @@ namespace LotusEditor.Components
     {
         private Vector3 _position;
         [DataMember]
-        public Vector3 Position { get => _position; set { if(_position == value) return; _position = value; OnPropertyChanged(nameof(Position)); } }
+        public Vector3 Position { get => _position; set { if (_position == value) return; _position = value; OnPropertyChanged(nameof(Position)); } }
 
         private Vector3 _rotation;
         [DataMember]
-        public Vector3 Rotation { get => _rotation; set { if(_rotation == value) return; _rotation = value; OnPropertyChanged(nameof(Rotation)); } }
+        public Vector3 Rotation { get => _rotation; set { if (_rotation == value) return; _rotation = value; OnPropertyChanged(nameof(Rotation)); } }
 
         private Vector3 _scale;
         [DataMember]
-        public Vector3 Scale { get => _scale; set { if(_scale == value) return; _scale = value; OnPropertyChanged(nameof(Scale)); } }
+        public Vector3 Scale { get => _scale; set { if (_scale == value) return; _scale = value; OnPropertyChanged(nameof(Scale)); } }
 
         public Transform(Entity owner) : base(owner)
         {
@@ -36,22 +36,22 @@ namespace LotusEditor.Components
     {
 
         private float? _posX;
-        public float? PosX { get => _posX; set { if(_posX.IsEqual(value)) return; _posX = value; OnPropertyChanged(nameof(PosX)); } }
+        public float? PosX { get => _posX; set { if (_posX.IsEqual(value)) return; _posX = value; OnPropertyChanged(nameof(PosX)); } }
 
         private float? _posY;
-        public float? PosY { get => _posY; set { if(_posY.IsEqual(value)) return; _posY = value; OnPropertyChanged(nameof(PosY)); } }
+        public float? PosY { get => _posY; set { if (_posY.IsEqual(value)) return; _posY = value; OnPropertyChanged(nameof(PosY)); } }
 
         private float? _posZ;
-        public float? PosZ { get => _posZ; set { if(_posZ.IsEqual(value)) return; _posZ = value; OnPropertyChanged(nameof(PosZ)); } }
+        public float? PosZ { get => _posZ; set { if (_posZ.IsEqual(value)) return; _posZ = value; OnPropertyChanged(nameof(PosZ)); } }
 
         private float? _rotX;
-        public float? RotX { get => _rotX; set { if(_rotX.IsEqual(value)) return; _rotX = value; OnPropertyChanged(nameof(RotX)); } }
+        public float? RotX { get => _rotX; set { if (_rotX.IsEqual(value)) return; _rotX = value; OnPropertyChanged(nameof(RotX)); } }
 
         private float? _rotY;
-        public float? RotY { get => _rotY; set { if(_rotY.IsEqual(value)) return; _rotY = value; OnPropertyChanged(nameof(RotY)); } }
+        public float? RotY { get => _rotY; set { if (_rotY.IsEqual(value)) return; _rotY = value; OnPropertyChanged(nameof(RotY)); } }
 
         private float? _rotZ;
-        public float? RotZ { get => _rotZ; set { if(_rotZ.IsEqual(value)) return; _rotZ = value; OnPropertyChanged(nameof(RotZ)); } }
+        public float? RotZ { get => _rotZ; set { if (_rotZ.IsEqual(value)) return; _rotZ = value; OnPropertyChanged(nameof(RotZ)); } }
 
         private float? _scaleX;
         public float? ScaleX { get => _scaleX; set { if (_scaleX.IsEqual(value)) return; _scaleX = value; OnPropertyChanged(nameof(ScaleX)); } }
@@ -74,13 +74,7 @@ namespace LotusEditor.Components
                 case nameof(PosX):
                 case nameof(PosZ):
                 case nameof(PosY):
-                    SelectedComponents.ForEach(c =>
-                    {
-                        Debug.WriteLine($"Old PosX: {c.Position.X}");
-                        c.Position = new Vector3(_posX ?? c.Position.X, _posY ?? c.Position.Y,
-                                _posZ ?? c.Position.Z);
-                        Debug.WriteLine($"New PosX: {c.Position.X}");
-                    });
+                    SelectedComponents.ForEach(c => c.Position = new Vector3(_posX ?? c.Position.X, _posY ?? c.Position.Y, _posZ ?? c.Position.Z));
                     return true;
 
                 case nameof(RotX):
@@ -101,7 +95,6 @@ namespace LotusEditor.Components
 
         protected override bool UpdateMSComponent()
         {
-            Debug.WriteLine("Updating ms comp");
             PosX = MSEntity.GetMixedValue(SelectedComponents, x => x.Position.X);
             PosY = MSEntity.GetMixedValue(SelectedComponents, x => x.Position.Y);
             PosZ = MSEntity.GetMixedValue(SelectedComponents, x => x.Position.Z);

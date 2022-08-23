@@ -692,6 +692,7 @@
     <Style TargetType="{x:Type util:NumberBox}" x:Key="{x:Type util:NumberBox}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Foreground" Value="{StaticResource Editor.FontColorBrush}"/>
+        <Setter Property="FontSize" Value="18"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type util:NumberBox}">
@@ -729,6 +730,7 @@
 
     <Style TargetType="{x:Type util:ScalarBox}" x:Key="{x:Type util:ScalarBox}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="FontSize" Value="18"/>
         <Setter Property="Foreground" Value="{StaticResource Editor.FontColorBrush}"/>
         <Setter Property="Background" Value="{StaticResource Editor.Window.GrayBrush2}"/>
         <Setter Property="BorderBrush" Value="{StaticResource Editor.Window.GrayBrush5}"/>
@@ -788,6 +790,7 @@
 
     <Style TargetType="{x:Type util:VectorBox}" x:Key="{x:Type util:VectorBox}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="FontSize" Value="18"/>
         <Setter Property="Background" Value="{StaticResource Editor.Window.GrayBrush2}"/>
         <Setter Property="BorderBrush" Value="{StaticResource Editor.Window.GrayBrush5}"/>
         <Setter Property="BorderThickness" Value="1"/>

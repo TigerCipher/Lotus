@@ -22,20 +22,31 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "Lotus/EngineApi/GameEntity.h"
+#include "../Components/Components.h"
+
+#define COMPONENT_INFO(name)                                                                                           \
+    namespace name                                                                                                     \
+    {                                                                                                                  \
+    struct create_info;                                                                                                \
+    }
 
 namespace lotus
 {
 
-struct TransformInfo;
+COMPONENT_INFO(transform)
+COMPONENT_INFO(script)
 
-struct EntityInfo
+#undef COMPONENT_INFO
+namespace entity
 {
-    TransformInfo* transform = nullptr;
-};
+    struct create_info
+    {
+        transform::create_info* transform = nullptr;
+        script::create_info*    script    = nullptr;
+    };
 
-Entity CreateEntity(const EntityInfo& desc);
-void   RemoveEntity(Entity ent);
-bool   IsAlive(Entity ent);
-
+    Entity CreateEntity(const create_info& info);
+    void   RemoveEntity(entity_id id);
+    bool   IsAlive(entity_id id);
+} // namespace entity
 } // namespace lotus

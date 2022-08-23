@@ -31,6 +31,15 @@
 
 #include <cstdint>
 #include <memory>
+#include <cassert>
+#include <utility>
+#include <unordered_map>
+// #include <array>
+// #include <map>
+// #include <functional>
+// #include <algorithm>
+// #include <string>
+// #include <sstream>
 
 #ifdef _WIN64
     #define WIN32_LEAN_AND_MEAN
@@ -39,8 +48,8 @@
     #error Currently only Windows x64 is supported. No current plans to change this
 #endif
 
-#include "Lotus/Util/Util.h"
-#include "Lotus/Util/MathUtil.h"
+#include "../Util/Util.h"
+#include "../Util/MathUtil.h"
 
 
 
@@ -111,6 +120,9 @@ constexpr uint64 InvalidIdU64 = 0xffff'ffff'ffff'ffffui64;
 
 using f32 = float;
 using f64 = double;
+
+
+using string_hash = std::hash<std::string>;
 
 
 template<typename T>

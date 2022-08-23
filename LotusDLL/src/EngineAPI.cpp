@@ -81,6 +81,6 @@ EDITOR_INTERFACE id::id_type CreateEntity(EntityDesc* e)
 
 EDITOR_INTERFACE void RemoveEntity(id::id_type id)
 {
-    LASSERT(id::IsValid(id));
+    LASSERT(id::is_valid(id));
     RemoveEntity(EntityFromId(id));
 }

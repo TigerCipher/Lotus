@@ -31,6 +31,20 @@ namespace lotus::utl
 {
 template<typename T>
 using vector = std::vector<T>;
+
+template<typename T>
+void EraseUnordered(std::vector<T>& vec, size_t index)
+{
+    if (vec.size() > 1)
+    {
+        std::iter_swap(vec.begin() + index, vec.end() - 1);
+        vec.pop_back();
+    } else
+    {
+        vec.clear();
+    }
+}
+
 } // namespace lotus::utl
 #endif
 

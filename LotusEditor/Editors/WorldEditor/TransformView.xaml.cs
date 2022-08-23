@@ -42,21 +42,21 @@ namespace LotusEditor.Editors
         }
 
         private Action GetAction(Func<Transform, (Transform transform, Vector3)> selector,
-    Action<(Transform transform, Vector3)> forEachAction)
+                                    Action<(Transform transform, Vector3)> forEachAction)
         {
-            if (!(DataContext is MSTransform vm))
+            if (DataContext is not MSTransform vm)
             {
                 _undoAction = null;
                 _propertyChanged = false;
                 return null;
             }
 
-            var selection = vm.SelectedComponents.Select(x => selector(x)).ToList();
-            return new Action(() =>
+            var selection = vm.SelectedComponents.Select(selector).ToList();
+            return () =>
             {
-                selection.ForEach(x => forEachAction(x));
+                selection.ForEach(forEachAction);
                 (GameEntityView.Instance.DataContext as MSEntity)?.GetMSComponent<MSTransform>().Refresh();
-            });
+            };
         }
 
         private Action GetPositionAction() => GetAction((x) => (x, x.Position), (x) => x.transform.Position = x.Item2);
