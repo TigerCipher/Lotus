@@ -29,21 +29,21 @@ namespace lotus::script
 
 namespace
 {
-    using ScriptRegistry = std::unordered_map<size_t, detail::ScriptCreator>;
+    using script_registry = std::unordered_map<size_t, detail::script_creator>;
 
-    utl::vector<detail::ScriptPtr> entityScripts;
+    utl::vector<detail::script_ptr> entityScripts;
     utl::vector<id::id_type>       idMapping;
     utl::vector<id::gen_type>      generations;
     utl::vector<script_id>         freeIds;
 
-    ScriptRegistry& registry()
+    script_registry& registry()
     {
-        static ScriptRegistry reg;
+        static script_registry reg;
         return reg;
     }
 
 
-    bool exists(script_id scriptId)
+    bool exists(const script_id scriptId)
     {
         LASSERT(id::is_valid(scriptId));
         const id::id_type index = id::index(scriptId);
@@ -57,9 +57,9 @@ namespace
 
 namespace detail
 {
-    byte register_script(size_t tag, ScriptCreator func)
+    byte register_script(size_t tag, script_creator func)
     {
-        bool res = registry().insert(ScriptRegistry::value_type { tag, func }).second;
+        bool res = registry().insert(script_registry::value_type { tag, func }).second;
         LASSERT(res);
         return res;
     }
@@ -86,9 +86,9 @@ Component create(const create_info& info, entity::Entity entity)
     }
 
     LASSERT(id::is_valid(scriptId));
+    const id::id_type index = (id::id_type) entityScripts.size();
     entityScripts.emplace_back(info.scriptCreator(entity));
     LASSERT(entityScripts.back()->GetId() == entity.GetId());
-    const id::id_type index = (id::id_type) entityScripts.size();
 
     idMapping [ id::index(scriptId) ] = index;
     return Component(scriptId);
@@ -100,7 +100,7 @@ void remove(Component comp)
     const script_id   id     = comp.GetId();
     const id::id_type index  = idMapping [ id::index(id) ];
     const script_id   lastId = entityScripts.back()->Script().GetId();
-    utl::EraseUnordered(entityScripts, index);
+    utl::erase_unordered(entityScripts, index);
     idMapping [ id::index(lastId) ] = index;
     idMapping [ id::index(id) ]     = id::InvalidId;
 }

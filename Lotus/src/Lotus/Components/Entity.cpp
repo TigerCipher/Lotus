@@ -36,7 +36,7 @@ namespace
     utl::vector<script::Component>    scripts;
 } // namespace
 
-Entity CreateEntity(const create_info& info)
+Entity create(const create_info& info)
 {
     LASSERT(info.transform);
     if (!info.transform) return {};
@@ -45,7 +45,7 @@ Entity CreateEntity(const create_info& info)
     if (freeIds.size() > id::MinDeletedElements)
     {
         ident = freeIds.front();
-        LASSERT(!IsAlive(ident));
+        LASSERT(!is_alive(ident));
         freeIds.pop_front();
         ident = entity_id { id::new_generation(ident) };
         ++generations [ id::index(ident) ];
@@ -56,6 +56,7 @@ Entity CreateEntity(const create_info& info)
 
         // transforms.resize(generations.size()) // --> more memory allocations than emplace_back
         transforms.emplace_back();
+        scripts.emplace_back();
     }
 
     const Entity      newEnt(ident);
@@ -76,16 +77,23 @@ Entity CreateEntity(const create_info& info)
     return newEnt;
 }
 
-void RemoveEntity(const entity_id id)
+void remove(const entity_id id)
 {
     const id::id_type index = id::index(id);
-    LASSERT(IsAlive(id));
+    LASSERT(is_alive(id));
+
+    if (scripts [ index ].IsValid())
+    {
+        script::remove(scripts [ index ]);
+        scripts [ index ] = {};
+    }
+
     transform::remove(transforms [ index ]);
     transforms [ index ] = {};
     freeIds.push_back(id);
 }
 
-bool IsAlive(const entity_id id)
+bool is_alive(const entity_id id)
 {
     LASSERT(id::is_valid(id));
     const id::id_type index = id::index(id);
@@ -102,7 +110,7 @@ bool IsAlive(const entity_id id)
 
 transform::Component Entity::Transform() const
 {
-    LASSERT(IsAlive(mId));
+    LASSERT(is_alive(mId));
     const id::id_type index = id::index(mId);
     return transforms [ index ];
 }
@@ -110,7 +118,7 @@ transform::Component Entity::Transform() const
 
 script::Component Entity::Script() const
 {
-    LASSERT(IsAlive(mId));
+    LASSERT(is_alive(mId));
     const id::id_type index = id::index(mId);
     return scripts [ index ];
 }

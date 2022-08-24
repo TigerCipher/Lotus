@@ -33,7 +33,7 @@ template<typename T>
 using vector = std::vector<T>;
 
 template<typename T>
-void EraseUnordered(std::vector<T>& vec, size_t index)
+void erase_unordered(std::vector<T>& vec, size_t index)
 {
     if (vec.size() > 1)
     {

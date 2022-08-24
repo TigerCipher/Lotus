@@ -120,7 +120,6 @@
     <ClInclude Include="src\Lotus\EngineApi\GameEntity.h" />
     <ClInclude Include="src\Lotus\EngineApi\ScriptComponent.h" />
     <ClInclude Include="src\Lotus\EngineApi\TransformComponent.h" />
-    <ClInclude Include="src\Lotus.h" />
     <ClInclude Include="src\Lotus\Util\MathUtil.h" />
     <ClInclude Include="src\Lotus\Util\Util.h" />
     <ClInclude Include="src\pch.h" />

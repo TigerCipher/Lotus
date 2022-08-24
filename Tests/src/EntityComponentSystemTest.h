@@ -69,10 +69,10 @@ private:
         while (count > 0)
         {
             ++mAdded;
-            Entity ent = CreateEntity(entityDesc);
+            Entity ent = create(entityDesc);
             LASSERT(ent.IsValid());
             mEntities.push_back(ent);
-            LASSERT(IsAlive(ent));
+            LASSERT(is_alive(ent));
             --count;
         }
     }
@@ -88,9 +88,9 @@ private:
             LASSERT(ent.IsValid());
             if (ent.IsValid())
             {
-                RemoveEntity(ent);
+                remove(ent);
                 mEntities.erase(mEntities.begin() + index);
-                LASSERT(!IsAlive(ent));
+                LASSERT(!is_alive(ent));
                 ++mRemoved;
             }
             --count;

@@ -22,11 +22,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="ProjectTemplates\EmptyProject\project.lproj" />
+    <None Include="ProjectTemplates\FirstPersonProject\project.lproj" />
+    <None Include="ProjectTemplates\project.lproj" />
+    <None Include="ProjectTemplates\ThirdPersonProject\project.lproj" />
+    <None Include="ProjectTemplates\TopDownProject\project.lproj" />
+  </ItemGroup>
+
+  <!-- <ItemGroup>
     <Compile Remove="ProjectTemplates\**" />
     <EmbeddedResource Remove="ProjectTemplates\**" />
     <None Remove="ProjectTemplates\**" />
     <Page Remove="ProjectTemplates\**" />
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
     <Page Include="App.xaml" />

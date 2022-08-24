@@ -66,20 +66,20 @@ namespace script
 
     namespace detail
     {
-        using ScriptPtr     = Scope<ScriptEntity>;
-        using ScriptCreator = ScriptPtr (*)(entity::Entity entity);
+        using script_ptr     = Scope<ScriptEntity>;
+        using script_creator = script_ptr (*)(entity::Entity entity);
 
-        byte register_script(size_t tag, ScriptCreator func);
+        byte register_script(size_t tag, script_creator func);
 
         template<class T>
-        ScriptPtr create_script(entity::Entity entity)
+        script_ptr create_script(entity::Entity entity)
         {
             LASSERT(entity.IsValid());
             return CreateScope<T>(entity);
         }
 
 #define LOTUS_REGISTER_SCRIPT(Type)                                                                                    \
-    class Type;                                                                                                       \
+    class Type; /* NOLINT(bugprone-macro-parentheses) */                                                               \
     namespace                                                                                                          \
     {                                                                                                                  \
         const uint8 reg_##Type =                                                                                       \

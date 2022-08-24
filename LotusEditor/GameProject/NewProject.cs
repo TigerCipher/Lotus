@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -24,6 +24,7 @@ namespace LotusEditor.GameProject
         public string IconFilePath { get; set; } = default!;
         public string ScreenshotFilePath { get; set; } = default!;
         public string ProjectFilePath { get; set; } = default!;
+        public string TemplatePath { get; set; }
     }
 
     class NewProject : ViewModelBase
@@ -32,6 +33,8 @@ namespace LotusEditor.GameProject
         private readonly string _templatePath = @"..\..\LotusEditor\ProjectTemplates";
 
         private string _name = "New Project";
+
+        // #TODO: Save last used path in a file so it gets set to that on the next launch. Or have it be a setting/preference the user can set?
         private string _path = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\LotusProjects\";
 
         private ObservableCollection<ProjectTemplate> _projectTemplates = new ObservableCollection<ProjectTemplate>();
@@ -115,6 +118,7 @@ namespace LotusEditor.GameProject
                     template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(dirName, "screenshot.png"));
                     template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
                     template.ProjectFilePath = Path.GetFullPath(Path.Combine(dirName, template.ProjectFile));
+                    template.TemplatePath = dirName;
 
                     _projectTemplates.Add(template);
                 }
@@ -197,6 +201,8 @@ namespace LotusEditor.GameProject
                 var projPath = Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
                 File.WriteAllText(projPath, projXml);
 
+                CreateMSVCSolution(template, path);
+
                 return path;
             }
             catch (Exception ex)
@@ -208,6 +214,34 @@ namespace LotusEditor.GameProject
 
         }
 
+        private void CreateMSVCSolution(ProjectTemplate template, string path)
+        {
+            Debug.Assert(File.Exists(Path.Combine(template.TemplatePath, "MSVCSolution")));
+            Debug.Assert(File.Exists(Path.Combine(template.TemplatePath, "MSVCProject")));
+
+            var engineApiPath = Path.Combine(MainWindow.LotusEngineSrcPath, @"Lotus\EngineApi\");
+            Debug.Assert(Directory.Exists(engineApiPath), engineApiPath);
+
+            var _0 = ProjectName;
+            var _1 = $"{{{Guid.NewGuid().ToString().ToUpper()}}}"; // proj guid
+            var _2 = $"{{{Guid.NewGuid().ToString().ToUpper()}}}"; // sln guid
+
+            var sln = File.ReadAllText(Path.Combine(template.TemplatePath, "MSVCSolution"));
+            sln = string.Format(sln, _0, _1, _2);
+
+            File.WriteAllText(Path.GetFullPath(Path.Combine(path, $"{_0}.sln")), sln);
+
+            _2 = engineApiPath;
+
+            var _3 = MainWindow.LotusPath;
+
+            var proj = File.ReadAllText(Path.Combine(template.TemplatePath, "MSVCProject"));
+            proj = string.Format(proj, _0, _1, _2, _3);
+
+            File.WriteAllText(Path.GetFullPath(Path.Combine(path, $@"Scripts\{_0}.vcxproj")), proj);
+
+
+        }
     }
 
 }

@@ -45,8 +45,8 @@ namespace entity
         script::create_info*    script    = nullptr;
     };
 
-    Entity CreateEntity(const create_info& info);
-    void   RemoveEntity(entity_id id);
-    bool   IsAlive(entity_id id);
+    Entity create(const create_info& info);
+    void   remove(entity_id id);
+    bool   is_alive(entity_id id);
 } // namespace entity
 } // namespace lotus
