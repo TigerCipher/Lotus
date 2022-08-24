@@ -24,6 +24,8 @@
                     Command="{Binding UndoCmd}"/>
             <Button Content="Redo"
                     Command="{Binding RedoCmd}" Margin="20,0,0,0"/>
+            <Button Content="Undo Selection" Command="{Binding UndoSelectionCmd}" Margin="20,0,0,0"/>
+            <Button Content="Redo Selection" Command="{Binding RedoSelectionCmd}" Margin="20,0,0,0"/>
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

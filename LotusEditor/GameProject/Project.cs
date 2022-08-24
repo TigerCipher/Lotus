@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -14,14 +14,14 @@ namespace LotusEditor.GameProject
     {
         public static string Extension { get; } = ".lproj";
         [DataMember] public string Name { get; private set; } = "New Project";
-        
+
         public string Location { get; private set; }
         public string FullPath => $"{Location}{Name}{Extension}";
         [DataMember(Name = "Scenes")]
         private ObservableCollection<Scene> _scenes = new();
         public ReadOnlyObservableCollection<Scene> Scenes { get; private set; }
         private Scene _activeScene;
-        
+
         public Scene ActiveScene
         {
             get => _activeScene;
@@ -37,7 +37,8 @@ namespace LotusEditor.GameProject
 
         public static Project Current => Application.Current.MainWindow!.DataContext as Project;
 
-        public static History HistoryManager { get; } = new History();
+        public static History HistoryManager { get; } = new();
+        public static History SelectionHistoryManager { get; } = new();
 
         public ICommand AddSceneCmd { get; private set; }
         public ICommand RemoveSceneCmd { get; private set; }
@@ -45,13 +46,16 @@ namespace LotusEditor.GameProject
         public ICommand UndoCmd { get; private set; }
         public ICommand RedoCmd { get; private set; }
 
+        public ICommand UndoSelectionCmd { get; private set; }
+        public ICommand RedoSelectionCmd { get; private set; }
+
         public ICommand SaveCmd { get; private set; }
 
         public Project(string name, string path)
         {
             Name = name;
             Location = path;
-            
+
             OnDeserialized(new StreamingContext());
         }
 
@@ -79,6 +83,7 @@ namespace LotusEditor.GameProject
         public void Unload()
         {
             HistoryManager.Reset();
+            SelectionHistoryManager.Reset();
         }
 
         [OnDeserialized]
@@ -116,12 +121,15 @@ namespace LotusEditor.GameProject
             UndoCmd = new RelayCommand<object>(x => HistoryManager.Undo());
             RedoCmd = new RelayCommand<object>(x => HistoryManager.Redo());
             SaveCmd = new RelayCommand<object>(x => Save(this));
+
+            UndoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Undo());
+            RedoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Redo());
         }
 
         private void AddSceneInternal(string sceneName)
         {
             Debug.Assert(!string.IsNullOrEmpty(sceneName.Trim()));
-            _scenes.Add(new Scene(this, sceneName)); 
+            _scenes.Add(new Scene(this, sceneName));
         }
 
         private void RemoveSceneInternal(Scene scene)

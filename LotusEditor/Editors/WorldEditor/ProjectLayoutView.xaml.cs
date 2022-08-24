@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,7 +45,7 @@ namespace LotusEditor.Editors
             var prevSelection = newSelection.Except(e.AddedItems.Cast<Entity>())
                 .Concat(e.RemovedItems.Cast<Entity>()).ToList();
 
-            Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(
+            Project.SelectionHistoryManager.AddUndoRedoAction(new UndoRedoAction(
                 "Selection changed",
                 () =>
                 {

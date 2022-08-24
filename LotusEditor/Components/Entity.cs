@@ -137,7 +137,6 @@ namespace LotusEditor.Components
 
         public void Refresh()
         {
-            Debug.WriteLine("Refreshing MSEntity");
             _enableUpdates = false;
             UpdateMSGameEntity();
             CreateComponentList();
@@ -146,7 +145,6 @@ namespace LotusEditor.Components
 
         private void CreateComponentList()
         {
-            Debug.WriteLine("Creating comp list");
             _components.Clear();
             var firstEnt = SelectedEntities.FirstOrDefault();
             if (firstEnt == null) return;
@@ -156,7 +154,6 @@ namespace LotusEditor.Components
                 var type = comp.GetType();
                 if (!SelectedEntities.Skip(1).Any(ent => ent.GetComponent(type) == null))
                 {
-                    Debug.WriteLine("Adding comp");
                     Debug.Assert(Components.FirstOrDefault(x=>x.GetType() == type) == null);
                     _components.Add(comp.GetMSComponent(this));
                 }
