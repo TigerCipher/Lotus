@@ -23,19 +23,27 @@
 
 #include "Common.h"
 #include <Lotus/Core/Common.h>
+#include <Lotus/Components/Script.h>
 
 #ifndef WIN32_LEAN_ANDMEAN
     #define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
-
+#include <atlsafe.h>
 
 using namespace lotus;
 
-namespace 
+namespace
 {
 HMODULE gameDll = nullptr;
-}
+
+using script_creator_func              = script::detail::script_creator (*)(size_t);
+script_creator_func get_script_creator = nullptr;
+
+using script_names_func            = LPSAFEARRAY (*)(void);
+script_names_func get_script_names = nullptr;
+
+} // namespace
 
 
 EDITOR_INTERFACE u32 LoadGameDll(const char* dllPath)
@@ -44,7 +52,9 @@ EDITOR_INTERFACE u32 LoadGameDll(const char* dllPath)
     gameDll = LoadLibraryA(dllPath);
     LASSERT(gameDll);
 
-    return gameDll ? TRUE : FALSE;
+    get_script_names   = (script_names_func) GetProcAddress(gameDll, "get_script_names");
+    get_script_creator = (script_creator_func) GetProcAddress(gameDll, "get_script_creator");
+    return gameDll && get_script_names && get_script_creator ? TRUE : FALSE;
 }
 
 EDITOR_INTERFACE uint32 UnloadGameDll()
@@ -55,3 +65,10 @@ EDITOR_INTERFACE uint32 UnloadGameDll()
     gameDll = nullptr;
     return TRUE;
 }
+
+EDITOR_INTERFACE script::detail::script_creator GetScriptCreator(const char* name)
+{
+    return gameDll && get_script_creator ? get_script_creator(string_hash()(name)) : nullptr;
+}
+
+EDITOR_INTERFACE LPSAFEARRAY GetScriptNames() { return gameDll && get_script_names ? get_script_names() : nullptr; }

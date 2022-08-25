@@ -20,9 +20,16 @@ namespace LotusEditor.EngineAPIStructs
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    class ScriptComponent
+    {
+        public IntPtr ScriptCreator;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     class EntityDesc
     {
-        public TransformComponent Transform = new TransformComponent();
+        public TransformComponent Transform = new();
+        public ScriptComponent Script = new();
     }
 }
 
@@ -38,6 +45,13 @@ namespace LotusEditor.DllWrapper
         [DllImport(_lotusDll)]
         public static extern int UnloadGameDll();
 
+        [DllImport(_lotusDll)]
+        public static extern IntPtr GetScriptCreator(string name);
+
+        [DllImport(_lotusDll)]
+        [return: MarshalAs(UnmanagedType.SafeArray)]
+        public static extern string[] GetScriptNames();
+
         internal static class EntityAPI
         {
             [DllImport(_lotusDll)]
@@ -52,6 +66,11 @@ namespace LotusEditor.DllWrapper
                     desc.Transform.Position = c.Position;
                     desc.Transform.Rotation = c.Rotation;
                     desc.Transform.Scale = c.Scale;
+                }
+
+                // Script
+                {
+                    // var c = entity.GetComponent<Script>();
                 }
 
                 return CreateEntity(desc);

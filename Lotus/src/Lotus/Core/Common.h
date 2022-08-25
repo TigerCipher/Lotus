@@ -52,11 +52,15 @@
 #include "../Util/MathUtil.h"
 
 
-
-
 // Make sure L_DEBUG is defined for debug builds
 #if !defined(L_DEBUG) && defined(_DEBUG)
     #define L_DEBUG
+#endif
+
+#ifdef L_EDITOR
+    #define L_EXPORT extern "C" __declspec(dllexport)
+#else
+    #define L_EXPORT
 #endif
 
 

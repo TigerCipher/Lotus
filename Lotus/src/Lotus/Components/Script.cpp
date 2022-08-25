@@ -53,20 +53,45 @@ namespace
                entityScripts [ idMapping [ index ] ]->IsValid();
     }
 
+#ifdef L_EDITOR
+    utl::vector<std::string>& script_names()
+    {
+        static utl::vector<std::string> names;
+        return names;
+    }
+#endif
+
 } // namespace
 
 namespace detail
 {
     byte register_script(size_t tag, script_creator func)
     {
-        bool res = registry().insert(script_registry::value_type { tag, func }).second;
+        const bool res = registry().insert(script_registry::value_type { tag, func }).second;
         LASSERT(res);
         return res;
     }
+
+    script_creator get_script_creator(const size_t tag)
+    {
+        const auto script = registry().find(tag);
+        LASSERT(script != registry().end() && script->first == tag);
+        return script->second;
+    }
+
+
+#ifdef L_EDITOR
+    uint8 add_script_name(const char* name)
+    {
+        script_names().emplace_back(name);
+        return true;
+    }
+#endif
+
 } // namespace detail
 
 
-Component create(const create_info& info, entity::Entity entity)
+Component create(const create_info& info, const entity::Entity entity)
 {
     LASSERT(entity.IsValid() && info.scriptCreator);
     script_id scriptId;
@@ -104,4 +129,21 @@ void remove(Component comp)
     idMapping [ id::index(lastId) ] = index;
     idMapping [ id::index(id) ]     = id::InvalidId;
 }
+
+#ifdef L_EDITOR
+
+    #include <atlsafe.h>
+
+extern "C" __declspec(dllexport) LPSAFEARRAY get_script_names()
+{
+    const u32 size = (u32) script_names().size();
+    if (!size) return nullptr;
+    CComSafeArray<BSTR> names(size);
+    for (u32 i = 0; i < size; ++i) { names.SetAt(i, A2BSTR_EX(script_names() [ i ].c_str()), false); }
+
+    return names.Detach();
+}
+
+#endif
+
 } // namespace lotus::script

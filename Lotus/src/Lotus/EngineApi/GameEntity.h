@@ -72,6 +72,8 @@ namespace script
 
         byte register_script(size_t tag, script_creator func);
 
+        L_EXPORT script_creator get_script_creator(size_t tag);
+
         template<class T>
         script_ptr create_script(entity::Entity entity)
         {
@@ -79,13 +81,25 @@ namespace script
             return CreateScope<T>(entity);
         }
 
-#define LOTUS_REGISTER_SCRIPT(Type)                                                                                    \
-    class Type; /* NOLINT(bugprone-macro-parentheses) */                                                               \
-    namespace                                                                                                          \
-    {                                                                                                                  \
-        const uint8 reg_##Type =                                                                                       \
-            lotus::script::detail::register_script(string_hash()(#Type), &lotus::script::detail::create_script<Type>); \
-    }
+#ifdef L_EDITOR
+        uint8 add_script_name(const char* name);
+
+    #define LOTUS_REGISTER_SCRIPT(Type)                                                                                \
+        namespace                                                                                                      \
+        {                                                                                                              \
+            const uint8 reg_##Type = lotus::script::detail::register_script(                                           \
+                string_hash()(#Type), &lotus::script::detail::create_script<Type>);                                    \
+            const uint8 name_##Type = lotus::script::detail::add_script_name(##Type);                                  \
+        }
+#else
+
+    #define LOTUS_REGISTER_SCRIPT(Type)                                                                                \
+        namespace                                                                                                      \
+        {                                                                                                              \
+            const uint8 reg_##Type = lotus::script::detail::register_script(                                           \
+                string_hash()(#Type), &lotus::script::detail::create_script<Type>);                                    \
+        }
+#endif
     } // namespace detail
 } // namespace script
 
