@@ -16,3 +16,10 @@ Editor will need to do the following ->
                           \/
     - foreward declare `class CharacterScript`
     - registerscript(std::hash<std::string>("CharacterScript"), &lotus::script::detail::create_script<CharacterScript>)
+
+
+settings/preferences
+    - Base Font Size?
+    - Close visual studio when close the editor or not
+    - Build on editor launch or not
+    - Show visual studio when building or not (maybe option for only if there was an error?)
