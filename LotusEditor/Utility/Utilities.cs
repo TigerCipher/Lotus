@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LotusEditor.Utility
@@ -26,5 +27,15 @@ namespace LotusEditor.Utility
     {
         public static int INVALID_ID => -1; // int because entity ids are currently u32's. This will not work for u64
         public static bool IsValid(int id) => id != INVALID_ID;
+    }
+
+    internal class StringUtil
+    {
+        private static readonly Regex _whitespace = new Regex(@"\s+");
+
+        public static string ReplaceWhitespace(string input, string replacement)
+        {
+            return _whitespace.Replace(input, replacement);
+        }
     }
 }

@@ -11,7 +11,7 @@
         <Border.Effect>
             <DropShadowEffect Opacity="0.6" BlurRadius="15" ShadowDepth="2"/>
         </Border.Effect>
-        <Grid Margin="32">
+        <Grid Margin="32,0">
             <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="{StaticResource Editor.RedBrush}"
                        Margin="0,10,0,0" TextWrapping="Wrap" x:Name="msgTextBlock"/>
             <DockPanel>

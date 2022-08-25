@@ -52,21 +52,21 @@ namespace entity
 
 namespace script
 {
-    class ScriptEntity : public entity::Entity
+    class ScriptableEntity : public entity::Entity
     {
     public:
-        virtual ~ScriptEntity() = default;
+        virtual ~ScriptableEntity() = default;
 
         virtual void OnStart() { }
         virtual void Update(Timestep ts) { }
 
     protected:
-        constexpr explicit ScriptEntity(const Entity entity) : Entity(entity.GetId()) { }
+        constexpr explicit ScriptableEntity(const Entity entity) : Entity(entity.GetId()) { }
     };
 
     namespace detail
     {
-        using script_ptr     = Scope<ScriptEntity>;
+        using script_ptr     = Scope<ScriptableEntity>;
         using script_creator = script_ptr (*)(entity::Entity entity);
 
         byte register_script(size_t tag, script_creator func);

@@ -6,9 +6,14 @@
              xmlns:local="clr-namespace:LotusEditor.Editors"
              xmlns:util="clr-namespace:LotusEditor.Utility"
              xmlns:ctrl="clr-namespace:LotusEditor.Utility.Controls"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" Focusable="True"
              d:DesignHeight="450" d:DesignWidth="800">
 
+    <UserControl.Resources>
+        <sys:Boolean x:Key="True">True</sys:Boolean>
+        <sys:Boolean x:Key="False">False</sys:Boolean>
+    </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Command="{Binding UndoCmd}" Modifiers="Control" Key="Z"/>
         <KeyBinding Command="{Binding RedoCmd}" Modifiers="Control" Key="Y"/>
@@ -23,9 +28,15 @@
             <Button Content="Undo"
                     Command="{Binding UndoCmd}"/>
             <Button Content="Redo"
-                    Command="{Binding RedoCmd}" Margin="20,0,0,0"/>
-            <Button Content="Undo Selection" Command="{Binding UndoSelectionCmd}" Margin="20,0,0,0"/>
-            <Button Content="Redo Selection" Command="{Binding RedoSelectionCmd}" Margin="20,0,0,0"/>
+                    Command="{Binding RedoCmd}" Margin="5,0,0,0"/>
+            <Button Content="Undo Selection" Command="{Binding UndoSelectionCmd}" Margin="5,0,0,0"/>
+            <Button Content="Redo Selection" Command="{Binding RedoSelectionCmd}" Margin="5,0,0,0"/>
+            <Button Content="New Script" Click="NewScript_OnButtonClick" Margin="5,0,0,0"/>
+            <Button Content="Build" Command="{Binding BuildCmd}" CommandParameter="{StaticResource True}" Margin="5,0,0,0"/>
+            <ComboBox x:Name="buildConfig" VerticalAlignment="Center" Margin="5,0" Width="84" SelectedIndex="{Binding BuildConfig}">
+                <ComboBoxItem Content="Debug"/>
+                <ComboBoxItem Content="Release"/>
+            </ComboBox>
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -51,20 +62,20 @@
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <Border Background="{StaticResource Editor.Selected.BackgroundColorBrush}">
-                    <StackPanel VerticalAlignment="Center">
-                        <ctrl:NumberBox VerticalAlignment="Center" HorizontalAlignment="Center" Value="0"/>
-                        <ctrl:ScalarBox Value="10" Multiplier="10"/>
-                        <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC2"/>
-                        <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC3"/>
-                        <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC4"/>
-
-                        <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC2" Orientation="Vertical"/>
-                        <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC3" Orientation="Vertical"/>
-                        <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC4" Orientation="Vertical"/>
-                    </StackPanel>
-
-                </Border>
+                <!-- <Border Background="{StaticResource Editor.Selected.BackgroundColorBrush}"> -->
+                <!--     <StackPanel VerticalAlignment="Center"> -->
+                <!--         <ctrl:NumberBox VerticalAlignment="Center" HorizontalAlignment="Center" Value="0"/> -->
+                <!--         <ctrl:ScalarBox Value="10" Multiplier="10"/> -->
+                <!--         <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC2"/> -->
+                <!--         <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC3"/> -->
+                <!--         <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC4"/> -->
+                <!-- -->
+                <!--         <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC2" Orientation="Vertical"/> -->
+                <!--         <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC3" Orientation="Vertical"/> -->
+                <!--         <ctrl:VectorBox X="0" Y="0" Z="0" W="0" VectorType="VEC4" Orientation="Vertical"/> -->
+                <!--     </StackPanel> -->
+                <!-- -->
+                <!-- </Border> -->
                 <GridSplitter Grid.Row="1" Height="5"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Top" Background="Transparent"/>

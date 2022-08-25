@@ -4,7 +4,12 @@
                     xmlns:local="clr-namespace:LotusEditor.Dictionaries"
                     xmlns:util="clr-namespace:LotusEditor.Utility.Controls"
                     >
-    <Style TargetType="{x:Type TextBox}" x:Key="TextBoxStyle">
+    <Style TargetType="{x:Type Control}" x:Key="LotusBaseControlStyle">
+        <Setter Property="FontSize" Value="18"/>
+    </Style>
+
+
+    <Style TargetType="{x:Type TextBox}" x:Key="TextBoxStyle" BasedOn="{StaticResource LotusBaseControlStyle}">
         <Setter Property="Foreground" Value="{StaticResource Editor.FontColorBrush}"/>
         <Setter Property="Background" Value="{StaticResource Editor.Window.GrayBrush2}"/>
         <Setter Property="BorderBrush" Value="{StaticResource Editor.Window.GrayBrush4}"/>
@@ -65,7 +70,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style TargetType="{x:Type Button}">
+    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource LotusBaseControlStyle}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
         <Setter Property="Background">
             <Setter.Value>
@@ -295,7 +300,7 @@
 
 
     <!-- ListBoxItem -->
-    <Style TargetType="{x:Type ListBoxItem}" x:Key="ListBoxItemStyle">
+    <Style TargetType="{x:Type ListBoxItem}" x:Key="ListBoxItemStyle" BasedOn="{StaticResource LotusBaseControlStyle}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Padding" Value="4,2,0,2" />
         <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment,
@@ -366,7 +371,7 @@
 
     <!-- ListBox -->
 
-    <Style TargetType="{x:Type ListBox}">
+    <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource LotusBaseControlStyle}">
         <Setter Property="ItemContainerStyle" Value="{StaticResource ListBoxItemStyle}"/>
         <Setter Property="Background" Value="{StaticResource Editor.Window.GrayBrush2}"/>
         <Setter Property="BorderBrush" Value="{StaticResource Editor.Window.GrayBrush4}"/>
@@ -424,7 +429,7 @@
         <GradientStop Color="{StaticResource Editor.Window.GrayColor5}" Offset="0.0"/>
         <GradientStop Color="{StaticResource Editor.Window.GrayColor3}" Offset="1.0"/>
     </LinearGradientBrush>
-    <Style TargetType="{x:Type TabControl}">
+    <Style TargetType="{x:Type TabControl}" BasedOn="{StaticResource LotusBaseControlStyle}">
         <Setter Property="Padding" Value="2"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -503,7 +508,7 @@
     <SolidColorBrush x:Key="TabItem.MouseOver.Border" Color="{StaticResource Editor.Selected.BackgroundColor}"/>
     <SolidColorBrush x:Key="TabItem.Disabled.Background" Color="{StaticResource Editor.Window.GrayColor4}"/>
     <SolidColorBrush x:Key="TabItem.Disabled.Border" Color="{StaticResource Editor.Window.GrayColor3}"/>
-    <Style TargetType="{x:Type TabItem}">
+    <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource LotusBaseControlStyle}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource Editor.FontColorBrush}"/>
         <Setter Property="Background" Value="{StaticResource TabItem.Static.Background}"/>
@@ -689,10 +694,9 @@
     </Style>
 
 
-    <Style TargetType="{x:Type util:NumberBox}" x:Key="{x:Type util:NumberBox}">
+    <Style TargetType="{x:Type util:NumberBox}" x:Key="{x:Type util:NumberBox}" BasedOn="{StaticResource LotusBaseControlStyle}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Foreground" Value="{StaticResource Editor.FontColorBrush}"/>
-        <Setter Property="FontSize" Value="18"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type util:NumberBox}">
@@ -728,9 +732,8 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type util:ScalarBox}" x:Key="{x:Type util:ScalarBox}">
+    <Style TargetType="{x:Type util:ScalarBox}" x:Key="{x:Type util:ScalarBox}" BasedOn="{StaticResource LotusBaseControlStyle}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-        <Setter Property="FontSize" Value="18"/>
         <Setter Property="Foreground" Value="{StaticResource Editor.FontColorBrush}"/>
         <Setter Property="Background" Value="{StaticResource Editor.Window.GrayBrush2}"/>
         <Setter Property="BorderBrush" Value="{StaticResource Editor.Window.GrayBrush5}"/>
@@ -788,9 +791,8 @@
     </Style>
 
 
-    <Style TargetType="{x:Type util:VectorBox}" x:Key="{x:Type util:VectorBox}">
+    <Style TargetType="{x:Type util:VectorBox}" x:Key="{x:Type util:VectorBox}" BasedOn="{StaticResource LotusBaseControlStyle}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-        <Setter Property="FontSize" Value="18"/>
         <Setter Property="Background" Value="{StaticResource Editor.Window.GrayBrush2}"/>
         <Setter Property="BorderBrush" Value="{StaticResource Editor.Window.GrayBrush5}"/>
         <Setter Property="BorderThickness" Value="1"/>

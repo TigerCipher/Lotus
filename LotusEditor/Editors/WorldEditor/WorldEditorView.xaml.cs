@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LotusEditor.GameDev;
 using LotusEditor.GameProject;
 
 namespace LotusEditor.Editors
@@ -33,6 +34,16 @@ namespace LotusEditor.Editors
             Loaded -= OnWorldEditorViewLoaded;
             Focus();
             // ((INotifyCollectionChanged)Project.HistoryManager.UndoList).CollectionChanged += (s, e) => Focus();
+        }
+
+        private void NewScript_OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            new NewScriptDialog().ShowDialog();
+        }
+
+        private void Build_OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }

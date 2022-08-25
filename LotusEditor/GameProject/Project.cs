@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -5,10 +6,20 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Input;
+using LotusEditor.GameDev;
 using LotusEditor.Utility;
 
 namespace LotusEditor.GameProject
 {
+
+    enum BuildConfiguration
+    {
+        DEBUG,
+        DEBUG_DLL,
+        RELEASE,
+        RELEASE_DLL
+    }
+
     [DataContract(Name = "Game")]
     internal class Project : ViewModelBase
     {
@@ -17,6 +28,20 @@ namespace LotusEditor.GameProject
 
         public string Location { get; private set; }
         public string FullPath => $"{Location}{Name}{Extension}";
+        public string SolutionName => $@"{Location}{Name}.sln";
+
+
+        private static readonly string[] _configNames = new[] { "Debug", "DebugDll", "Release", "ReleaseDll" };
+
+        private int _buildConfig;
+        public int BuildConfig { get => _buildConfig; set { if (_buildConfig == value) return; _buildConfig = value; OnPropertyChanged(nameof(BuildConfig)); } }
+
+        public BuildConfiguration ExeBuildConfig =>
+            BuildConfig == 0 ? BuildConfiguration.DEBUG : BuildConfiguration.RELEASE;
+
+        public BuildConfiguration DllBuildConfig =>
+            BuildConfig == 0 ? BuildConfiguration.DEBUG_DLL : BuildConfiguration.RELEASE_DLL;
+
         [DataMember(Name = "Scenes")]
         private ObservableCollection<Scene> _scenes = new();
         public ReadOnlyObservableCollection<Scene> Scenes { get; private set; }
@@ -50,6 +75,8 @@ namespace LotusEditor.GameProject
         public ICommand RedoSelectionCmd { get; private set; }
 
         public ICommand SaveCmd { get; private set; }
+        public ICommand BuildCmd { get; private set; }
+
 
         public Project(string name, string path)
         {
@@ -69,7 +96,7 @@ namespace LotusEditor.GameProject
         {
             Debug.Assert(data != null && File.Exists(data.FullPath));
             var proj = Serializer.FromFile<Project>(data.FullPath);
-            proj.Location = data.ProjectPath;
+            proj.Location = Path.GetDirectoryName(data.ProjectPath) + "\\";
 
             return proj;
         }
@@ -82,6 +109,7 @@ namespace LotusEditor.GameProject
 
         public void Unload()
         {
+            VisualStudio.CloseInstance();
             HistoryManager.Reset();
             SelectionHistoryManager.Reset();
         }
@@ -118,12 +146,44 @@ namespace LotusEditor.GameProject
                     () => RemoveSceneInternal(x)));
             }, x => !x.IsActive);
 
-            UndoCmd = new RelayCommand<object>(x => HistoryManager.Undo());
-            RedoCmd = new RelayCommand<object>(x => HistoryManager.Redo());
+            UndoCmd = new RelayCommand<object>(x => HistoryManager.Undo(), x => HistoryManager.UndoList.Any());
+            RedoCmd = new RelayCommand<object>(x => HistoryManager.Redo(), x => HistoryManager.RedoList.Any());
             SaveCmd = new RelayCommand<object>(x => Save(this));
+            BuildCmd = new RelayCommand<bool>(x => BuildGameDll(x), x => !VisualStudio.IsDebugging() && VisualStudio.BuildFinished);
 
-            UndoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Undo());
-            RedoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Redo());
+            UndoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Undo(), x => SelectionHistoryManager.UndoList.Any());
+            RedoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Redo(), x => SelectionHistoryManager.RedoList.Any());
+        }
+
+        private void BuildGameDll(bool showWindow = true)
+        {
+            try
+            {
+                UnloadGameDll();
+
+                VisualStudio.BuildSolution(this, GetConfigName(DllBuildConfig), showWindow);
+                if (VisualStudio.BuildSucceeded)
+                {
+                    LoadGameDll();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                Logger.Error($"Failed to build the game dll");
+                throw;
+            }
+
+        }
+
+        private void LoadGameDll()
+        {
+
+        }
+
+        private void UnloadGameDll()
+        {
+
         }
 
         private void AddSceneInternal(string sceneName)
@@ -137,6 +197,9 @@ namespace LotusEditor.GameProject
             Debug.Assert(_scenes.Contains(scene));
             _scenes.Remove(scene);
         }
+
+
+        private static string GetConfigName(BuildConfiguration config) => _configNames[(int)config];
 
     }
 }
