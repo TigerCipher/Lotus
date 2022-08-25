@@ -64,8 +64,8 @@ namespace LotusEditor.Utility.Controls
             if (Math.Abs(delta) > SystemParameters.MinimumHorizontalDragDistance)
             {
                 if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control)) _speedMultiplier = 0.001;
-                else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) _speedMultiplier = 1;
-                else _speedMultiplier = 0.1;
+                else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) _speedMultiplier = 0.1;
+                else _speedMultiplier = 0.01;
                 var newValue = _originalValue + (delta * _speedMultiplier * Multiplier);
                 Value = newValue.ToString("0.#####");
                 _valueChanged = true;

@@ -55,8 +55,8 @@ class {0} : public lotus::script::ScriptableEntity
 {{
 public:
     constexpr explicit {0}(lotus::entity::Entity entity) : lotus::script::ScriptableEntity(entity) {{}}
-    void {0}::OnStart() override;
-    void {0}::Update(lotus::Timestep ts) override;
+    void OnStart() override;
+    void Update(lotus::Timestep ts) override;
 private:
 }};
 

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using LotusEditor.GameProject;
@@ -156,12 +157,12 @@ namespace LotusEditor.GameDev
 
         public static void BuildSolution(Project project, string configName, bool showWindow)
         {
-            Logger.Info($"Building {project.Name}");
             if (IsDebugging())
             {
                 Logger.Error("Visual Studio is currently running a process");
                 return;
             }
+            Logger.Info($"Building {project.Name}");
 
             OpenInstance(project.SolutionName);
             BuildFinished = BuildSucceeded = false;
@@ -181,17 +182,30 @@ namespace LotusEditor.GameDev
                     _vsInstance.Events.BuildEvents.OnBuildProjConfigBegin += OnBuildBegin;
                     _vsInstance.Events.BuildEvents.OnBuildProjConfigDone += OnBuildDone;
 
+                    try
+                    {
+                        foreach (var pdb in Directory.GetFiles(Path.Combine($"{project.Location}", $@"x64\{configName}"),
+                                    "*.pdb"))
+                        {
+                            File.Delete(pdb);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine(e.Message);
+                    }
 
-                    Logger.Info($"Setting Visual Studio solution to {configName} mode");
+
+
+                    // Logger.Info($"Setting Visual Studio solution to {configName} mode");
                     _vsInstance.Solution.SolutionBuild.SolutionConfigurations.Item(configName).Activate();
 
-                    Logger.Info("Building...");
                     _vsInstance.ExecuteCommand("Build.BuildSolution");
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
-                    Logger.Error($"Failed to build. Caught an exception: {ex.Message}");
+                    Logger.Error("Failed to build");
                     System.Threading.Thread.Sleep(1000);
                 }
             }
@@ -203,7 +217,7 @@ namespace LotusEditor.GameDev
         {
             if (BuildFinished) return;
 
-            if(success) Logger.Info($"Built {project} for {platform} in {projectconfig} mode successfully");
+            if (success) Logger.Info($"Built {project} for {platform} in {projectconfig} mode successfully");
             else Logger.Error($"Failed to build {project} in {projectconfig} mode");
 
             BuildFinished = true;
@@ -217,6 +231,7 @@ namespace LotusEditor.GameDev
 
         public static bool IsDebugging()
         {
+            // if (_vsInstance == null) return false;
             var res = false;
 
             for (var i = 0; i < 3; i++)

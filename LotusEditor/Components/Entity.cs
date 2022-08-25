@@ -30,12 +30,12 @@ namespace LotusEditor.Components
                 if (_isActive == value) return; _isActive = value;
                 if (_isActive)
                 {
-                    EntityId = EngineAPI.CreateEntity(this);
+                    EntityId = EngineAPI.EntityAPI.CreateEntity(this);
                     Debug.Assert(ID.IsValid(_entityId));
                 }
                 else if(ID.IsValid(EntityId))
                 {
-                    EngineAPI.RemoveEntity(this);
+                    EngineAPI.EntityAPI.RemoveEntity(this);
                     EntityId = ID.INVALID_ID;
                 }
 

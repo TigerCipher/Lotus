@@ -31,8 +31,8 @@
                     Command="{Binding RedoCmd}" Margin="5,0,0,0"/>
             <Button Content="Undo Selection" Command="{Binding UndoSelectionCmd}" Margin="5,0,0,0"/>
             <Button Content="Redo Selection" Command="{Binding RedoSelectionCmd}" Margin="5,0,0,0"/>
-            <Button Content="New Script" Click="NewScript_OnButtonClick" Margin="5,0,0,0"/>
-            <Button Content="Build" Command="{Binding BuildCmd}" CommandParameter="{StaticResource True}" Margin="5,0,0,0"/>
+            <Button Content="New Script" Click="NewScript_OnButtonClick" Margin="5,0,0,0" IsEnabled="{Binding Path=IsEnabled, ElementName=buildButton}"/>
+            <Button Content="Build" Command="{Binding BuildCmd}" CommandParameter="{StaticResource True}" Margin="5,0,0,0" x:Name="buildButton"/>
             <ComboBox x:Name="buildConfig" VerticalAlignment="Center" Margin="5,0" Width="84" SelectedIndex="{Binding BuildConfig}">
                 <ComboBoxItem Content="Debug"/>
                 <ComboBoxItem Content="Release"/>
@@ -80,11 +80,11 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Top" Background="Transparent"/>
                 <TabControl Grid.Row="1" Background="{StaticResource Editor.Window.GrayBrush2}" Margin="0,5,0,0">
-                    <TabItem Header="History">
-                        <util:HistoryView DataContext="{Binding HistoryManager}"/>
-                    </TabItem>
                     <TabItem Header="Console">
                         <util:LoggerView/>
+                    </TabItem>
+                    <TabItem Header="History">
+                        <util:HistoryView DataContext="{Binding HistoryManager}"/>
                     </TabItem>
                 </TabControl>
             </Grid>

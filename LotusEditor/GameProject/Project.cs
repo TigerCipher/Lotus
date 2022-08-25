@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using LotusEditor.DllWrapper;
 using LotusEditor.GameDev;
 using LotusEditor.Utility;
 
@@ -34,6 +36,7 @@ namespace LotusEditor.GameProject
         private static readonly string[] _configNames = new[] { "Debug", "DebugDll", "Release", "ReleaseDll" };
 
         private int _buildConfig;
+        [DataMember]
         public int BuildConfig { get => _buildConfig; set { if (_buildConfig == value) return; _buildConfig = value; OnPropertyChanged(nameof(BuildConfig)); } }
 
         public BuildConfiguration ExeBuildConfig =>
@@ -86,6 +89,47 @@ namespace LotusEditor.GameProject
             OnDeserialized(new StreamingContext());
         }
 
+        private void SetCommands()
+        {
+            AddSceneCmd = new RelayCommand<object>(x =>
+            {
+                AddSceneInternal($"New Scene {_scenes.Count}");
+                var newScene = _scenes.Last();
+                var index = _scenes.Count - 1;
+                HistoryManager.AddUndoRedoAction(new UndoRedoAction(
+                    $"Add Scene {newScene.Name}",
+                    () => RemoveSceneInternal(newScene),
+                    () => _scenes.Insert(index, newScene)));
+            });
+
+            RemoveSceneCmd = new RelayCommand<Scene>(x =>
+            {
+                var index = _scenes.IndexOf(x);
+                RemoveSceneInternal(x);
+
+                HistoryManager.AddUndoRedoAction(new UndoRedoAction($"Remove Scene {x.Name}",
+                    () => _scenes.Insert(index, x),
+                    () => RemoveSceneInternal(x)));
+            }, x => !x.IsActive);
+
+            UndoCmd = new RelayCommand<object>(x => HistoryManager.Undo(), x => HistoryManager.UndoList.Any());
+            RedoCmd = new RelayCommand<object>(x => HistoryManager.Redo(), x => HistoryManager.RedoList.Any());
+            SaveCmd = new RelayCommand<object>(x => Save(this));
+            BuildCmd = new RelayCommand<bool>(async x => await BuildGameDll(x), x => !VisualStudio.IsDebugging() && VisualStudio.BuildFinished);
+
+            UndoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Undo(), x => SelectionHistoryManager.UndoList.Any());
+            RedoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Redo(), x => SelectionHistoryManager.RedoList.Any());
+
+            OnPropertyChanged(nameof(AddSceneCmd));
+            OnPropertyChanged(nameof(RemoveSceneCmd));
+            OnPropertyChanged(nameof(UndoCmd));
+            OnPropertyChanged(nameof(RedoCmd));
+            OnPropertyChanged(nameof(SaveCmd));
+            OnPropertyChanged(nameof(BuildCmd));
+            OnPropertyChanged(nameof(UndoSelectionCmd));
+            OnPropertyChanged(nameof(RedoSelectionCmd));
+        }
+
         public static Project Load(string file)
         {
             Debug.Assert(File.Exists(file));
@@ -115,7 +159,7 @@ namespace LotusEditor.GameProject
         }
 
         [OnDeserialized]
-        private void OnDeserialized(StreamingContext ctx)
+        private async void OnDeserialized(StreamingContext ctx)
         {
             if (_scenes != null)
             {
@@ -125,43 +169,18 @@ namespace LotusEditor.GameProject
 
             ActiveScene = Scenes.FirstOrDefault(x => x.IsActive);
 
-            AddSceneCmd = new RelayCommand<object>(x =>
-            {
-                AddSceneInternal($"New Scene {_scenes.Count}");
-                var newScene = _scenes.Last();
-                var index = _scenes.Count - 1;
-                HistoryManager.AddUndoRedoAction(new UndoRedoAction(
-                    $"Add Scene {newScene.Name}",
-                    () => RemoveSceneInternal(newScene),
-                    () => _scenes.Insert(index, newScene)));
-            });
+            await BuildGameDll(false);
 
-            RemoveSceneCmd = new RelayCommand<Scene>(x =>
-            {
-                var index = _scenes.IndexOf(x);
-                RemoveSceneInternal(x);
-
-                HistoryManager.AddUndoRedoAction(new UndoRedoAction($"Remove Scene {x.Name}",
-                    () => _scenes.Insert(index, x),
-                    () => RemoveSceneInternal(x)));
-            }, x => !x.IsActive);
-
-            UndoCmd = new RelayCommand<object>(x => HistoryManager.Undo(), x => HistoryManager.UndoList.Any());
-            RedoCmd = new RelayCommand<object>(x => HistoryManager.Redo(), x => HistoryManager.RedoList.Any());
-            SaveCmd = new RelayCommand<object>(x => Save(this));
-            BuildCmd = new RelayCommand<bool>(x => BuildGameDll(x), x => !VisualStudio.IsDebugging() && VisualStudio.BuildFinished);
-
-            UndoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Undo(), x => SelectionHistoryManager.UndoList.Any());
-            RedoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Redo(), x => SelectionHistoryManager.RedoList.Any());
+            SetCommands();
         }
 
-        private void BuildGameDll(bool showWindow = true)
+        private async Task BuildGameDll(bool showWindow = true)
         {
             try
             {
                 UnloadGameDll();
 
-                VisualStudio.BuildSolution(this, GetConfigName(DllBuildConfig), showWindow);
+                await Task.Run(() => VisualStudio.BuildSolution(this, GetConfigName(DllBuildConfig), showWindow));
                 if (VisualStudio.BuildSucceeded)
                 {
                     LoadGameDll();
@@ -178,12 +197,27 @@ namespace LotusEditor.GameProject
 
         private void LoadGameDll()
         {
+            Logger.Info("Loading game dll");
 
+            var configName = GetConfigName(DllBuildConfig);
+            var dll = $@"{Location}x64\{configName}\{Name}.dll";
+            if (File.Exists(dll) && EngineAPI.LoadGameDll(dll) != 0)
+            {
+                Logger.Info("Game dll loaded successfully");
+            }
+            else
+            {
+                Logger.Warn("Failed to load the game dll. Try rebuilding the project");
+            }
         }
 
         private void UnloadGameDll()
         {
-
+            Logger.Info("Unloading game dll");
+            if (EngineAPI.UnloadGameDll() != 0)
+            {
+                Logger.Info("Game dll unloaded successfully");
+            }
         }
 
         private void AddSceneInternal(string sceneName)

@@ -20,7 +20,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
     <PlatformTarget>x64</PlatformTarget>
-    <OutputPath>..\bin\Debug\</OutputPath>
+    <OutputPath>..\bin\DebugDll\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -30,7 +30,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">
     <PlatformTarget>x64</PlatformTarget>
-    <OutputPath>..\bin\Release\</OutputPath>
+    <OutputPath>..\bin\ReleaseDll\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -57,7 +57,6 @@
   <ItemGroup>
     <None Include="ProjectTemplates\EmptyProject\project.lproj" />
     <None Include="ProjectTemplates\FirstPersonProject\project.lproj" />
-    <None Include="ProjectTemplates\project.lproj" />
     <None Include="ProjectTemplates\ThirdPersonProject\project.lproj" />
     <None Include="ProjectTemplates\TopDownProject\project.lproj" />
   </ItemGroup>

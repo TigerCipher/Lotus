@@ -64,6 +64,7 @@ namespace script
         constexpr explicit ScriptableEntity(const Entity entity) : Entity(entity.GetId()) { }
     };
 
+
     namespace detail
     {
         using script_ptr     = Scope<ScriptableEntity>;

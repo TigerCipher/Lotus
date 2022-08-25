@@ -30,31 +30,41 @@ namespace LotusEditor.DllWrapper
 {
     internal static class EngineAPI
     {
-        private const string _dllName = "LotusDLL.dll";
+        private const string _lotusDll = "LotusDLL.dll";
 
-        [DllImport(_dllName)]
-        private static extern int CreateEntity(EntityDesc desc);
+        [DllImport(_lotusDll, CharSet = CharSet.Ansi)]
+        public static extern int LoadGameDll(string dllPath);
 
-        public static int CreateEntity(Entity entity)
+        [DllImport(_lotusDll)]
+        public static extern int UnloadGameDll();
+
+        internal static class EntityAPI
         {
-            EntityDesc desc = new EntityDesc();
-            // Transform
+            [DllImport(_lotusDll)]
+            private static extern int CreateEntity(EntityDesc desc);
+
+            public static int CreateEntity(Entity entity)
             {
-                var c = entity.GetComponent<Transform>();
-                desc.Transform.Position = c.Position;
-                desc.Transform.Rotation = c.Rotation;
-                desc.Transform.Scale = c.Scale;
+                EntityDesc desc = new EntityDesc();
+                // Transform
+                {
+                    var c = entity.GetComponent<Transform>();
+                    desc.Transform.Position = c.Position;
+                    desc.Transform.Rotation = c.Rotation;
+                    desc.Transform.Scale = c.Scale;
+                }
+
+                return CreateEntity(desc);
             }
 
-            return CreateEntity(desc);
+            [DllImport(_lotusDll)]
+            private static extern void RemoveEntity(int id);
+
+            public static void RemoveEntity(Entity entity)
+            {
+                RemoveEntity(entity.EntityId);
+            }
         }
 
-        [DllImport(_dllName)]
-        private static extern void RemoveEntity(int id);
-
-        public static void RemoveEntity(Entity entity)
-        {
-            RemoveEntity(entity.EntityId);
-        }
     }
 }

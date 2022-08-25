@@ -68,7 +68,7 @@ namespace LotusEditor
             }
             else
             {
-                LotusPath = enginePath;
+                LotusPath = devModeEnabled ? @"D:\CppWorkspace\Lotus" : enginePath;
             }
         }
 
