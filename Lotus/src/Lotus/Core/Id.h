@@ -89,7 +89,7 @@ namespace detail
         };
 
 #else
-    #define L_TYPED_ID(name) using name = id_type;
+    #define L_TYPED_ID(name) using name = id::id_type;
 #endif
 
 } // namespace lotus::id

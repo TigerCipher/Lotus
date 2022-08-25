@@ -32,9 +32,9 @@ namespace
     using script_registry = std::unordered_map<size_t, detail::script_creator>;
 
     utl::vector<detail::script_ptr> entityScripts;
-    utl::vector<id::id_type>       idMapping;
-    utl::vector<id::gen_type>      generations;
-    utl::vector<script_id>         freeIds;
+    utl::vector<id::id_type>        idMapping;
+    utl::vector<id::gen_type>       generations;
+    utl::vector<script_id>          freeIds;
 
     script_registry& registry()
     {

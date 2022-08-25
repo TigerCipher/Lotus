@@ -41,10 +41,10 @@ struct TransformDesc
     f32 rotation [ 3 ];
     f32 scale [ 3 ];
 
-    TransformInfo ToTransformData()
+    transform::create_info ToTransformData()
     {
         using namespace DirectX;
-        TransformInfo data {};
+        transform::create_info data {};
         memcpy(&data.position [ 0 ], &position [ 0 ], sizeof(f32) * _countof(position));
         memcpy(&data.scale [ 0 ], &scale [ 0 ], sizeof(f32) * _countof(scale));
 
@@ -64,7 +64,7 @@ struct EntityDesc
 };
 
 
-Entity EntityFromId(id::id_type id) { return Entity { EntityId { id } }; }
+entity::Entity EntityFromId(id::id_type id) { return entity::Entity { entity::entity_id { id } }; }
 
 
 } // namespace
@@ -72,15 +72,15 @@ Entity EntityFromId(id::id_type id) { return Entity { EntityId { id } }; }
 EDITOR_INTERFACE id::id_type CreateEntity(EntityDesc* e)
 {
     LASSERT(e);
-    EntityDesc&   desc { *e };
-    TransformInfo transform = desc.transform.ToTransformData();
-    EntityInfo    entity    = { &transform };
+    EntityDesc&            desc { *e };
+    transform::create_info transform = desc.transform.ToTransformData();
+    entity::create_info    entity    = { &transform };
 
-    return CreateEntity(entity).GetId();
+    return entity::create(entity).GetId();
 }
 
 EDITOR_INTERFACE void RemoveEntity(id::id_type id)
 {
     LASSERT(id::is_valid(id));
-    RemoveEntity(EntityFromId(id));
+    entity::remove(entity::entity_id{id});
 }
