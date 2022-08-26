@@ -13,7 +13,7 @@ namespace LotusEditor.Components
         TRANSFORM,
         SCRIPT,
     }
-    internal class ComponentFactory
+    static class ComponentFactory
     {
 
         private static readonly Func<Entity, object, Component>[] _func = new Func<Entity, object, Component>[]
@@ -26,6 +26,16 @@ namespace LotusEditor.Components
         {
             Debug.Assert((int)compType < _func.Length);
             return _func[(int)compType];
+        }
+
+        public static ComponentType ToEnumType(this Component comp)
+        {
+            return comp switch
+            {
+                Transform => ComponentType.TRANSFORM,
+                Script => ComponentType.SCRIPT,
+                _ => throw new ArgumentException("Unknown component type")
+            };
         }
     }
 }

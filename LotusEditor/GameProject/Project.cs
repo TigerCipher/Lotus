@@ -157,6 +157,24 @@ namespace LotusEditor.GameProject
             Logger.Info($"Saved project {proj.Name} to {proj.FullPath}");
         }
 
+        private void SaveToBinary()
+        {
+            var bin = $@"{Location}x64\{VisualStudio.GetConfigName(ExeBuildConfig)}\game.bin";
+
+            using var bw = new BinaryWriter(File.Open(bin, FileMode.Create, FileAccess.Write));
+            bw.Write(ActiveScene.Entities.Count);
+            foreach (var entity in ActiveScene.Entities)
+            {
+                bw.Write(0); // entity type
+                bw.Write(entity.Components.Count);
+                foreach (var comp in entity.Components)
+                {
+                    bw.Write((int)comp.ToEnumType());
+                    comp.WriteToBinary(bw);
+                }
+            }
+        }
+
         public void Unload()
         {
             UnloadGameDll();
@@ -240,7 +258,7 @@ namespace LotusEditor.GameProject
             await Task.Run(() => VisualStudio.BuildSolution(this, ExeBuildConfig, debug));
             if (VisualStudio.BuildSucceeded)
             {
-                // Save the project to binary
+                SaveToBinary();
                 await Task.Run(() => VisualStudio.Run(this, ExeBuildConfig, debug));
             }
         }

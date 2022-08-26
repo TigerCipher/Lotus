@@ -42,14 +42,14 @@ struct transform_component
     {
         using namespace DirectX;
         transform::create_info data {};
-        memcpy(&data.position [ 0 ], &position [ 0 ], sizeof(f32) * _countof(position));
-        memcpy(&data.scale [ 0 ], &scale [ 0 ], sizeof(f32) * _countof(scale));
+        memcpy(&data.position [ 0 ], &position [ 0 ], sizeof(position));
+        memcpy(&data.scale [ 0 ], &scale [ 0 ], sizeof(scale));
 
         vec3a rot { &rotation [ 0 ] };
         vec   quat { XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3A(&rot)) };
         vec4a rotQuad {};
         XMStoreFloat4A(&rotQuad, quat);
-        memcpy(&data.rotation [ 0 ], &rotQuad.x, sizeof(f32) * _countof(data.rotation));
+        memcpy(&data.rotation [ 0 ], &rotQuad.x, sizeof(rotation));
 
         return data;
     }

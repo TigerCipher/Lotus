@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -27,6 +28,7 @@ namespace LotusEditor.Components
         }
 
         public abstract IMSComponent GetMSComponent(MSEntity msEnt);
+        public abstract void WriteToBinary(BinaryWriter bw);
     }
 
 
