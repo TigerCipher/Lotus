@@ -307,6 +307,41 @@ namespace LotusEditor.GameDev
                 return IsDebuggingInternal();
             }
         }
+
+        private static void RunInternal(Project project, BuildConfiguration buildConfig, bool debug)
+        {
+            CallOnSTAThread(() =>
+            {
+                if(_vsInstance != null && !IsDebuggingInternal() && BuildSucceeded)
+                    _vsInstance.ExecuteCommand(debug ? "Debug.Start" : "Debug.StartWithoutDebugging");
+
+            });
+        }
+
+        public static void Run(Project project, BuildConfiguration buildConfig, bool debug)
+        {
+            lock (_lock)
+            {
+                RunInternal(project, buildConfig, debug);
+            }
+        }
+
+        private static void StopInternal()
+        {
+            CallOnSTAThread(() =>
+            {
+                if(_vsInstance != null && IsDebuggingInternal())
+                    _vsInstance.ExecuteCommand("Debug.StopDebugging");
+            });
+        }
+
+        public static void Stop()
+        {
+            lock (_lock)
+            {
+                StopInternal();
+            }
+        }
     }
 
     // Class containing the IOleMEssageFilter thread error-handling function

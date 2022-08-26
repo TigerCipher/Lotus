@@ -223,6 +223,7 @@
     <ClCompile Include="src\Lotus\Components\Entity.cpp" />
     <ClCompile Include="src\Lotus\Components\Script.cpp" />
     <ClCompile Include="src\Lotus\Components\Transform.cpp" />
+    <ClCompile Include="src\Lotus\Core\Engine.cpp" />
     <ClCompile Include="src\Lotus\Core\EntryPoint.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

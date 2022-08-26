@@ -19,6 +19,9 @@
         <KeyBinding Command="{Binding RedoCmd}" Modifiers="Control" Key="Y"/>
         <KeyBinding Command="{Binding SaveCmd}" Modifiers="Control" Key="S"/>
         <KeyBinding Command="{Binding BuildCmd}" CommandParameter="{StaticResource True}" Modifiers="Control" Key="B"/>
+        <KeyBinding Command="{Binding DebugStartCmd}" CommandParameter="{StaticResource True}" Key="F5"/>
+        <KeyBinding Command="{Binding DebugStartWithoutDebuggingCmd}" CommandParameter="{StaticResource True}" Modifiers="Control" Key="F5"/>
+        <KeyBinding Command="{Binding DebugStopCmd}" CommandParameter="{StaticResource True}" Modifiers="Shift" Key="F5"/>
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>

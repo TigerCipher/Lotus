@@ -76,6 +76,10 @@ namespace LotusEditor.GameProject
         public ICommand SaveCmd { get; private set; }
         public ICommand BuildCmd { get; private set; }
 
+        public ICommand DebugStartCmd { get; private set; }
+        public ICommand DebugStartWithoutDebuggingCmd { get; private set; }
+        public ICommand DebugStopCmd { get; private set; }
+
 
         public Project(string name, string path)
         {
@@ -115,6 +119,9 @@ namespace LotusEditor.GameProject
 
             UndoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Undo(), x => SelectionHistoryManager.UndoList.Any());
             RedoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Redo(), x => SelectionHistoryManager.RedoList.Any());
+            DebugStartCmd = new RelayCommand<object>(async x => await RunGame(true), x => !VisualStudio.IsDebugging() && VisualStudio.BuildFinished);
+            DebugStartWithoutDebuggingCmd = new RelayCommand<object>(async x => await RunGame(false), x => !VisualStudio.IsDebugging() && VisualStudio.BuildFinished);
+            DebugStopCmd = new RelayCommand<object>(async x => await StopGame(), x => VisualStudio.IsDebugging());
 
             OnPropertyChanged(nameof(AddSceneCmd));
             OnPropertyChanged(nameof(RemoveSceneCmd));
@@ -124,6 +131,9 @@ namespace LotusEditor.GameProject
             OnPropertyChanged(nameof(BuildCmd));
             OnPropertyChanged(nameof(UndoSelectionCmd));
             OnPropertyChanged(nameof(RedoSelectionCmd));
+            OnPropertyChanged(nameof(DebugStartCmd));
+            OnPropertyChanged(nameof(DebugStartWithoutDebuggingCmd));
+            OnPropertyChanged(nameof(DebugStopCmd));
         }
 
         public static Project Load(string file)
@@ -223,6 +233,20 @@ namespace LotusEditor.GameProject
                 AvailableScripts = null;
             }
         }
+
+
+        private async Task RunGame(bool debug)
+        {
+            await Task.Run(() => VisualStudio.BuildSolution(this, ExeBuildConfig, debug));
+            if (VisualStudio.BuildSucceeded)
+            {
+                // Save the project to binary
+                await Task.Run(() => VisualStudio.Run(this, ExeBuildConfig, debug));
+            }
+        }
+
+        private async Task StopGame() => await Task.Run(VisualStudio.Stop);
+
 
         private void AddSceneInternal(string sceneName)
         {

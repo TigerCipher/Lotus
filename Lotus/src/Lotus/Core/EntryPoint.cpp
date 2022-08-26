@@ -22,4 +22,50 @@
 // ------------------------------------------------------------------------------
 #include "pch.h"
 
-int main() { return 0; }
+#ifdef _WIN64
+
+    #ifndef WIN32_LEAN_AND_MEAN
+        #define WIN32_LEAN_AND_MEAN
+    #endif
+
+    #include <Windows.h>
+    #include <crtdbg.h>
+
+    #ifndef L_EDITOR
+extern bool engine_initialize();
+extern void engine_update();
+extern void engine_shutdown();
+
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
+        #if L_DEBUG
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+        #endif
+    if (engine_initialize())
+    {
+        MSG  msg;
+        bool running = true;
+
+        while (running)
+        {
+            while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+                running &= (msg.message != WM_QUIT);
+            }
+
+            engine_update();
+        }
+    }
+
+    engine_shutdown();
+    return 0;
+}
+
+    #endif
+
+
+#else
+    #error Lotus currently only supports Windows x64
+#endif
