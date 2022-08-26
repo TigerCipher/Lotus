@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using LotusEditor.Components;
 using LotusEditor.EngineAPIStructs;
+using LotusEditor.GameProject;
+using LotusEditor.Utility;
 
 namespace LotusEditor.EngineAPIStructs
 {
@@ -70,7 +72,18 @@ namespace LotusEditor.DllWrapper
 
                 // Script
                 {
-                    // var c = entity.GetComponent<Script>();
+                    var c = entity.GetComponent<Script>();
+                    if (c != null && Project.Current != null)
+                    {
+                        if (Project.Current.AvailableScripts.Contains(c.Name))
+                        {
+                            desc.Script.ScriptCreator = GetScriptCreator(c.Name);
+                        }
+                        else
+                        {
+                            Logger.Error($"Failed to find script: {c.Name}. Entity will be created without it");
+                        }
+                    }
                 }
 
                 return CreateEntity(desc);

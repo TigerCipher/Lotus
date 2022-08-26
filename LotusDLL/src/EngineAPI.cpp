@@ -62,6 +62,7 @@ EDITOR_INTERFACE uint32 UnloadGameDll()
     if (!gameDll) return FALSE;
     LASSERT(gameDll);
     int res = FreeLibrary(gameDll);
+    LASSERT(res);
     gameDll = nullptr;
     return TRUE;
 }
@@ -71,4 +72,7 @@ EDITOR_INTERFACE script::detail::script_creator GetScriptCreator(const char* nam
     return gameDll && get_script_creator ? get_script_creator(string_hash()(name)) : nullptr;
 }
 
-EDITOR_INTERFACE LPSAFEARRAY GetScriptNames() { return gameDll && get_script_names ? get_script_names() : nullptr; }
+EDITOR_INTERFACE LPSAFEARRAY GetScriptNames()
+{
+    return gameDll && get_script_names ? get_script_names() : nullptr;
+}

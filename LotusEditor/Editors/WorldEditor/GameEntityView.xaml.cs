@@ -89,9 +89,40 @@ namespace LotusEditor.Editors
             Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(msEnt.IsEnabled == true ? "Enabled entity" : "Disable entity", undo, redo));
         }
 
+        private void AddComponent(ComponentType compType, object data)
+        {
+            var creationFunc = ComponentFactory.GetCreateFunction(compType);
+            var changedEntities = new List<(Entity entity, Component comp)>();
+            var vm = DataContext as MSEntity;
+            foreach (var ent in vm.SelectedEntities)
+            {
+                var comp = creationFunc(ent, data);
+                if (ent.AddComponent(comp))
+                {
+                    changedEntities.Add((ent, comp));
+                }
+            }
+
+            if (changedEntities.Any())
+            {
+                vm.Refresh();
+                Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction($"Added {compType} component",
+                    () => // undo
+                    {
+                        changedEntities.ForEach(x=>x.entity.RemoveComponent(x.comp));
+                        (DataContext as MSEntity).Refresh();
+                    },
+                    () =>// redo
+                    {
+                        changedEntities.ForEach(x => x.entity.AddComponent(x.comp));
+                        (DataContext as MSEntity).Refresh();
+                    }));
+            }
+        }
+
         private void AddScriptComponent_OnClick(object sender, RoutedEventArgs e)
         {
-            
+            AddComponent(ComponentType.SCRIPT, (sender as MenuItem).Header.ToString());
         }
 
         private void AddComponent_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using LotusEditor.Components;
 using LotusEditor.DllWrapper;
 using LotusEditor.GameDev;
 using LotusEditor.Utility;
@@ -38,7 +39,7 @@ namespace LotusEditor.GameProject
             BuildConfig == 0 ? BuildConfiguration.DEBUG_DLL : BuildConfiguration.RELEASE_DLL;
 
         private string[] _availableScripts;
-        public string[] AvailableScripts { get => _availableScripts; private set { if(_availableScripts == value) return; _availableScripts = value; OnPropertyChanged(nameof(AvailableScripts)); } }
+        public string[] AvailableScripts { get => _availableScripts; private set { if (_availableScripts == value) return; _availableScripts = value; OnPropertyChanged(nameof(AvailableScripts)); } }
 
         [DataMember(Name = "Scenes")]
         private ObservableCollection<Scene> _scenes = new();
@@ -58,7 +59,7 @@ namespace LotusEditor.GameProject
 
 
 
-        public static Project Current => Application.Current.MainWindow?.DataContext as Project;
+        public static Project Current => Application.Current.MainWindow.DataContext as Project;
 
         public static History HistoryManager { get; } = new();
         public static History SelectionHistoryManager { get; } = new();
@@ -148,6 +149,7 @@ namespace LotusEditor.GameProject
 
         public void Unload()
         {
+            UnloadGameDll();
             VisualStudio.CloseInstance();
             HistoryManager.Reset();
             SelectionHistoryManager.Reset();
@@ -163,6 +165,8 @@ namespace LotusEditor.GameProject
             }
 
             ActiveScene = Scenes.FirstOrDefault(x => x.IsActive);
+
+            Debug.Assert(ActiveScene != null);
 
             await BuildGameDll(false);
 
@@ -196,11 +200,12 @@ namespace LotusEditor.GameProject
 
             var configName = VisualStudio.GetConfigName(DllBuildConfig);
             var dll = $@"{Location}x64\{configName}\{Name}.dll";
+            AvailableScripts = null;
             if (File.Exists(dll) && EngineAPI.LoadGameDll(dll) != 0)
             {
-                Logger.Info("Game dll loaded successfully");
-
                 AvailableScripts = EngineAPI.GetScriptNames();
+                ActiveScene.Entities.Where(x => x.GetComponent<Script>() != null).ToList().ForEach(x => x.IsActive = true);
+                Logger.Info("Game dll loaded successfully");
             }
             else
             {
@@ -211,6 +216,7 @@ namespace LotusEditor.GameProject
         private void UnloadGameDll()
         {
             Logger.Info("Unloading game dll");
+            ActiveScene.Entities.Where(x => x.GetComponent<Script>() != null).ToList().ForEach(x => x.IsActive = false);
             if (EngineAPI.UnloadGameDll() != 0)
             {
                 Logger.Info("Game dll unloaded successfully");
