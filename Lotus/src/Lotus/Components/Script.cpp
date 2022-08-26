@@ -130,20 +130,22 @@ void remove(Component comp)
     idMapping [ id::index(id) ]     = id::InvalidId;
 }
 
+
+
+} // namespace lotus::script
+
 #ifdef L_EDITOR
 
     #include <atlsafe.h>
 
 extern "C" __declspec(dllexport) LPSAFEARRAY get_script_names()
 {
-    const u32 size = (u32) script_names().size();
+    const u32 size = (u32) lotus::script::script_names().size();
     if (!size) return nullptr;
     CComSafeArray<BSTR> names(size);
-    for (u32 i = 0; i < size; ++i) { names.SetAt(i, A2BSTR_EX(script_names() [ i ].c_str()), false); }
+    for (u32 i = 0; i < size; ++i) { names.SetAt(i, A2BSTR_EX(lotus::script::script_names() [ i ].c_str()), false); }
 
     return names.Detach();
 }
 
 #endif
-
-} // namespace lotus::script

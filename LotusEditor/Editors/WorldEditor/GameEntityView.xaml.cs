@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -86,6 +87,22 @@ namespace LotusEditor.Editors
             msEnt.IsEnabled = (sender as CheckBox).IsChecked;
             var redo = GetEnableAction();
             Project.HistoryManager.AddUndoRedoAction(new UndoRedoAction(msEnt.IsEnabled == true ? "Enabled entity" : "Disable entity", undo, redo));
+        }
+
+        private void AddScriptComponent_OnClick(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void AddComponent_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var menu = FindResource("addComponentMenu") as ContextMenu;
+            var button = sender as ToggleButton;
+            button.IsChecked = true;
+            menu.Placement = PlacementMode.Bottom;
+            menu.PlacementTarget = button;
+            menu.MinWidth = button.ActualWidth;
+            menu.IsOpen = true;
         }
     }
 }

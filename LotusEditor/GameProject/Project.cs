@@ -14,18 +14,11 @@ using LotusEditor.Utility;
 namespace LotusEditor.GameProject
 {
 
-    enum BuildConfiguration
-    {
-        DEBUG,
-        DEBUG_DLL,
-        RELEASE,
-        RELEASE_DLL
-    }
 
     [DataContract(Name = "Game")]
     internal class Project : ViewModelBase
     {
-        public static string Extension { get; } = ".lproj";
+        public static string Extension => ".lproj";
         [DataMember] public string Name { get; private set; } = "New Project";
 
         public string Location { get; private set; }
@@ -33,7 +26,6 @@ namespace LotusEditor.GameProject
         public string SolutionName => $@"{Location}{Name}.sln";
 
 
-        private static readonly string[] _configNames = new[] { "Debug", "DebugDll", "Release", "ReleaseDll" };
 
         private int _buildConfig;
         [DataMember]
@@ -44,6 +36,9 @@ namespace LotusEditor.GameProject
 
         public BuildConfiguration DllBuildConfig =>
             BuildConfig == 0 ? BuildConfiguration.DEBUG_DLL : BuildConfiguration.RELEASE_DLL;
+
+        private string[] _availableScripts;
+        public string[] AvailableScripts { get => _availableScripts; private set { if(_availableScripts == value) return; _availableScripts = value; OnPropertyChanged(nameof(AvailableScripts)); } }
 
         [DataMember(Name = "Scenes")]
         private ObservableCollection<Scene> _scenes = new();
@@ -63,7 +58,7 @@ namespace LotusEditor.GameProject
 
 
 
-        public static Project Current => Application.Current.MainWindow!.DataContext as Project;
+        public static Project Current => Application.Current.MainWindow?.DataContext as Project;
 
         public static History HistoryManager { get; } = new();
         public static History SelectionHistoryManager { get; } = new();
@@ -180,7 +175,7 @@ namespace LotusEditor.GameProject
             {
                 UnloadGameDll();
 
-                await Task.Run(() => VisualStudio.BuildSolution(this, GetConfigName(DllBuildConfig), showWindow));
+                await Task.Run(() => VisualStudio.BuildSolution(this, DllBuildConfig, showWindow));
                 if (VisualStudio.BuildSucceeded)
                 {
                     LoadGameDll();
@@ -199,11 +194,13 @@ namespace LotusEditor.GameProject
         {
             Logger.Info("Loading game dll");
 
-            var configName = GetConfigName(DllBuildConfig);
+            var configName = VisualStudio.GetConfigName(DllBuildConfig);
             var dll = $@"{Location}x64\{configName}\{Name}.dll";
             if (File.Exists(dll) && EngineAPI.LoadGameDll(dll) != 0)
             {
                 Logger.Info("Game dll loaded successfully");
+
+                AvailableScripts = EngineAPI.GetScriptNames();
             }
             else
             {
@@ -217,6 +214,7 @@ namespace LotusEditor.GameProject
             if (EngineAPI.UnloadGameDll() != 0)
             {
                 Logger.Info("Game dll unloaded successfully");
+                AvailableScripts = null;
             }
         }
 
@@ -231,9 +229,6 @@ namespace LotusEditor.GameProject
             Debug.Assert(_scenes.Contains(scene));
             _scenes.Remove(scene);
         }
-
-
-        private static string GetConfigName(BuildConfiguration config) => _configNames[(int)config];
 
     }
 }

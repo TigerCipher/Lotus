@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using LotusEditor;
 using LotusEditor.Components;
@@ -17,6 +18,7 @@ namespace LotusEditor.Components
 {
     [DataContract]
     [KnownType(typeof(Transform))]
+    [KnownType(typeof(Script))]
     internal class Entity : ViewModelBase
     {
         private int _entityId = ID.INVALID_ID;
@@ -80,6 +82,34 @@ namespace LotusEditor.Components
         public Component GetComponent(Type type) => Components.FirstOrDefault(c => c.GetType() == type);
 
         public T GetComponent<T>() where T : Component => GetComponent(typeof(T)) as T;
+
+        public bool AddComponent(Component comp)
+        {
+            Debug.Assert(comp != null);
+            if (!Components.Any(x => x.GetType() == comp.GetType()))
+            {
+                IsActive = false;
+                _components.Add(comp);
+                IsActive = true;
+                return true;
+            }
+
+            Logger.Warn($"Entity {Name}:{EntityId} already has a {comp.GetType().Name} component");
+            return false;
+        }
+
+        public void RemoveComponent(Component comp)
+        {
+            Debug.Assert(comp != null);
+            if (comp is Transform) return;
+
+            if (_components.Contains(comp))
+            {
+                IsActive = false;
+                _components.Remove(comp);
+                IsActive = true;
+            }
+        }
 
     }
 

@@ -89,7 +89,7 @@ namespace script
         {                                                                                                              \
             const uint8 reg_##Type = lotus::script::detail::register_script(                                           \
                 string_hash()(#Type), &lotus::script::detail::create_script<Type>);                                    \
-            const uint8 name_##Type = lotus::script::detail::add_script_name(##Type);                                  \
+            const uint8 name_##Type = lotus::script::detail::add_script_name(#Type);                                   \
         }
 #else
 
