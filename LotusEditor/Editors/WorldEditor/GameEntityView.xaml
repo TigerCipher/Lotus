@@ -10,6 +10,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <local:NullableBoolConverter x:Key="nullableBoolConverter"/>
         <DataTemplate DataType="{x:Type vm:MSTransform}">
             <local:TransformView/>
         </DataTemplate>
@@ -53,9 +54,10 @@
                 </Style.Triggers>
             </Style>
         </ScrollViewer.Style>
-        <StackPanel Background="{StaticResource Editor.Window.GrayBrush4}">
+        <StackPanel Background="{StaticResource Editor.Window.GrayBrush4}" VerticalAlignment="Top">
             <Border Height="32" Background="{StaticResource Editor.Window.GrayBrush3}">
                 <ToggleButton x:Name="addComponent" VerticalAlignment="Center" ClickMode="Press" Focusable="False"
+                              IsEnabled="{Binding IsEnabled, Converter={StaticResource nullableBoolConverter}}"
                               HorizontalAlignment="Left" Margin="5,0,0,0" PreviewMouseLeftButtonDown="AddComponent_OnMouseLeftButtonDown">
                     <ToggleButton.Content>
                         <DockPanel>
@@ -74,6 +76,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Name" Grid.Column="0" Margin="5,0,0,0" Style="{StaticResource LightTextBlockStyle}"/>
                 <TextBox Text="{Binding Name, UpdateSourceTrigger=Explicit}" Grid.Column="1"
+                         IsEnabled="{Binding IsEnabled, Converter={StaticResource nullableBoolConverter}}"
                          GotKeyboardFocus="Name_OnTextBoxKeyboardFocus"
                          LostKeyboardFocus="Name_OnTextBoxKeyboardFocusLost"/>
                 <StackPanel Orientation="Horizontal" Grid.Column="2">
@@ -83,7 +86,8 @@
                 </StackPanel>
 
             </Grid>
-            <ItemsControl ItemsSource="{Binding Components}">
+            <ItemsControl ItemsSource="{Binding Components}" IsEnabled="{Binding IsEnabled, Converter={StaticResource nullableBoolConverter}}"
+                          IsTabStop="False" SnapsToDevicePixels="True">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel/>

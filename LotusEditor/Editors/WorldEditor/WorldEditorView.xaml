@@ -18,6 +18,7 @@
         <KeyBinding Command="{Binding UndoCmd}" Modifiers="Control" Key="Z"/>
         <KeyBinding Command="{Binding RedoCmd}" Modifiers="Control" Key="Y"/>
         <KeyBinding Command="{Binding SaveCmd}" Modifiers="Control" Key="S"/>
+        <KeyBinding Command="{Binding BuildCmd}" CommandParameter="{StaticResource True}" Modifiers="Control" Key="B"/>
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -40,10 +41,10 @@
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0" MinWidth="350">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
