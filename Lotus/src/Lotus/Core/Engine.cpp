@@ -1,28 +1,45 @@
 // ------------------------------------------------------------------------------
-// 
+//
 // Lotus
 //    Copyright 2022 Matthew Rogers
-// 
+//
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
 //    You may obtain a copy of the License at
-// 
+//
 //        http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 //    Unless required by applicable law or agreed to in writing, software
 //    distributed under the License is distributed on an "AS IS" BASIS,
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-// 
+//
 // File Name: Engine.cpp
 // Date File Created: 8/26/2022
 // Author: Matt
-// 
+//
 // ------------------------------------------------------------------------------
 #include "pch.h"
 
+#ifndef PRODUCTION
 
-bool engine_initialize() { return true; }
-void engine_update(){}
-void engine_shutdown(){}
+    #include "Lotus/Content/ContentLoader.h"
+    #include "Lotus/Components/Script.h"
+
+    #include <thread>
+
+bool engine_initialize()
+{
+    const bool res = lotus::content::load_game();
+    return res;
+}
+void engine_update()
+{
+    lotus::script::update_all(10.0f);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+}
+
+void engine_shutdown() { lotus::content::unload_game(); }
+
+#endif

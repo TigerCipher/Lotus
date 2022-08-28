@@ -130,8 +130,10 @@ void remove(Component comp)
     idMapping [ id::index(id) ]     = id::InvalidId;
 }
 
-
-
+void update_all(Timestep ts)
+{
+    for (const auto& scr : entityScripts) { scr->Update(ts); }
+}
 } // namespace lotus::script
 
 #ifdef L_EDITOR

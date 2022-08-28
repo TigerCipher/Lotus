@@ -167,9 +167,11 @@ namespace LotusEditor.GameProject
             {
                 bw.Write(0); // entity type
                 bw.Write(entity.Components.Count);
+                Logger.Info($"Entity with {entity.Components.Count} components");
                 foreach (var comp in entity.Components)
                 {
                     bw.Write((int)comp.ToEnumType());
+                    Logger.Info($"Component of type {(int)comp.ToEnumType()}");
                     comp.WriteToBinary(bw);
                 }
             }

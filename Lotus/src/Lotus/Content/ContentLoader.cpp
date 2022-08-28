@@ -28,6 +28,12 @@
 #include "../Components/Script.h"
 
 #include <fstream>
+#include <filesystem>
+
+#ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
 
 namespace lotus::content
 {
@@ -49,8 +55,8 @@ namespace
 
     bool read_transform(const byte*& data, entity::create_info& info)
     {
-        using namespace DirectX;
         LASSERT(!info.transform);
+        using namespace DirectX;
 
         f32 rotation [ 3 ];
 
@@ -58,7 +64,7 @@ namespace
         data += sizeof(transformInfo.position);
 
         memcpy(&rotation [ 0 ], data, sizeof(rotation));
-        data += sizeof(transformInfo.rotation);
+        data += sizeof(rotation);
 
         memcpy(&transformInfo.scale [ 0 ], data, sizeof(transformInfo.scale));
         data += sizeof(transformInfo.scale);
@@ -70,6 +76,7 @@ namespace
         memcpy(&transformInfo.rotation [ 0 ], &rotQuad.x, sizeof(transformInfo.rotation));
 
         info.transform = &transformInfo;
+        return true;
     }
 
     bool read_script(const byte*& data, entity::create_info& info)
@@ -103,9 +110,15 @@ namespace
 
 bool load_game()
 {
-    // read the game.bin
+    wchar_t path [ MAX_PATH ];
+    const u32 length = GetModuleFileName(nullptr, &path [ 0 ], MAX_PATH);
+    if (!length || GetLastError() == ERROR_INSUFFICIENT_BUFFER) return false;
+
+    std::filesystem::path p = path;
+    SetCurrentDirectory(p.parent_path().wstring().c_str());
+
     std::ifstream     game("game.bin", std::ios::in | std::ios::binary);
-    utl::vector<byte> buffer(std::istreambuf_iterator(game), {});
+    utl::vector<byte> buffer(std::istreambuf_iterator<char>(game), {});
 
     LASSERT(buffer.size());
 
@@ -131,6 +144,7 @@ bool load_game()
         {
             const u32 compType = *at;
             at += size32;
+            LASSERT(compIndex == 0 || compIndex == 1);
             LASSERT(compType < ComponentType::COUNT);
 
             if (!compReaders [ compType ](at, info)) return false;

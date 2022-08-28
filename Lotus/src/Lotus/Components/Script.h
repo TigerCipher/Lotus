@@ -33,5 +33,6 @@ struct create_info
 
 Component create(const create_info& info, entity::Entity entity);
 void      remove(Component comp);
+void      update_all(Timestep ts);
 
 } // namespace lotus::script
