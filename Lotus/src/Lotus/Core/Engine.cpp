@@ -25,13 +25,57 @@
 
     #include "Lotus/Content/ContentLoader.h"
     #include "Lotus/Components/Script.h"
+    #include "Lotus/Platform/Platform.h"
+    #include "Lotus/Graphics/Renderer.h"
 
     #include <thread>
+using namespace lotus;
+namespace
+{
+
+graphics::render_surface gameWindow {};
+
+LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+    switch (msg)
+    {
+    case WM_DESTROY:
+    {
+        if (gameWindow.window.IsClosed())
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
+    }
+    break;
+
+    case WM_SYSCHAR:
+        if (wparam == VK_RETURN && (HIWORD(lparam) & KF_ALTDOWN))
+        {
+            gameWindow.window.SetFullscreen(!gameWindow.window.IsFullscreen());
+            return 0;
+        }
+        break;
+
+    default: break;
+    }
+
+    return DefWindowProc(hwnd, msg, wparam, lparam);
+}
+} // namespace
+
 
 bool engine_initialize()
 {
-    const bool res = lotus::content::load_game();
-    return res;
+    if (!content::load_game()) return false;
+
+    constexpr platform::window_create_info info { &winproc, nullptr, L"Lotus Game" };
+
+    gameWindow.window = platform::create_window(&info);
+
+    if (!gameWindow.window.IsValid()) return false;
+
+    return true;
 }
 void engine_update()
 {
@@ -39,6 +83,10 @@ void engine_update()
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
-void engine_shutdown() { lotus::content::unload_game(); }
+void engine_shutdown()
+{
+    platform::remove_window(gameWindow.window.GetId());
+    content::unload_game();
+}
 
 #endif

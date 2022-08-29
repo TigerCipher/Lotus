@@ -214,6 +214,7 @@
     <ClInclude Include="src\Lotus\Core\Id.h" />
     <ClInclude Include="src\Lotus\Core\Timestep.h" />
     <ClInclude Include="src\Lotus\Core\Types.h" />
+    <ClInclude Include="src\Lotus\Graphics\Renderer.h" />
     <ClInclude Include="src\Lotus\Platform\Platform.h" />
     <ClInclude Include="src\Lotus\Platform\Window.h" />
     <ClInclude Include="src\Lotus\EngineApi\GameEntity.h" />

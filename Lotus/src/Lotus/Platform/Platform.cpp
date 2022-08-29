@@ -205,15 +205,19 @@ Window create_window(const window_create_info* const info)
     RegisterClassEx(&wc);
 
     window_info winInfo;
-    RECT        rc { winInfo.clientArea };
+    winInfo.clientArea.right = info && info->width ? winInfo.clientArea.left + info->width : winInfo.clientArea.right;
+    winInfo.clientArea.bottom =
+        info && info->height ? winInfo.clientArea.top + info->height : winInfo.clientArea.bottom;
 
-    AdjustWindowRect(&rc, winInfo.style, FALSE);
+    RECT rect { winInfo.clientArea };
+
+    AdjustWindowRect(&rect, winInfo.style, FALSE);
 
     const wchar_t* caption = info && info->caption ? info->caption : L"Lotus Game";
-    const s32      left    = info && info->left ? info->left : winInfo.clientArea.left;
-    const s32      top     = info && info->top ? info->top : winInfo.clientArea.top;
-    const s32      width   = info && info->width ? info->width : rc.right - rc.left;
-    const s32      height  = info && info->height ? info->height : rc.bottom - rc.top;
+    const s32      left    = info ? info->left : winInfo.topLeft.x;
+    const s32      top     = info ? info->top : winInfo.topLeft.y;
+    const s32      width   = rect.right - rect.left;
+    const s32      height  = rect.bottom - rect.top;
 
     winInfo.style |= parent ? WS_CHILD : WS_OVERLAPPEDWINDOW;
 
@@ -223,7 +227,7 @@ Window create_window(const window_create_info* const info)
 
     if (winInfo.hwnd)
     {
-        SetLastError(0);
+        L_DBG(SetLastError(0));
         const window_id id { add_to_windows(winInfo) };
 
         SetWindowLongPtr(winInfo.hwnd, GWLP_USERDATA, (LONG_PTR) id);
@@ -290,9 +294,9 @@ void Window::Resize(const uint32 width, const uint32 height) const
     resize_window(mId, width, height);
 }
 
-const uint32 Window::Width() const { return Size().x; }
+uint32 Window::Width() const { return Size().x; }
 
-const uint32 Window::Height() const { return Size().y; }
+uint32 Window::Height() const { return Size().y; }
 
 bool Window::IsClosed() const
 {

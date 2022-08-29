@@ -59,6 +59,8 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
             return 0;
         }
         break;
+
+    default: break;
     }
 
     return DefWindowProc(hwnd, msg, wparam, lparam);
@@ -76,7 +78,12 @@ public:
             { &winproc, nullptr, L"Test Window 4", 400, 400, 800, 600 },
         };
 
-        for (u32 i = 0; i < numWindows; ++i) { windows [ i ] = platform::create_window(&info [ i ]); }
+        for (u32 i = 0; i < numWindows; ++i)
+        {
+            windows [ i ] = platform::create_window(&info [ i ]);
+            int w         = windows [ i ].Width();
+            int a         = 0;
+        }
 
         return true;
     }

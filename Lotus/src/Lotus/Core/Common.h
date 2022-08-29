@@ -54,9 +54,12 @@
     (x) = nullptr;
 
 #ifdef L_DEBUG
+// May very well end up using custom asserts with better logging
     #define LASSERT(condition) assert(condition)
+    #define L_DBG(x)           x
 #else
-    #define LASSERT(condition)
+    #define LASSERT(condition) (void(0))
+    #define L_DBG(x)           (void(0))
 #endif
 
 // System includes
@@ -87,8 +90,3 @@
 #include "Types.h"
 #include "../Util/Util.h"
 #include "../Util/MathUtil.h"
-
-
-
-
-
