@@ -23,22 +23,41 @@
 
 #pragma comment(lib, "Lotus.lib")
 
-#define TEST_ECS 1
+#define TEST_ECS     0
+#define TEST_WINDOWS 1
 
 #if TEST_ECS
     #include "EntityComponentSystemTest.h"
+#elif TEST_WINDOWS
+    #include "WindowTest.h"
 #else
     #error A test has not been enabled
 #endif
 
-int main(int argc, char** argv)
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 #if L_DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-
     EngineTest engineTest;
-    if (engineTest.Init()) engineTest.Run();
+    if (engineTest.Init())
+    {
+        MSG  msg;
+        bool running = true;
+
+        while (running)
+        {
+            while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+                running &= (msg.message != WM_QUIT);
+            }
+
+            engineTest.Run();
+        }
+    }
 
     engineTest.Shutdown();
+    return 0;
 }

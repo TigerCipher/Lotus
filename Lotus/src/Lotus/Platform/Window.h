@@ -39,9 +39,10 @@ public:
 
     void SetFullscreen(bool fullscreen) const;
     bool IsFullscreen() const;
-    void SetCaption(const char* caption) const;
+    void SetCaption(const wchar_t* caption) const;
 
-    vec2i Size() const;
+    vec4u Rect() const;
+    vec2u Size() const;
     void  Resize(uint32 width, uint32 height) const;
 
     const uint32 Width() const;
