@@ -19,6 +19,7 @@
         <KeyBinding Command="{Binding RedoCmd}" Modifiers="Control" Key="Y"/>
         <KeyBinding Command="{Binding SaveCmd}" Modifiers="Control" Key="S"/>
         <KeyBinding Command="{Binding BuildCmd}" CommandParameter="{StaticResource True}" Modifiers="Control" Key="B"/>
+        <!-- <KeyBinding Command="{Binding BuildExeCmd}" CommandParameter="{StaticResource False}" Modifiers="Control" Key="B"/> -->
         <KeyBinding Command="{Binding DebugStartCmd}" CommandParameter="{StaticResource True}" Key="F5"/>
         <KeyBinding Command="{Binding DebugStartWithoutDebuggingCmd}" CommandParameter="{StaticResource True}" Modifiers="Control" Key="F5"/>
         <KeyBinding Command="{Binding DebugStopCmd}" CommandParameter="{StaticResource True}" Modifiers="Shift" Key="F5"/>
@@ -37,6 +38,7 @@
             <Button Content="Redo Selection" Command="{Binding RedoSelectionCmd}" Margin="5,0,0,0"/>
             <Button Content="New Script" Click="NewScript_OnButtonClick" Margin="5,0,0,0" IsEnabled="{Binding Path=IsEnabled, ElementName=buildButton}"/>
             <Button Content="Build" Command="{Binding BuildCmd}" CommandParameter="{StaticResource True}" Margin="5,0,0,0" x:Name="buildButton"/>
+            <Button Content="Build EXE" Command="{Binding BuildExeCmd}" CommandParameter="{StaticResource False}" Margin="5,0,0,0" x:Name="buildExeButton"/>
             <ComboBox x:Name="buildConfig" VerticalAlignment="Center" Margin="5,0" Width="84" SelectedIndex="{Binding BuildConfig}">
                 <ComboBoxItem Content="Debug"/>
                 <ComboBoxItem Content="Release"/>

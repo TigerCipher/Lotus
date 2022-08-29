@@ -75,6 +75,7 @@ namespace LotusEditor.GameProject
 
         public ICommand SaveCmd { get; private set; }
         public ICommand BuildCmd { get; private set; }
+        public ICommand BuildExeCmd { get; private set; }
 
         public ICommand DebugStartCmd { get; private set; }
         public ICommand DebugStartWithoutDebuggingCmd { get; private set; }
@@ -116,6 +117,7 @@ namespace LotusEditor.GameProject
             RedoCmd = new RelayCommand<object>(x => HistoryManager.Redo(), x => HistoryManager.RedoList.Any());
             SaveCmd = new RelayCommand<object>(x => Save(this));
             BuildCmd = new RelayCommand<bool>(async x => await BuildGameDll(x), x => !VisualStudio.IsDebugging() && VisualStudio.BuildFinished);
+            BuildExeCmd = new RelayCommand<bool>(async x => await BuildGameExe(x), x => !VisualStudio.IsDebugging() && VisualStudio.BuildFinished);
 
             UndoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Undo(), x => SelectionHistoryManager.UndoList.Any());
             RedoSelectionCmd = new RelayCommand<object>(x => SelectionHistoryManager.Redo(), x => SelectionHistoryManager.RedoList.Any());
@@ -129,6 +131,7 @@ namespace LotusEditor.GameProject
             OnPropertyChanged(nameof(RedoCmd));
             OnPropertyChanged(nameof(SaveCmd));
             OnPropertyChanged(nameof(BuildCmd));
+            OnPropertyChanged(nameof(BuildExeCmd));
             OnPropertyChanged(nameof(UndoSelectionCmd));
             OnPropertyChanged(nameof(RedoSelectionCmd));
             OnPropertyChanged(nameof(DebugStartCmd));
@@ -201,6 +204,24 @@ namespace LotusEditor.GameProject
             await BuildGameDll(false);
 
             SetCommands();
+        }
+
+        private async Task BuildGameExe(bool showWindow = false)
+        {
+            try
+            {
+                await Task.Run(() => VisualStudio.BuildSolution(this, ExeBuildConfig, false));
+                if (VisualStudio.BuildSucceeded)
+                {
+                    SaveToBinary();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                Logger.Error($"Failed to build the game exe");
+                throw;
+            }
         }
 
         private async Task BuildGameDll(bool showWindow = true)
