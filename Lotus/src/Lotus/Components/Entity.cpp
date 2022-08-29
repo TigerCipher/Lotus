@@ -20,7 +20,6 @@
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
-#include "pch.h"
 #include "Entity.h"
 #include "Transform.h"
 #include "Script.h"
@@ -98,7 +97,6 @@ bool is_alive(const entity_id id)
     LASSERT(id::is_valid(id));
     const id::id_type index = id::index(id);
     LASSERT(index < generations.size());
-    LASSERT(generations [ index ] == id::generation(id));
     return generations [ index ] == id::generation(id) && transforms [ index ].IsValid();
 }
 

@@ -15,28 +15,45 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: pch.h
-// Date File Created: 08/19/2022
+// File Name: Window.h
+// Date File Created: 8/28/2022
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
-#ifndef LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3
-#define LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3
-
-#include <cstdint>
-#include <cassert>
-#include <array>
-#include <map>
-#include <unordered_map>
-#include <functional>
-#include <memory>
-#include <utility>
-#include <algorithm>
-#include <string>
-#include <sstream>
-
+#pragma once
 #include "Lotus/Core/Common.h"
-#include "Lotus/Util/Util.h"
-#include "Lotus/Util/MathUtil.h"
 
-#endif //LOTUS_PCH_H_7_B5468_E5_CDCF445_BB_08DE75_F_3376D_4D3
+namespace lotus::platform
+{
+L_TYPED_ID(window_id)
+
+class Window
+{
+public:
+    constexpr Window() = default;
+    constexpr explicit Window(const window_id id) : mId(id) { }
+
+    constexpr window_id GetId() const { return mId; }
+
+    constexpr bool IsValid() const { return id::is_valid(mId); }
+
+    void SetFullscreen(bool fullscreen) const;
+    bool IsFullscreen() const;
+    void SetCaption(const char* caption) const;
+
+    vec2i Size() const;
+    void  Resize(uint32 width, uint32 height) const;
+
+    const uint32 Width() const;
+    const uint32 Height() const;
+
+    bool IsClosed() const;
+
+    void* Handle() const;
+
+private:
+    window_id mId { id::InvalidId };
+};
+
+
+} // namespace lotus::platform

@@ -29,28 +29,7 @@
 #pragma warning(disable : 4530)
 
 
-#include <cstdint>
-#include <memory>
-#include <cassert>
-#include <utility>
-#include <unordered_map>
-// #include <array>
-// #include <map>
-// #include <functional>
-// #include <algorithm>
-// #include <string>
-// #include <sstream>
-
-#ifdef _WIN64
-    #define WIN32_LEAN_AND_MEAN
-    #include <Windows.h>
-#else
-    #error Currently only Windows x64 is supported. No current plans to change this
-#endif
-
-#include "../Util/Util.h"
-#include "../Util/MathUtil.h"
-
+// Macros
 
 // Make sure L_DEBUG is defined for debug builds
 #if !defined(L_DEBUG) && defined(_DEBUG)
@@ -80,78 +59,36 @@
     #define LASSERT(condition)
 #endif
 
+// System includes
 
-// Types and shortcuts
+#include <cstdint>
+#include <memory>
+#include <utility>
+#include <cassert>
+#include <unordered_map>
+// #include <array>
+// #include <map>
+// #include <functional>
+// #include <algorithm>
+// #include <string>
+// #include <sstream>
 
-namespace lotus
-{
-// byte is contained in the lotus namespace, because I've had issues with it conflicting with std::byte in other
-// projects
-using byte = uint8_t;
-} // namespace lotus
-using ulong = unsigned long;
-
-// ensure x bit, but I hate using _t, it looks ugly
-
-using uint8  = uint8_t;
-using uint16 = uint16_t;
-using uint32 = uint32_t;
-using uint64 = uint64_t;
-
-using int8  = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
+#ifdef _WIN64
+    #define WIN32_LEAN_AND_MEAN
+    #include <Windows.h>
+#else
+    #error Currently only Windows x64 is supported. No current plans to change this
+#endif
 
 
-// Even shorter because why not? (above ones are preferred for explicitness)
-using u8  = uint8_t;
-using u16 = uint16_t;
-using u32 = uint32_t;
-using u64 = uint64_t;
+// Lotus includes
 
-using s8  = int8_t;
-using s16 = int16_t;
-using s32 = int32_t;
-using s64 = int64_t;
+#include "Id.h"
+#include "Types.h"
+#include "../Util/Util.h"
+#include "../Util/MathUtil.h"
 
 
-constexpr uint8  InvalidIdU8  = 0xffui8;
-constexpr uint16 InvalidIdU16 = 0xffffui16;
-constexpr uint32 InvalidIdU32 = 0xffff'ffffui32;
-constexpr uint64 InvalidIdU64 = 0xffff'ffff'ffff'ffffui64;
 
 
-using f32 = float;
-using f64 = double;
 
-
-using string_hash = std::hash<std::string>;
-
-
-template<typename T>
-using UniquePtr = std::unique_ptr<T>;
-
-// Scope as well as above in case I decide to make my own version of unique ptr
-template<typename T>
-using Scope = std::unique_ptr<T>;
-
-template<typename T>
-using SharedPtr = std::shared_ptr<T>;
-
-// Ref as well as above in case I decide to make my own version of shared ptr
-template<typename T>
-using Ref = std::shared_ptr<T>;
-
-
-template<typename T, typename... Args>
-constexpr Scope<T> CreateScope(Args&&... args)
-{
-    return std::make_unique<T>(std::forward<Args>(args)...);
-}
-
-template<typename T, typename... Args>
-constexpr Ref<T> CreateRef(Args&&... args)
-{
-    return std::make_shared<T>(std::forward<Args>(args)...);
-}

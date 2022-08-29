@@ -20,7 +20,6 @@
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
-#include "pch.h"
 #include "Script.h"
 
 namespace lotus::script
@@ -34,7 +33,7 @@ namespace
     utl::vector<detail::script_ptr> entityScripts;
     utl::vector<id::id_type>        idMapping;
     utl::vector<id::gen_type>       generations;
-    utl::vector<script_id>          freeIds;
+    utl::deque<script_id>           freeIds;
 
     script_registry& registry()
     {
@@ -100,7 +99,7 @@ Component create(const create_info& info, const entity::Entity entity)
     {
         scriptId = freeIds.front();
         LASSERT(!exists(scriptId));
-        freeIds.pop_back();
+        freeIds.pop_front();
         scriptId = script_id { id::new_generation(scriptId) };
         ++generations [ id::index(scriptId) ];
     } else
@@ -119,7 +118,7 @@ Component create(const create_info& info, const entity::Entity entity)
     return Component(scriptId);
 }
 
-void remove(Component comp)
+void remove(const Component comp)
 {
     assert(comp.IsValid() && exists(comp.GetId()));
     const script_id   id     = comp.GetId();

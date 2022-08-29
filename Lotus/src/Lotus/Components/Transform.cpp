@@ -20,7 +20,6 @@
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
-#include "pch.h"
 #include "Transform.h"
 
 namespace lotus::transform

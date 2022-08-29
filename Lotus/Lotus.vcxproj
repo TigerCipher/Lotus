@@ -118,7 +118,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>L_EDITOR;_CRT_SECURE_NO_WARNINGS;L_DEBUG;L_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -213,12 +213,14 @@
     <ClInclude Include="src\Lotus\Core\Common.h" />
     <ClInclude Include="src\Lotus\Core\Id.h" />
     <ClInclude Include="src\Lotus\Core\Timestep.h" />
+    <ClInclude Include="src\Lotus\Core\Types.h" />
+    <ClInclude Include="src\Lotus\Platform\Platform.h" />
+    <ClInclude Include="src\Lotus\Platform\Window.h" />
     <ClInclude Include="src\Lotus\EngineApi\GameEntity.h" />
     <ClInclude Include="src\Lotus\EngineApi\ScriptComponent.h" />
     <ClInclude Include="src\Lotus\EngineApi\TransformComponent.h" />
     <ClInclude Include="src\Lotus\Util\MathUtil.h" />
     <ClInclude Include="src\Lotus\Util\Util.h" />
-    <ClInclude Include="src\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lotus\Components\Entity.cpp" />
@@ -227,12 +229,8 @@
     <ClCompile Include="src\Lotus\Content\ContentLoader.cpp" />
     <ClCompile Include="src\Lotus\Core\Engine.cpp" />
     <ClCompile Include="src\Lotus\Core\EntryPoint.cpp" />
-    <ClCompile Include="src\pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">Create</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="src\Lotus\Platform\Platform.cpp" />
+    <ClCompile Include="src\Lotus\Platform\Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

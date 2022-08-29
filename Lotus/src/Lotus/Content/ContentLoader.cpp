@@ -20,7 +20,6 @@
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
-#include "pch.h"
 #include "ContentLoader.h"
 
 #include "../Components/Entity.h"

@@ -23,8 +23,8 @@
 #pragma once
 
 #include "Common.h"
+#include "Types.h"
 
-#include <cassert>
 
 namespace lotus::id
 {
