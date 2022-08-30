@@ -54,6 +54,15 @@ namespace LotusEditor.DllWrapper
         [return: MarshalAs(UnmanagedType.SafeArray)]
         public static extern string[] GetScriptNames();
 
+        [DllImport(_lotusDll)]
+        public static extern int CreateRenderSurface(IntPtr host, int width, int height);
+
+        [DllImport(_lotusDll)]
+        public static extern void RemoveRenderSurface(int surfaceId);
+
+        [DllImport(_lotusDll)]
+        public static extern IntPtr GetWindowHandle(int surfaceId);
+
         internal static class EntityAPI
         {
             [DllImport(_lotusDll)]

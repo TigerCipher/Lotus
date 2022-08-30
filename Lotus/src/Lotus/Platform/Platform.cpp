@@ -138,12 +138,10 @@ namespace
                 GetWindowRect(info.hwnd, &rect);
                 info.topLeft.x = rect.left;
                 info.topLeft.y = rect.top;
-                info.style     = 0;
-                SetWindowLongPtr(info.hwnd, GWL_STYLE, info.style);
+                SetWindowLongPtr(info.hwnd, GWL_STYLE, 0);
                 ShowWindow(info.hwnd, SW_MAXIMIZE);
             } else
             {
-                info.style = WS_VISIBLE | WS_OVERLAPPEDWINDOW;
                 SetWindowLongPtr(info.hwnd, GWL_STYLE, info.style);
                 resize_window(info, info.clientArea);
                 ShowWindow(info.hwnd, SW_SHOWNORMAL);
@@ -164,7 +162,7 @@ namespace
     vec2u get_window_size(const window_id id)
     {
         const window_info& info = get_from_id(id);
-        const RECT         area = info.fullscreen ? info.fullscreenArea : info.clientArea;
+        const RECT&        area = info.fullscreen ? info.fullscreenArea : info.clientArea;
 
         return { (u32) area.right - (u32) area.left, (u32) area.bottom - (u32) area.top };
     }
@@ -172,7 +170,7 @@ namespace
     vec4u get_window_rect(const window_id id)
     {
         const window_info& info = get_from_id(id);
-        const RECT         area = info.fullscreen ? info.fullscreenArea : info.clientArea;
+        const RECT&        area = info.fullscreen ? info.fullscreenArea : info.clientArea;
 
         return { (u32) area.left, (u32) area.top, (u32) area.right, (u32) area.bottom };
     }
@@ -211,6 +209,8 @@ Window create_window(const window_create_info* const info)
 
     RECT rect { winInfo.clientArea };
 
+    winInfo.style |= parent ? WS_CHILD : WS_OVERLAPPEDWINDOW;
+
     AdjustWindowRect(&rect, winInfo.style, FALSE);
 
     const wchar_t* caption = info && info->caption ? info->caption : L"Lotus Game";
@@ -219,7 +219,6 @@ Window create_window(const window_create_info* const info)
     const s32      width   = rect.right - rect.left;
     const s32      height  = rect.bottom - rect.top;
 
-    winInfo.style |= parent ? WS_CHILD : WS_OVERLAPPEDWINDOW;
 
     // extended style, window class name, instance title, window style, x pos, y pos, width, height, menu, hinstance, extra params
     winInfo.hwnd = CreateWindowEx(0, wc.lpszClassName, caption, winInfo.style, left, top, width, height, parent,

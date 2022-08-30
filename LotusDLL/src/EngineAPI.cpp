@@ -24,6 +24,8 @@
 #include "Common.h"
 #include <Lotus/Core/Common.h>
 #include <Lotus/Components/Script.h>
+#include <Lotus/Graphics/Renderer.h>
+#include <Lotus/Platform/Platform.h>
 
 #ifndef WIN32_LEAN_ANDMEAN
     #define WIN32_LEAN_AND_MEAN
@@ -42,6 +44,8 @@ script_creator_func get_script_creator = nullptr;
 
 using script_names_func            = LPSAFEARRAY (*)(void);
 script_names_func get_script_names = nullptr;
+
+utl::vector<graphics::render_surface> surfaces;
 
 } // namespace
 
@@ -75,4 +79,27 @@ EDITOR_INTERFACE script::detail::script_creator GetScriptCreator(const char* nam
 EDITOR_INTERFACE LPSAFEARRAY GetScriptNames()
 {
     return gameDll && get_script_names ? get_script_names() : nullptr;
+}
+
+EDITOR_INTERFACE uint32 CreateRenderSurface(HWND host, int32 width, int32 height)
+{
+    platform::window_create_info info { nullptr, host, nullptr, 0, 0, width, height };
+    graphics::render_surface     surface { platform::create_window(&info), {} };
+
+    LASSERT(surface.window.IsValid());
+    surfaces.emplace_back(surface);
+
+    return (u32) surfaces.size() - 1;
+}
+
+EDITOR_INTERFACE void RemoveRenderSurface(uint32 id)
+{
+    LASSERT(id < surfaces.size());
+    platform::remove_window(surfaces [ id ].window.GetId());
+}
+
+EDITOR_INTERFACE HWND GetWindowHandle(uint32 id)
+{
+    LASSERT(id < surfaces.size());
+    return (HWND) surfaces [ id ].window.Handle();
 }
