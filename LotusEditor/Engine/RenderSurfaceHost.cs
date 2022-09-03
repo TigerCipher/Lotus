@@ -5,9 +5,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Interop;
 using LotusEditor.DllWrapper;
 using LotusEditor.Utility;
+using Microsoft.VisualBasic.Devices;
+using Mouse = System.Windows.Input.Mouse;
 
 namespace LotusEditor.Engine
 {
@@ -17,13 +20,26 @@ namespace LotusEditor.Engine
         private readonly int _width = 800;
         private readonly int _height = 600;
         private IntPtr _renderWindowHandle = IntPtr.Zero;
+        private DelayEventTimer _resizeTimer;
 
-        public int SurfaceId { get; private set; }
+        public int SurfaceId { get; private set; } = ID.INVALID_ID;
 
         public RenderSurfaceHost(double width, double height)
         {
             _width = (int)width;
             _height = (int)height;
+            _resizeTimer = new DelayEventTimer(TimeSpan.FromMilliseconds(250.0));
+            _resizeTimer.Triggered += Resize;
+        }
+
+        private void Resize(object sender, DelayEventTimerArgs e)
+        {
+            e.RepeatEvent = Mouse.LeftButton == MouseButtonState.Pressed;
+            if (!e.RepeatEvent)
+            {
+                Logger.Info("Resized");
+                EngineAPI.ResizeRenderSurface(SurfaceId);
+            }
         }
 
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
@@ -41,6 +57,11 @@ namespace LotusEditor.Engine
             EngineAPI.RemoveRenderSurface(SurfaceId);
             SurfaceId = ID.INVALID_ID;
             _renderWindowHandle = IntPtr.Zero;
+        }
+
+        public void Resize()
+        {
+            _resizeTimer.Trigger();
         }
     }
 }

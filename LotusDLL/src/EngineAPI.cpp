@@ -103,3 +103,9 @@ EDITOR_INTERFACE HWND GetWindowHandle(uint32 id)
     LASSERT(id < surfaces.size());
     return (HWND) surfaces [ id ].window.Handle();
 }
+
+EDITOR_INTERFACE void ResizeRenderSurface(uint32 id)
+{
+    LASSERT(id < surfaces.size());
+    surfaces [ id ].window.Resize(0, 0);
+}

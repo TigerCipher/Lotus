@@ -63,6 +63,9 @@ namespace LotusEditor.DllWrapper
         [DllImport(_lotusDll)]
         public static extern IntPtr GetWindowHandle(int surfaceId);
 
+        [DllImport(_lotusDll)]
+        public static extern int ResizeRenderSurface(int surfaceId);
+
         internal static class EntityAPI
         {
             [DllImport(_lotusDll)]
