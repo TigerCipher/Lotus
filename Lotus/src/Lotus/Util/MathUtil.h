@@ -63,10 +63,70 @@ using mat3  = DirectX::XMFLOAT3X3;
 using mat4  = DirectX::XMFLOAT4X4;
 using mat4a = DirectX::XMFLOAT4X4A;
 
-constexpr float pi      = 3.1415926535897932384626433832795f;
-constexpr float epsilon = 1e-5f;
+constexpr f32 pi      = 3.1415926535897932384626433832795f;
+constexpr f32 epsilon = 1e-5f;
 
 namespace lotus::math
 {
-// #TODO: Math helpers
+
+template<typename T>
+constexpr T clamp(T value, T min, T max)
+{
+    return value < min ? min : value > max ? max : value;
 }
+
+
+template<u32 bits>
+constexpr u32 pack_unit_float(f32 f)
+{
+    static_assert(bits <= sizeof(u32) * 8);
+    LASSERT(f >= 0.0f && f <= 1.0f);
+    constexpr f32 intervals = (f32) ((1ui32 << bits) - 1);
+    return (u32) (intervals * f + 0.5f);
+}
+
+template<u32 bits>
+constexpr f32 unpack_to_unit_float(u32 i)
+{
+    static_assert(bits <= sizeof(u32) * 8);
+    LASSERT(i < 1ui32 << bits);
+    constexpr f32 intervals = (f32) ((1ui32 << bits) - 1);
+    return (f32) i / intervals;
+}
+
+template<u32 bits>
+constexpr u32 pack_float(f32 f, f32 min, f32 max)
+{
+    LASSERT(min < max);
+    LASSERT(f >= min && f <= max);
+    const f32 distance = (f - min) / (max - min);
+    return pack_unit_float<bits>(distance);
+}
+
+template<u32 bits>
+constexpr f32 unpack_to_float(u32 i, f32 min, f32 max)
+{
+    LASSERT(min < max);
+    return unpack_to_unit_float<bits>(i) * (max - min) + min;
+}
+
+
+inline vec load_float(const f32* src) { return DirectX::XMLoadFloat(src); }
+inline vec load_float2(const vec2* src) { return DirectX::XMLoadFloat2(src); }
+inline vec load_float3(const vec3* src) { return DirectX::XMLoadFloat3(src); }
+inline vec load_float4(const vec4* src) { return DirectX::XMLoadFloat4(src); }
+
+inline void store_float(f32* dest, vec v) { DirectX::XMStoreFloat(dest, v); }
+inline void store_float2(vec2* dest, vec v) { DirectX::XMStoreFloat2(dest, v); }
+inline void store_float3(vec3* dest, vec v) { DirectX::XMStoreFloat3(dest, v); }
+inline void store_float4(vec4* dest, vec v) { DirectX::XMStoreFloat4(dest, v); }
+
+inline vec normalize_vec3(const vec v) { return DirectX::XMVector3Normalize(v); }
+inline vec dot_vec3(const vec v1, const vec v2) { return DirectX::XMVector3Dot(v1, v2); }
+inline vec cross_vec3(vec v1, vec v2) { return DirectX::XMVector3Cross(v1, v2); }
+inline vec reciptrocal_length_vec3(const vec v1) { return DirectX::XMVector3ReciprocalLength(v1); }
+
+inline f32  scalar_cos(f32 value) { return DirectX::XMScalarCos(value); }
+inline bool scalar_near_equal(f32 s1, f32 s2) { return DirectX::XMScalarNearEqual(s1, s2, epsilon); }
+
+} // namespace lotus::math

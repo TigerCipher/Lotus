@@ -16,6 +16,7 @@
     <ClInclude Include="src\PrimitiveMesh.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\PrimitiveMesh.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -55,7 +56,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;CONTENTTOOLS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;CONTENTTOOLS_EXPORTS;_WINDOWS;_USRDLL;L_DEBUG;L_WINDOWS;L_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -74,7 +75,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;CONTENTTOOLS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;CONTENTTOOLS_EXPORTS;_WINDOWS;_USRDLL;L_RELEASE;L_EDITOR;L_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>

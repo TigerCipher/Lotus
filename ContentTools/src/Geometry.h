@@ -27,15 +27,46 @@
 namespace lotus::tools
 {
 
+namespace packed_vertex
+{
+    // static mesh
+    struct vertex_static
+    {
+        vec3 position;
+        u8   reserved [ 3 ];
+        u8   tsign; // if z is neg: Bit 1 = 0, if pos: Bit 1 = 1
+        u16  normal [ 2 ];
+        u16  tangent [ 2 ];
+        vec2 uv;
+    };
+} // namespace packed_vertex
+
+struct vertex
+{
+    vec4 tangent;
+    vec3 position;
+    vec3 normal;
+    vec2 uv;
+};
+
 struct mesh
 {
-    utl::vector<vec3> positions;
-    utl::vector<vec3> normals;
-    utl::vector<vec4> tangents;
-
+    utl::vector<vec3>              positions;
+    utl::vector<vec3>              normals;
+    utl::vector<vec4>              tangents;
     utl::vector<utl::vector<vec2>> uvSets;
+    utl::vector<u32>               rawIndices;
 
-    utl::vector<u32> rawIndices;
+    utl::vector<vertex> vertices;
+    utl::vector<u32>    indices;
+
+
+    // output
+    std::string name;
+    utl::vector<packed_vertex::vertex_static> packedVerticesStatic;
+    f32                                       lodThreshold = -1.0f;
+    u32                                       lodId { InvalidIdU32 };
+
 };
 
 struct lod_group
@@ -67,5 +98,8 @@ struct scene_data
 
     geometry_import_settings settings;
 };
+
+void process_scene(scene& scene, const geometry_import_settings& settings);
+void pack_data(const scene& scene, scene_data& data);
 
 } // namespace lotus::tools
