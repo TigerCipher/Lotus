@@ -9,14 +9,8 @@
     <BaseOutputPath>..\bin</BaseOutputPath>
     <PlatformTarget>x64</PlatformTarget>
     <UseWindowsForms>True</UseWindowsForms>
-    <Configurations>Debug;Release;DebugDll;ReleaseDll</Configurations>
+    <Configurations>DebugDll;ReleaseDll</Configurations>
     <Platforms>x64</Platforms>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PlatformTarget>x64</PlatformTarget>
-    <OutputPath>..\bin\Debug\</OutputPath>
-    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
@@ -24,12 +18,6 @@
     <OutputPath>..\bin\DebugDll\</OutputPath>
     <DebugType>portable</DebugType>
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PlatformTarget>x64</PlatformTarget>
-    <OutputPath>..\bin\Release\</OutputPath>
-    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">

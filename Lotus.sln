@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LotusDLL", "LotusDLL\LotusDLL.vcxproj", "{0795CDCC-4605-4019-949C-E70592F2F3FB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ContentTools", "ContentTools\ContentTools.vcxproj", "{27A956F1-B368-464D-9940-62768E367D83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -29,12 +31,10 @@ Global
 		ReleaseDll|x64 = ReleaseDll|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Debug|x64.ActiveCfg = Debug|x64
-		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Debug|x64.Build.0 = Debug|x64
+		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Debug|x64.ActiveCfg = DebugDll|x64
 		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.DebugDll|x64.ActiveCfg = DebugDll|x64
 		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.DebugDll|x64.Build.0 = DebugDll|x64
-		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Release|x64.ActiveCfg = Release|x64
-		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Release|x64.Build.0 = Release|x64
+		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.Release|x64.ActiveCfg = ReleaseDll|x64
 		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.ReleaseDll|x64.ActiveCfg = ReleaseDll|x64
 		{9AEE8D99-BDC1-4AB6-95E6-349C6A780E22}.ReleaseDll|x64.Build.0 = ReleaseDll|x64
 		{7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF}.Debug|x64.ActiveCfg = Debug|x64
@@ -53,14 +53,20 @@ Global
 		{6A0DD7FB-A6C1-4C0D-866B-0183FAAB7061}.Release|x64.Build.0 = Release|x64
 		{6A0DD7FB-A6C1-4C0D-866B-0183FAAB7061}.ReleaseDll|x64.ActiveCfg = ReleaseDll|x64
 		{6A0DD7FB-A6C1-4C0D-866B-0183FAAB7061}.ReleaseDll|x64.Build.0 = ReleaseDll|x64
-		{0795CDCC-4605-4019-949C-E70592F2F3FB}.Debug|x64.ActiveCfg = Debug|x64
-		{0795CDCC-4605-4019-949C-E70592F2F3FB}.Debug|x64.Build.0 = Debug|x64
+		{0795CDCC-4605-4019-949C-E70592F2F3FB}.Debug|x64.ActiveCfg = DebugDll|x64
 		{0795CDCC-4605-4019-949C-E70592F2F3FB}.DebugDll|x64.ActiveCfg = DebugDll|x64
 		{0795CDCC-4605-4019-949C-E70592F2F3FB}.DebugDll|x64.Build.0 = DebugDll|x64
-		{0795CDCC-4605-4019-949C-E70592F2F3FB}.Release|x64.ActiveCfg = Release|x64
-		{0795CDCC-4605-4019-949C-E70592F2F3FB}.Release|x64.Build.0 = Release|x64
+		{0795CDCC-4605-4019-949C-E70592F2F3FB}.Release|x64.ActiveCfg = ReleaseDll|x64
 		{0795CDCC-4605-4019-949C-E70592F2F3FB}.ReleaseDll|x64.ActiveCfg = ReleaseDll|x64
 		{0795CDCC-4605-4019-949C-E70592F2F3FB}.ReleaseDll|x64.Build.0 = ReleaseDll|x64
+		{27A956F1-B368-464D-9940-62768E367D83}.Debug|x64.ActiveCfg = DebugDll|x64
+		{27A956F1-B368-464D-9940-62768E367D83}.Debug|x64.Build.0 = DebugDll|x64
+		{27A956F1-B368-464D-9940-62768E367D83}.DebugDll|x64.ActiveCfg = DebugDll|x64
+		{27A956F1-B368-464D-9940-62768E367D83}.DebugDll|x64.Build.0 = DebugDll|x64
+		{27A956F1-B368-464D-9940-62768E367D83}.Release|x64.ActiveCfg = ReleaseDll|x64
+		{27A956F1-B368-464D-9940-62768E367D83}.Release|x64.Build.0 = ReleaseDll|x64
+		{27A956F1-B368-464D-9940-62768E367D83}.ReleaseDll|x64.ActiveCfg = ReleaseDll|x64
+		{27A956F1-B368-464D-9940-62768E367D83}.ReleaseDll|x64.Build.0 = ReleaseDll|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

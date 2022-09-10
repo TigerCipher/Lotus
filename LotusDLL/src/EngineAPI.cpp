@@ -83,9 +83,8 @@ EDITOR_INTERFACE LPSAFEARRAY GetScriptNames()
 
 EDITOR_INTERFACE uint32 CreateRenderSurface(HWND host, int32 width, int32 height)
 {
-    platform::window_create_info info { nullptr, host, nullptr, 0, 0, width, height };
+    const platform::window_create_info info { nullptr, host, nullptr, 0, 0, width, height };
     graphics::render_surface     surface { platform::create_window(&info), {} };
-
     LASSERT(surface.window.IsValid());
     surfaces.emplace_back(surface);
 

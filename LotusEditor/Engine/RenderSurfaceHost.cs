@@ -42,13 +42,35 @@ namespace LotusEditor.Engine
             }
         }
 
+        // [DllImport("user32.dll", EntryPoint = "CreateWindowEx", CharSet = CharSet.Unicode)]
+        // internal static extern IntPtr CreateWindowEx(int dwExStyle,
+        //                                       string lpszClassName,
+        //                                       string lpszWindowName,
+        //                                       int style,
+        //                                       int x, int y,
+        //                                       int width, int height,
+        //                                       IntPtr hwndParent,
+        //                                       IntPtr hMenu,
+        //                                       IntPtr hInst,
+        //                                       [MarshalAs(UnmanagedType.AsAny)] object pvParam);
+
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
+            // IntPtr hwndHost = CreateWindowEx(0, "static", "",
+            //                0x40000000 | 0x10000000 | 0x02000000,
+            //                0, 0,
+            //                _width, _height,
+            //                hwndParent.Handle,
+            //                IntPtr.Zero,
+            //                IntPtr.Zero,
+            //                0);
             SurfaceId = EngineAPI.CreateRenderSurface(hwndParent.Handle, _width, _height);
+            // SurfaceId = EngineAPI.CreateRenderSurface(hwndHost, _width, _height);
             Debug.Assert(ID.IsValid(SurfaceId));
             _renderWindowHandle = EngineAPI.GetWindowHandle(SurfaceId);
             Debug.Assert(_renderWindowHandle != IntPtr.Zero);
 
+            // return new HandleRef(this, hwndHost);
             return new HandleRef(this, _renderWindowHandle);
         }
 
