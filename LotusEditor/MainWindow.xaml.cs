@@ -53,7 +53,7 @@ namespace LotusEditor
 
             var devModeEnabled = devMode != null && devMode == "TRUE";
 
-            if (!devModeEnabled && (enginePath == null || !Directory.Exists(Path.Combine(enginePath, @"Lotus\EngineApi"))))
+            if (!devModeEnabled && (enginePath == null || !Directory.Exists(Path.Combine(enginePath, @"Lotus\src\Lotus\EngineApi"))))
             {
                 var dlg = new EnginePathDialog();
                 if (dlg.ShowDialog() == true)
