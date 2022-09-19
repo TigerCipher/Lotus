@@ -76,38 +76,38 @@ constexpr T clamp(T value, T min, T max)
 }
 
 
-template<u32 bits>
+template<u32 Bits>
 constexpr u32 pack_unit_float(f32 f)
 {
-    static_assert(bits <= sizeof(u32) * 8);
+    static_assert(Bits <= sizeof(u32) * 8);
     LASSERT(f >= 0.0f && f <= 1.0f);
-    constexpr f32 intervals = (f32) ((1ui32 << bits) - 1);
+    constexpr f32 intervals = (f32) ((1ui32 << Bits) - 1);
     return (u32) (intervals * f + 0.5f);
 }
 
-template<u32 bits>
+template<u32 Bits>
 constexpr f32 unpack_to_unit_float(u32 i)
 {
-    static_assert(bits <= sizeof(u32) * 8);
-    LASSERT(i < 1ui32 << bits);
-    constexpr f32 intervals = (f32) ((1ui32 << bits) - 1);
+    static_assert(Bits <= sizeof(u32) * 8);
+    LASSERT(i < 1ui32 << Bits);
+    constexpr f32 intervals = (f32) ((1ui32 << Bits) - 1);
     return (f32) i / intervals;
 }
 
-template<u32 bits>
+template<u32 Bits>
 constexpr u32 pack_float(f32 f, f32 min, f32 max)
 {
     LASSERT(min < max);
     LASSERT(f >= min && f <= max);
     const f32 distance = (f - min) / (max - min);
-    return pack_unit_float<bits>(distance);
+    return pack_unit_float<Bits>(distance);
 }
 
-template<u32 bits>
+template<u32 Bits>
 constexpr f32 unpack_to_float(u32 i, f32 min, f32 max)
 {
     LASSERT(min < max);
-    return unpack_to_unit_float<bits>(i) * (max - min) + min;
+    return unpack_to_unit_float<Bits>(i) * (max - min) + min;
 }
 
 
@@ -124,7 +124,7 @@ inline void store_float4(vec4* dest, vec v) { DirectX::XMStoreFloat4(dest, v); }
 inline vec normalize_vec3(const vec v) { return DirectX::XMVector3Normalize(v); }
 inline vec dot_vec3(const vec v1, const vec v2) { return DirectX::XMVector3Dot(v1, v2); }
 inline vec cross_vec3(vec v1, vec v2) { return DirectX::XMVector3Cross(v1, v2); }
-inline vec reciptrocal_length_vec3(const vec v1) { return DirectX::XMVector3ReciprocalLength(v1); }
+inline vec reciprocal_length_vec3(const vec v1) { return DirectX::XMVector3ReciprocalLength(v1); }
 
 inline f32  scalar_cos(f32 value) { return DirectX::XMScalarCos(value); }
 inline bool scalar_near_equal(f32 s1, f32 s2) { return DirectX::XMScalarNearEqual(s1, s2, epsilon); }

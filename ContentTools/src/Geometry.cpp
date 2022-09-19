@@ -21,6 +21,8 @@
 //
 // ------------------------------------------------------------------------------
 #include "Geometry.h"
+
+
 using namespace DirectX; // need this to use the overloaded operators
 
 namespace lotus::tools
@@ -59,7 +61,7 @@ namespace
 
     void process_normals(mesh& m, f32 angle)
     {
-        const f32  cosAngle = math::scalar_cos(pi - angle * pi / 180.0f);
+        const f32  cosAlpha = math::scalar_cos(pi - angle * pi / 180.0f);
         const bool hard     = math::scalar_near_equal(angle, 180.0f);
         const bool soft     = math::scalar_near_equal(angle, 0.0f);
 
@@ -88,15 +90,15 @@ namespace
                     for (u32 k = j + 1; k < numRefs; ++k)
                     {
                         // cos(angle) between normals
-                        f32 n  = 0.0f;
-                        vec n2 = math::load_float3(&m.normals [ refs [ k ] ]);
+                        f32 cosTheta = 0.0f;
+                        vec n2       = math::load_float3(&m.normals [ refs [ k ] ]);
                         if (!soft)
                         {
                             // cos(angle) = dot(n1, n2) / (|n1| * |n2|) ---- we assume n2 is unit length, so it is taken out of the formula
-                            math::store_float(&n, math::dot_vec3(n1, n2) * math::reciptrocal_length_vec3(n1));
+                            math::store_float(&cosTheta, math::dot_vec3(n1, n2) * math::reciprocal_length_vec3(n1));
                         }
 
-                        if (soft || n >= cosAngle)
+                        if (soft || cosTheta >= cosAlpha)
                         {
                             n1 += n2;
                             m.indices [ refs [ k ] ] = m.indices [ refs [ j ] ];
@@ -183,6 +185,113 @@ namespace
 
         pack_vertices(m);
     }
+
+    u64 get_mesh_size(const mesh& m)
+    {
+        const u64     numVerts = m.vertices.size();
+        const u64     vertBufferSize = sizeof(packed_vertex::vertex_static) * numVerts;
+        const u64     indexSize = numVerts < 1 << 16 ? sizeof(u16) : sizeof(u32);
+        const u64     indexBufferSize = indexSize * m.indices.size();
+        constexpr u64 size32 = sizeof(u32);
+
+        const u64 size = size32 + m.name.size() + // mesh name len
+            size32 + // mesh id
+            size32 + // vertex size
+            size32 + // num vertices
+            size32 + // index size
+            size32 + // num indices
+            sizeof(f32) + // lod threshold
+            vertBufferSize + indexBufferSize;
+
+
+        return size;
+    }
+
+    u64 get_scene_size(const scene& scene)
+    {
+        constexpr u64 size32 = sizeof(u32);
+
+        u64 size = size32 + scene.name.size() + size32;
+
+        for (auto& lod : scene.lodGroups)
+        {
+            u64 lodSize = size32 + lod.name.size() + size32;
+
+            for (auto& m : lod.meshes) { lodSize += get_mesh_size(m); }
+            size += lodSize;
+        }
+
+        return size;
+    }
+
+    void pack_mesh_data(const mesh& m, u8* const buffer, u64& at)
+    {
+        constexpr u64 size32 = sizeof(u32);
+        u32 s = 0;
+
+        // Mesh name
+        s = (u32)m.name.size();
+        memcpy(&buffer[at], &s, size32);
+        at += size32;
+
+        memcpy(&buffer[at], m.name.c_str(), s);
+        at += s;
+
+        // lod id
+        s = m.lodId;
+        memcpy(&buffer[at], &s, size32);
+        at += size32;
+
+        // vertex size
+        constexpr u32 vertexSize = sizeof(packed_vertex::vertex_static);
+        s = vertexSize;
+        memcpy(&buffer[at], &s, size32);
+        at += size32;
+
+        // num verts
+        const u32 numVerts = (u32)m.vertices.size();
+        s = numVerts;
+        memcpy(&buffer[at], &s, size32);
+        at += size32;
+
+        // Index Size
+        const u32 indexSize = numVerts < 1 << 16 ? sizeof(u16) : sizeof(u32);
+        s = indexSize;
+        memcpy(&buffer[at], &s, size32);
+        at += size32;
+
+        // Num indices
+        const u32 numIndices = (u32)m.indices.size();
+        s = numIndices;
+        memcpy(&buffer[at], &s, size32);
+        at += size32;
+
+        // lod threshold
+        memcpy(&buffer[at], &m.lodThreshold, sizeof(f32));
+        at += sizeof(f32);
+
+        // Vertex data
+        s = vertexSize * numVerts;
+        memcpy(&buffer[at], m.packedVerticesStatic.data(), s);
+        at += s;
+
+        // Index data
+        s = indexSize * numIndices;
+        void* data = (void*)m.indices.data();
+        utl::vector<u16> indices;
+        if (indexSize == sizeof(u16))
+        {
+            indices.resize(numIndices);
+            for (u32 i = 0; i < numIndices; ++i)
+            {
+                indices[i] = (u16)m.indices[i];
+            }
+            data = (void*)indices.data();
+        }
+        memcpy(&buffer[at], data, s);
+        at += s;
+    }
+
 } // namespace
 
 void process_scene(scene& scene, const geometry_import_settings& settings)
@@ -193,5 +302,52 @@ void process_scene(scene& scene, const geometry_import_settings& settings)
     }
 }
 
-void pack_data(const scene& scene, scene_data& data) { }
+
+
+void pack_data(const scene& scene, scene_data& data)
+{
+    constexpr u64 size32    = sizeof(u32);
+    const u64     sceneSize = get_scene_size(scene);
+    data.bufferSize         = (u32) sceneSize;
+    data.buffer             = (u8*) CoTaskMemAlloc(sceneSize);
+    LASSERT(data.buffer);
+
+    u8* const buffer = data.buffer;
+    u64       at     = 0;
+    u32       s      = 0;
+
+    // scene name
+    s = (u32) scene.name.size();
+    memcpy(&buffer [ at ], &s, size32);
+    at += size32;
+
+    memcpy(&buffer[at], scene.name.c_str(), s);
+    at += s;
+
+    // Number of lods
+    s = (u32)scene.lodGroups.size();
+    memcpy(&buffer[at], &s, size32);
+    at += size32;
+
+    for(auto& lod : scene.lodGroups)
+    {
+        s = (u32)lod.name.size();
+        memcpy(&buffer[at], &s, size32);
+        at += size32;
+
+        memcpy(&buffer[at], lod.name.c_str(), s);
+        at += s;
+
+        // Number of meshes in lod
+        s = (u32)lod.meshes.size();
+        memcpy(&buffer[at], &s, size32);
+        at += size32;
+
+        for(auto& m : lod.meshes)
+        {
+            pack_mesh_data(m, buffer, at);
+        }
+    }
+}
+
 } // namespace lotus::tools

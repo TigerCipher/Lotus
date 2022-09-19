@@ -110,6 +110,7 @@ namespace
         const u32 numIndices = 3 * 2 * horizCount * vertCount;
         LASSERT(m.rawIndices.size() == numIndices);
 
+        m.uvSets.resize(1);
         for (u32 i = 0; i < numIndices; ++i) { m.uvSets [ 0 ].emplace_back(uvs [ i ]); }
 
         return m;

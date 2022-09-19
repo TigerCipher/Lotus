@@ -28,3 +28,4 @@
 #endif
 
 #include "Lotus/Core/Common.h"
+#include <combaseapi.h>
