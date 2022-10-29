@@ -222,45 +222,45 @@ namespace LotusEditor.GameDev
                 Logger.Error("Visual Studio is currently running a process");
                 return;
             }
-
-            OpenInstanceInternal(project.SolutionName);
-            BuildFinished = BuildSucceeded = false;
-
-            CallOnSTAThread(() =>
-            {
-                if (_vsInstance.Solution.IsOpen) return;
-                Logger.Info($"Opening Visual Studio solution {project.SolutionName}");
-                _vsInstance.Solution.Open(project.SolutionName);
-            });
-
-            _vsInstance.MainWindow.Visible = showWindow;
-
-            _vsInstance.Events.BuildEvents.OnBuildProjConfigBegin += OnBuildBegin;
-            _vsInstance.Events.BuildEvents.OnBuildProjConfigDone += OnBuildDone;
-
-            var configName = GetConfigName(buildConfig);
-
             try
             {
+                OpenInstanceInternal(project.SolutionName);
+                BuildFinished = BuildSucceeded = false;
+
+                CallOnSTAThread(() =>
+                {
+                    if (_vsInstance.Solution.IsOpen) return;
+                    Logger.Info($"Opening Visual Studio solution {project.SolutionName}");
+                    _vsInstance.Solution.Open(project.SolutionName);
+                });
+
+                _vsInstance.MainWindow.Visible = showWindow;
+
+                _vsInstance.Events.BuildEvents.OnBuildProjConfigBegin += OnBuildBegin;
+                _vsInstance.Events.BuildEvents.OnBuildProjConfigDone += OnBuildDone;
+
+                var configName = GetConfigName(buildConfig);
+
+
                 foreach (var pdb in Directory.GetFiles(Path.Combine($"{project.Location}", $@"x64\{configName}"),
                             "*.pdb"))
                 {
                     File.Delete(pdb);
                 }
+
+                CallOnSTAThread(() =>
+                {
+                    _vsInstance.Solution.SolutionBuild.SolutionConfigurations.Item(configName).Activate();
+                    _vsInstance.ExecuteCommand("Build.BuildSolution");
+                    _resetEvent.Wait();
+                    _resetEvent.Reset();
+                });
             }
             catch (Exception e)
             {
+                Logger.Error($"Failed to build solution: {e.Message}");
                 Debug.WriteLine(e.Message);
             }
-
-            CallOnSTAThread(() =>
-            {
-                _vsInstance.Solution.SolutionBuild.SolutionConfigurations.Item(configName).Activate();
-                _vsInstance.ExecuteCommand("Build.BuildSolution");
-                _resetEvent.Wait();
-                _resetEvent.Reset();
-            });
-
         }
 
         public static void BuildSolution(Project project, BuildConfiguration buildConfig, bool showWindow = true)
@@ -312,7 +312,7 @@ namespace LotusEditor.GameDev
         {
             CallOnSTAThread(() =>
             {
-                if(_vsInstance != null && !IsDebuggingInternal() && BuildSucceeded)
+                if (_vsInstance != null && !IsDebuggingInternal() && BuildSucceeded)
                     _vsInstance.ExecuteCommand(debug ? "Debug.Start" : "Debug.StartWithoutDebugging");
 
             });
@@ -330,7 +330,7 @@ namespace LotusEditor.GameDev
         {
             CallOnSTAThread(() =>
             {
-                if(_vsInstance != null && IsDebuggingInternal())
+                if (_vsInstance != null && IsDebuggingInternal())
                     _vsInstance.ExecuteCommand("Debug.StopDebugging");
             });
         }

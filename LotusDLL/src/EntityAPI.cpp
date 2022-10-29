@@ -38,7 +38,7 @@ struct transform_component
     f32 rotation [ 3 ];
     f32 scale [ 3 ];
 
-    transform::create_info ToTransformData()
+    transform::create_info to_create_info()
     {
         using namespace DirectX;
         transform::create_info data {};
@@ -49,7 +49,7 @@ struct transform_component
         vec   quat { XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3A(&rot)) };
         vec4a rotQuad {};
         XMStoreFloat4A(&rotQuad, quat);
-        memcpy(&data.rotation [ 0 ], &rotQuad.x, sizeof(rotation));
+        memcpy(&data.rotation [ 0 ], &rotQuad.x, sizeof(data.rotation));
 
         return data;
     }
@@ -83,7 +83,7 @@ EDITOR_INTERFACE id::id_type CreateEntity(EntityDesc* e)
 {
     LASSERT(e);
     EntityDesc&            desc { *e };
-    transform::create_info transform = desc.transform.ToTransformData();
+    transform::create_info transform = desc.transform.to_create_info();
     script::create_info    scriptInfo = desc.script.to_create_info();
     entity::create_info    entity    = { &transform, &scriptInfo };
 

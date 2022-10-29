@@ -348,6 +348,8 @@ void pack_data(const scene& scene, scene_data& data)
             pack_mesh_data(m, buffer, at);
         }
     }
+
+    LASSERT(sceneSize == at);
 }
 
 } // namespace lotus::tools

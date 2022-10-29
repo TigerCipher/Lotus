@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LotusEditor.Content;
 using LotusEditor.GameDev;
 using LotusEditor.GameProject;
 
@@ -44,6 +45,12 @@ namespace LotusEditor.Editors
         private void Build_OnButtonClick(object sender, RoutedEventArgs e)
         {
             
+        }
+
+        private void OnCreatePrimitiveMesh_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new PrimitiveMeshDialog();
+            dlg.ShowDialog();
         }
     }
 }

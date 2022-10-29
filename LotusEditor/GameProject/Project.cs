@@ -201,8 +201,8 @@ namespace LotusEditor.GameProject
 
             Debug.Assert(ActiveScene != null);
 
-            await BuildGameDll(false);
-
+            // await BuildGameDll(false);
+            LoadGameDll();
             SetCommands();
         }
 

@@ -18,8 +18,14 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lotus", "Lotus\Lotus.vcxproj", "{7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{6A0DD7FB-A6C1-4C0D-866B-0183FAAB7061}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF} = {7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LotusDLL", "LotusDLL\LotusDLL.vcxproj", "{0795CDCC-4605-4019-949C-E70592F2F3FB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF} = {7C219D0D-E835-C5BE-B1B7-681E1D8BC1EF}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ContentTools", "ContentTools\ContentTools.vcxproj", "{27A956F1-B368-464D-9940-62768E367D83}"
 EndProject
