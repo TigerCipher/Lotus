@@ -25,6 +25,7 @@ namespace LotusEditor.GameProject
         public string Location { get; private set; }
         public string FullPath => $"{Location}{Name}{Extension}";
         public string SolutionName => $@"{Location}{Name}.sln";
+        public string ContentPath => $@"{Location}Assets\";
 
 
 
@@ -80,6 +81,7 @@ namespace LotusEditor.GameProject
         public ICommand DebugStartCmd { get; private set; }
         public ICommand DebugStartWithoutDebuggingCmd { get; private set; }
         public ICommand DebugStopCmd { get; private set; }
+        
 
 
         public Project(string name, string path)

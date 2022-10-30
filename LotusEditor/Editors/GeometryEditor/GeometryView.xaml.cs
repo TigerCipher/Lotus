@@ -22,6 +22,9 @@ namespace LotusEditor.Editors.GeometryEditor
     /// </summary>
     public partial class GeometryView : UserControl
     {
+
+        private static readonly GeometryView _geometryView = new() { Background = (Brush)Application.Current.FindResource("Editor.Window.GrayBrush4")};
+
         private Point _clickPosition;
         private bool _capturedLeft;
         private bool _capturedRight;
@@ -148,6 +151,20 @@ namespace LotusEditor.Editors.GeometryEditor
             v.Y = r * Math.Cos(theta);
 
             vm.CameraPosition = new Point3D(v.X, v.Y, v.Z);
+        }
+
+        internal static BitmapSource RenderToBitmap(MeshRenderer meshRenderer, int width, int height)
+        {
+            var bmp = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Default);
+            _geometryView.DataContext = meshRenderer;
+            _geometryView.Width = width;
+            _geometryView.Height = height;
+            _geometryView.Measure(new Size(width, height));
+            _geometryView.Arrange(new Rect(0, 0, width, height));
+            _geometryView.UpdateLayout();
+
+            bmp.Render(_geometryView);
+            return bmp;
         }
     }
 }

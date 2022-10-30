@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,8 +15,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using LotusEditor.ContentToolsAPIStructs;
 using LotusEditor.DllWrapper;
+using LotusEditor.Editors;
 using LotusEditor.Editors.GeometryEditor;
+using LotusEditor.GameProject;
+using LotusEditor.Utility;
 using LotusEditor.Utility.Controls;
+using Microsoft.Win32;
+using Window = System.Windows.Window;
 
 namespace LotusEditor.Content
 {
@@ -136,6 +142,23 @@ namespace LotusEditor.Content
             foreach (var mesh in vm.MeshRenderer.Meshes)
             {
                 mesh.Diffuse = brush;
+            }
+        }
+
+        private void SaveButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var dlg = new SaveFileDialog()
+            {
+                InitialDirectory = Project.Current.ContentPath,
+                Filter = "Asset File (*.asset)|*.asset"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                Debug.Assert(!string.IsNullOrEmpty(dlg.FileName));
+                Logger.Info($"Saving asset file to {dlg.FileName}");
+                var asset = (DataContext as IAssetEditor).Asset;
+                asset.Save(dlg.FileName);
             }
         }
     }

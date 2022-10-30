@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using LotusEditor.Utility;
 
 namespace LotusEditor.Content
@@ -82,6 +84,16 @@ namespace LotusEditor.Content
             ReverseHandedness = false;
             ImportEmbededTextures = true;
             ImportAnimations = true;
+        }
+
+        public void ToBinary(BinaryWriter writer)
+        {
+            writer.Write(CalculateNormals);
+            writer.Write(CalculateTangents);
+            writer.Write(SmoothingAngle);
+            writer.Write(ReverseHandedness);
+            writer.Write(ImportEmbededTextures);
+            writer.Write(ImportAnimations);
         }
     }
 
@@ -192,6 +204,118 @@ namespace LotusEditor.Content
         {
             Debug.Assert(lodGroup >= 0 && lodGroup < _lodGroups.Count);
             return _lodGroups.Any() ? _lodGroups[lodGroup] : null;
+        }
+
+        public override IEnumerable<string> Save(string file)
+        {
+            Debug.Assert(_lodGroups.Any());
+            var savedFiles = new List<string>();
+            if (!_lodGroups.Any()) return savedFiles;
+            var path = Path.GetDirectoryName(file) + Path.DirectorySeparatorChar;
+            var fileName = Path.GetFileNameWithoutExtension(file);
+
+            try
+            {
+                foreach (var lodGroup in _lodGroups)
+                {
+                    Debug.Assert(lodGroup.LODS.Any());
+                    // use name of highest detail mesh
+                    var meshName = path + fileName + "_" + lodGroup.LODS[0].Name + AssetFileExtension;
+                    Guid = Guid.NewGuid(); // need dif id for each asset file
+                    Logger.Info($"Saving mesh with highest lod with name {lodGroup.LODS[0].Name} and guid {Guid.ToString()}");
+                    byte[] data = null;
+                    using (var writer = new BinaryWriter(new MemoryStream()))
+                    {
+                        writer.Write(lodGroup.Name);
+                        writer.Write(lodGroup.LODS.Count);
+                        var hashes = new List<byte>();
+                        Logger.Info("Saving LODs");
+                        foreach (var lod in lodGroup.LODS)
+                        {
+                            LodToBinary(lod, writer, out var hash);
+                            hashes.AddRange(hash);
+                        }
+
+                        Logger.Info("Computing hash");
+                        Hash = ContentUtil.ComputeHash(hashes.ToArray());
+                        data = (writer.BaseStream as MemoryStream).ToArray();
+                        Icon = GenerateIcon(lodGroup.LODS[0]);
+                    }
+
+                    Debug.Assert(data?.Length > 0);
+
+                    using (var writer = new BinaryWriter(File.Open(meshName, FileMode.Create, FileAccess.Write)))
+                    {
+                        WriteAssetFileHeader(writer);
+                        Logger.Info("Saving import settings");
+                        ImportSettings.ToBinary(writer);
+                        Logger.Info("Saving data buffer");
+                        writer.Write(data.Length);
+                        writer.Write(data);
+                    }
+
+                    savedFiles.Add(meshName);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Write(e.Message);
+                Logger.Error($"Failed to save geometry asset to {file}");
+            }
+
+            Logger.Info($"{fileName} successfully saved!");
+            return savedFiles;
+        }
+
+        private byte[] GenerateIcon(MeshLOD lod)
+        {
+            Logger.Info("Generating asset icon");
+            var width = 90 * 4; // 90 pixels * 4, so 4x sampling
+            BitmapSource bmp = null;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                bmp = Editors.GeometryEditor.GeometryView.RenderToBitmap(new Editors.GeometryEditor.MeshRenderer(lod, null),
+                    width, width);
+                bmp = new TransformedBitmap(bmp, new ScaleTransform(0.25, 0.25, 0.5, 0.5));
+            });
+
+            using var memStream = new MemoryStream();
+            memStream.SetLength(0);
+
+            Logger.Info("Encoding icon");
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bmp));
+            encoder.Save(memStream);
+
+            Logger.Info("Icon created");
+            return memStream.ToArray();
+        }
+
+
+        private void LodToBinary(MeshLOD lod, BinaryWriter writer, out byte[] hash)
+        {
+            writer.Write(lod.Name);
+            writer.Write(lod.LodThreshold);
+            writer.Write(lod.Meshes.Count);
+
+            var meshBegin = writer.BaseStream.Position;
+
+            foreach (var mesh in lod.Meshes)
+            {
+                writer.Write(mesh.VertexSize);
+                writer.Write(mesh.VertexCount);
+                writer.Write(mesh.IndexCount);
+                writer.Write(mesh.IndexCount);
+                writer.Write(mesh.Vertices);
+                writer.Write(mesh.Indices);
+            }
+
+            var meshDataSize = writer.BaseStream.Position - meshBegin;
+            Debug.Assert(meshDataSize > 0);
+
+            var buffer = (writer.BaseStream as MemoryStream).ToArray();
+            hash = ContentUtil.ComputeHash(buffer, (int)meshBegin, (int)meshDataSize);
         }
     }
 }

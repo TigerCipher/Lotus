@@ -77,23 +77,23 @@ struct lod_group
 struct scene
 {
     std::string            name;
-    utl::vector<lod_group> lodGroups;
+    utl::vector<lod_group> lod_groups;
 };
 
 struct geometry_import_settings
 {
-    f32 smoothingAngle;
-    u8  calculateNormals;
-    u8  calculateTangents;
-    u8  reverseHandedness;
-    u8  importEmbededTextures;
-    u8  importAnimations;
+    f32 smoothing_angle;
+    u8  calculate_normals;
+    u8  calculate_tangents;
+    u8  reverse_handedness;
+    u8  import_embeded_textures;
+    u8  import_animations;
 };
 
 struct scene_data
 {
     u8* buffer;
-    u32 bufferSize;
+    u32 buffer_size;
 
     geometry_import_settings settings;
 };

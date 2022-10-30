@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -129,6 +130,30 @@ namespace LotusEditor.Utility
             }
 
             return sb.ToString(0, length);
+        }
+
+        public static string FixFilename(string name)
+        {
+            var path = new StringBuilder(name[..(name.LastIndexOf(Path.DirectorySeparatorChar) + 1)]);
+            var file = new StringBuilder(name[(name.LastIndexOf(Path.DirectorySeparatorChar) + 1)..]);
+            foreach (var c in Path.GetInvalidPathChars())
+            {
+                path.Replace(c, '_');
+            }
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                file.Replace(c, '_');
+            }
+
+            return path.Append(file).ToString();
+        }
+
+        public static byte[] ComputeHash(byte[] data, int offset = 0, int count = 0)
+        {
+            if (!(data?.Length > 0)) return null;
+            using var sha = SHA256.Create();
+            return sha.ComputeHash(data, offset, count > 0 ? count : data.Length);
+
         }
     }
 }
