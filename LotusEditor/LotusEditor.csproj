@@ -28,6 +28,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\PrimitiveMeshView\PlaneTexture.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <COMReference Include="EnvDTE80">
       <WrapperTool>tlbimp</WrapperTool>
       <VersionMinor>0</VersionMinor>
@@ -46,6 +50,10 @@
       <Isolated>false</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\PrimitiveMeshView\PlaneTexture.png" />
   </ItemGroup>
 
   <ItemGroup>

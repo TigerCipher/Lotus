@@ -78,6 +78,10 @@ namespace
                 vec2 uv = { uRange.x, 1.0f - vRange.x };
                 uv.x += i * uStep;
                 uv.y -= j * vStep;
+                // vec2 uv{ 0, 1.0f };
+                // uv.x += i % 2;
+                // uv.y -= j % 2;
+
                 uvs.emplace_back(uv);
             }
         }
