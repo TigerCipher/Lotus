@@ -29,16 +29,16 @@ namespace lotus::tools
 
 namespace packed_vertex
 {
-    // static mesh
-    struct vertex_static
-    {
-        vec3 position;
-        u8   reserved [ 3 ];
-        u8   tsign; // if z is neg: Bit 1 = 0, if pos: Bit 1 = 1
-        u16  normal [ 2 ];
-        u16  tangent [ 2 ];
-        vec2 uv;
-    };
+// static mesh
+struct vertex_static
+{
+    vec3 position;
+    u8   reserved[3];
+    u8   tsign; // if z is neg: Bit 1 = 0, if pos: Bit 1 = 1
+    u16  normal[2];
+    u16  tangent[2];
+    vec2 uv;
+};
 } // namespace packed_vertex
 
 struct vertex
@@ -54,19 +54,18 @@ struct mesh
     utl::vector<vec3>              positions;
     utl::vector<vec3>              normals;
     utl::vector<vec4>              tangents;
-    utl::vector<utl::vector<vec2>> uvSets;
-    utl::vector<u32>               rawIndices;
+    utl::vector<utl::vector<vec2>> uv_sets;
+    utl::vector<u32>               raw_indices;
 
     utl::vector<vertex> vertices;
     utl::vector<u32>    indices;
 
 
     // output
-    std::string name;
-    utl::vector<packed_vertex::vertex_static> packedVerticesStatic;
-    f32                                       lodThreshold = -1.0f;
-    u32                                       lodId { InvalidIdU32 };
-
+    std::string                               name;
+    utl::vector<packed_vertex::vertex_static> packed_vertices_static;
+    f32                                       lod_threshold = -1.0f;
+    u32                                       lod_id{InvalidIdU32};
 };
 
 struct lod_group

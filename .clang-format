@@ -1,6 +1,6 @@
-# Format Style Options - Created with Clang Power Tools
+# WIP formatting settings
 ---
-BasedOnStyle: WebKit
+BasedOnStyle: LLVM
 AlignAfterOpenBracket: Align
 AlignConsecutiveMacros: Consecutive
 AlignConsecutiveAssignments: Consecutive
@@ -8,9 +8,9 @@ AlignConsecutiveDeclarations: Consecutive
 AlignOperands: AlignAfterOperator
 AllowShortBlocksOnASingleLine: Always
 AllowShortCaseLabelsOnASingleLine: true
-AllowShortIfStatementsOnASingleLine: Always
-AllowShortLoopsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
 AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBraces: Custom
 BraceWrapping: 
@@ -38,15 +38,16 @@ IndentPPDirectives: BeforeHash
 KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 2
 ReflowComments: false
-SortIncludes: false
+SortIncludes: Never
 SpaceAfterCStyleCast: true
-SpacesInSquareBrackets: true
-SpaceBeforeSquareBrackets: true
+SpacesInSquareBrackets: false
+SpaceBeforeSquareBrackets: false
 SpaceAfterTemplateKeyword: false
 UseTab: Never
 IndentWidth: 4
 TabWidth: 4
 #IndentAccessModifiers: true
-#AccessModifierOffset: -4
+AccessModifierOffset: -4
 ContinuationIndentWidth: 4
+PointerAlignment: Left
 ...

@@ -56,7 +56,7 @@
         </Grid.RowDefinitions>
         <Canvas x:Name="canvas">
             <Rectangle Width="{Binding Path=ActualWidth, ElementName=createProjectButton}"
-                       Height="{Binding Path=ActualHeight, ElementName=canvas}" x:Name="highlightRect" Canvas.Left="200" Opacity="0.3">
+                       Height="{Binding Path=ActualHeight, ElementName=canvas}" x:Name="highlightRect" Canvas.Left="150" Opacity="0.3">
                 <Rectangle.Effect>
                     <BlurEffect Radius="10" KernelType="Gaussian"/>
                 </Rectangle.Effect>

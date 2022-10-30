@@ -28,109 +28,113 @@ namespace lotus::tools
 
 namespace
 {
-    using PrimitiveMeshCreator = void (*)(scene&, const primitive_create_info& info);
+using PrimitiveMeshCreator = void (*)(scene&, const primitive_create_info& info);
 
 
-    enum Axis : u32
+enum Axis : u32
+{
+    AXIS_X = 0,
+    AXIS_Y = 1,
+    AXIS_Z = 2
+};
+
+void create_plane(scene& scene, const primitive_create_info& info);
+void create_cube(scene& scene, const primitive_create_info& info);
+void create_uv_sphere(scene& scene, const primitive_create_info& info);
+void create_ico_sphere(scene& scene, const primitive_create_info& info);
+void create_cylinder(scene& scene, const primitive_create_info& info);
+void create_capsule(scene& scene, const primitive_create_info& info);
+
+PrimitiveMeshCreator creators[]{create_plane,      create_cube,     create_uv_sphere,
+                                create_ico_sphere, create_cylinder, create_capsule};
+
+static_assert(_countof(creators) == PrimitiveMeshType::COUNT);
+
+mesh create_plane(const primitive_create_info& info, const u32 horizontal_index = AXIS_X,
+                  const u32 vertical_index = AXIS_Z, const bool flip_winding = false,
+                  const vec3 offset = {-0.5f, 0.0f, -0.5f}, const vec2 u_range = {0.0f, 1.0f},
+                  const vec2 v_range = {0.0f, 1.0f})
+{
+    LASSERT(horizontal_index < 3 && vertical_index < 3 && horizontal_index != vertical_index);
+    const u32 horiz_count = math::clamp(info.segments[horizontal_index], 1u, 10u);
+    const u32 vert_count  = math::clamp(info.segments[vertical_index], 1u, 10u);
+    const f32 horiz_step  = 1.0f / horiz_count;
+    const f32 vert_step   = 1.0f / vert_count;
+    const f32 u_step      = (u_range.y - u_range.x) / horiz_count;
+    const f32 v_step      = (v_range.y - v_range.x) / vert_count;
+
+    mesh              m;
+    utl::vector<vec2> uvs;
+
+    for (u32 j = 0; j <= vert_count; ++j)
     {
-        AXIS_X = 0,
-        AXIS_Y = 1,
-        AXIS_Z = 2
-    };
-
-    void create_plane(scene& scene, const primitive_create_info& info);
-    void create_cube(scene& scene, const primitive_create_info& info);
-    void create_uv_sphere(scene& scene, const primitive_create_info& info);
-    void create_ico_sphere(scene& scene, const primitive_create_info& info);
-    void create_cylinder(scene& scene, const primitive_create_info& info);
-    void create_capsule(scene& scene, const primitive_create_info& info);
-
-    PrimitiveMeshCreator creators [] { create_plane,      create_cube,     create_uv_sphere,
-                                       create_ico_sphere, create_cylinder, create_capsule };
-
-    static_assert(_countof(creators) == PrimitiveMeshType::COUNT);
-
-    mesh create_plane(const primitive_create_info& info, u32 horizontalIndex = AXIS_X, u32 verticalIndex = AXIS_Z,
-                      bool flipWinding = false, vec3 offset = { -0.5f, 0.0f, -0.5f }, vec2 uRange = { 0.0f, 1.0f },
-                      vec2 vRange = { 0.0f, 1.0f })
-    {
-        LASSERT(horizontalIndex < 3 && verticalIndex < 3 && horizontalIndex != verticalIndex);
-        const u32 horizCount = math::clamp(info.segments [ horizontalIndex ], 1u, 10u);
-        const u32 vertCount  = math::clamp(info.segments [ verticalIndex ], 1u, 10u);
-        const f32 horizStep  = 1.0f / horizCount;
-        const f32 vertStep   = 1.0f / vertCount;
-        const f32 uStep      = (uRange.y - uRange.x) / horizCount;
-        const f32 vStep      = (vRange.y - vRange.x) / vertCount;
-
-        mesh              m;
-        utl::vector<vec2> uvs;
-
-        for (u32 j = 0; j <= vertCount; ++j)
+        for (u32 i = 0; i <= horiz_count; ++i)
         {
-            for (u32 i = 0; i <= horizCount; ++i)
-            {
-                vec3       pos = offset;
-                f32* const arr = &pos.x;
-                arr [ horizontalIndex ] += i * horizStep;
-                arr [ verticalIndex ] += j * vertStep;
-                m.positions.emplace_back(pos.x * info.size.x, pos.y * info.size.y, pos.z * info.size.z);
+            vec3       pos = offset;
+            f32* const arr = &pos.x;
+            arr[horizontal_index] += i * horiz_step;
+            arr[vertical_index] += j * vert_step;
+            m.positions.emplace_back(pos.x * info.size.x, pos.y * info.size.y, pos.z * info.size.z);
 
-                vec2 uv = { uRange.x, 1.0f - vRange.x };
-                uv.x += i * uStep;
-                uv.y -= j * vStep;
-                // vec2 uv{ 0, 1.0f };
-                // uv.x += i % 2;
-                // uv.y -= j % 2;
+            vec2 uv = {u_range.x, 1.0f - v_range.x};
+            uv.x += i * u_step;
+            uv.y -= j * v_step;
+            // vec2 uv{ 0, 1.0f };
+            // uv.x += i % 2;
+            // uv.y -= j % 2;
 
-                uvs.emplace_back(uv);
-            }
+            uvs.emplace_back(uv);
         }
-
-        LASSERT(m.positions.size() == ((u64) horizCount + 1) * ((u64) vertCount + 1));
-
-        const u32 rowLen = horizCount + 1;
-
-        for (u32 j = 0; j < vertCount; ++j)
-        {
-            for (u32 i = 0; i < horizCount; ++i)
-            {
-                const u32 index [ 4 ] {
-                    i + j * rowLen,
-                    i + (j + 1) * rowLen,
-                    (i + 1) + j * rowLen,
-                    (i + 1) + (j + 1) * rowLen,
-                };
-
-                m.rawIndices.emplace_back(index [ 0 ]);
-                m.rawIndices.emplace_back(index [ flipWinding ? 2 : 1 ]);
-                m.rawIndices.emplace_back(index [ flipWinding ? 1 : 2 ]);
-
-                m.rawIndices.emplace_back(index [ 2 ]);
-                m.rawIndices.emplace_back(index [ flipWinding ? 3 : 1 ]);
-                m.rawIndices.emplace_back(index [ flipWinding ? 1 : 3 ]);
-            }
-        }
-
-        const u32 numIndices = 3 * 2 * horizCount * vertCount;
-        LASSERT(m.rawIndices.size() == numIndices);
-
-        m.uvSets.resize(1);
-        for (u32 i = 0; i < numIndices; ++i) { m.uvSets [ 0 ].emplace_back(uvs [ m.rawIndices [ i ] ]); }
-
-        return m;
     }
 
-    void create_plane(scene& scene, const primitive_create_info& info)
+    LASSERT(m.positions.size() == ((u64) horiz_count + 1) * ((u64) vert_count + 1));
+
+    const u32 row_len = horiz_count + 1;
+
+    for (u32 j = 0; j < vert_count; ++j)
     {
-        lod_group lod { "plane" };
-        lod.meshes.emplace_back(create_plane(info));
-        scene.lodGroups.emplace_back(lod);
+        for (u32 i = 0; i < horiz_count; ++i)
+        {
+            const u32 index[4]{
+                i + j * row_len,
+                i + (j + 1) * row_len,
+                (i + 1) + j * row_len,
+                (i + 1) + (j + 1) * row_len,
+            };
+
+            m.raw_indices.emplace_back(index[0]);
+            m.raw_indices.emplace_back(index[flip_winding ? 2 : 1]);
+            m.raw_indices.emplace_back(index[flip_winding ? 1 : 2]);
+
+            m.raw_indices.emplace_back(index[2]);
+            m.raw_indices.emplace_back(index[flip_winding ? 3 : 1]);
+            m.raw_indices.emplace_back(index[flip_winding ? 1 : 3]);
+        }
     }
-    void create_cube(scene& scene, const primitive_create_info& info) { }
-    void create_uv_sphere(scene& scene, const primitive_create_info& info) { }
-    void create_ico_sphere(scene& scene, const primitive_create_info& info) { }
-    void create_cylinder(scene& scene, const primitive_create_info& info) { }
-    void create_capsule(scene& scene, const primitive_create_info& info) { }
+
+    const u32 num_indices = 3 * 2 * horiz_count * vert_count;
+    LASSERT(m.raw_indices.size() == num_indices);
+
+    m.uv_sets.resize(1);
+    for (u32 i = 0; i < num_indices; ++i)
+    {
+        m.uv_sets[0].emplace_back(uvs[m.raw_indices[i]]);
+    }
+
+    return m;
+}
+
+void create_plane(scene& scene, const primitive_create_info& info)
+{
+    lod_group lod{"plane"};
+    lod.meshes.emplace_back(create_plane(info));
+    scene.lodGroups.emplace_back(lod);
+}
+void create_cube(scene& scene, const primitive_create_info& info) {}
+void create_uv_sphere(scene& scene, const primitive_create_info& info) {}
+void create_ico_sphere(scene& scene, const primitive_create_info& info) {}
+void create_cylinder(scene& scene, const primitive_create_info& info) {}
+void create_capsule(scene& scene, const primitive_create_info& info) {}
 
 } // namespace
 
@@ -140,7 +144,7 @@ EDITOR_INTERFACE void CreatePrimitiveMesh(scene_data* data, primitive_create_inf
     LASSERT(info->type < PrimitiveMeshType::COUNT);
 
     scene scene;
-    creators [ info->type ](scene, *info);
+    creators[info->type](scene, *info);
 
     data->settings.calculateNormals = 1;
     process_scene(scene, data->settings);

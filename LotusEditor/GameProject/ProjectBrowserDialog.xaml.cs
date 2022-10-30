@@ -61,7 +61,7 @@ namespace LotusEditor.GameProject
 
         private void AnimateNewProject()
         {
-            var highlightAnim = new DoubleAnimation(200, 400, new Duration(TimeSpan.FromSeconds(0.2)));
+            var highlightAnim = new DoubleAnimation(150, 400, new Duration(TimeSpan.FromSeconds(0.2)));
             highlightAnim.EasingFunction = _easing;
             highlightAnim.Completed += (s, e) =>
             {
@@ -76,7 +76,7 @@ namespace LotusEditor.GameProject
 
         private void AnimateOpenProject()
         {
-            var highlightAnim = new DoubleAnimation(400, 200, new Duration(TimeSpan.FromSeconds(0.2)));
+            var highlightAnim = new DoubleAnimation(400, 150, new Duration(TimeSpan.FromSeconds(0.2)));
             highlightAnim.EasingFunction = _easing;
             highlightAnim.Completed += (s, e) =>
             {

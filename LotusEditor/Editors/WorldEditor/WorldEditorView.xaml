@@ -8,8 +8,9 @@
              xmlns:ctrl="clr-namespace:LotusEditor.Utility.Controls"
              xmlns:eng="clr-namespace:LotusEditor.Engine"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:gameProject="clr-namespace:LotusEditor.GameProject"
              mc:Ignorable="d" Focusable="True"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" d:DataContext="{d:DesignInstance Type= gameProject:Project}">
 
     <UserControl.Resources>
         <sys:Boolean x:Key="True">True</sys:Boolean>

@@ -33,15 +33,15 @@ namespace
 
     void recalculate_normals(mesh& m)
     {
-        const u32 numIndices = (u32) m.rawIndices.size();
+        const u32 numIndices = (u32) m.raw_indices.size();
         m.normals.resize(numIndices);
 
         for (u32 i = 0; i < numIndices; ++i)
         {
             //
-            const u32 i0 = m.rawIndices [ i ];
-            const u32 i1 = m.rawIndices [ ++i ];
-            const u32 i2 = m.rawIndices [ ++i ];
+            const u32 i0 = m.raw_indices [ i ];
+            const u32 i1 = m.raw_indices [ ++i ];
+            const u32 i2 = m.raw_indices [ ++i ];
 
             vec v0 = math::load_float3(&m.positions [ i0 ]);
             vec v1 = math::load_float3(&m.positions [ i1 ]);
@@ -65,13 +65,13 @@ namespace
         const bool hard     = math::scalar_near_equal(angle, 180.0f);
         const bool soft     = math::scalar_near_equal(angle, 0.0f);
 
-        const u32 numIndices  = (u32) m.rawIndices.size();
+        const u32 numIndices  = (u32) m.raw_indices.size();
         const u32 numVertices = (u32) m.positions.size();
         LASSERT(numIndices && numVertices);
         m.indices.resize(numIndices);
 
         utl::vector<utl::vector<u32>> indexRef(numVertices);
-        for (u32 i = 0; i < numIndices; ++i) { indexRef [ m.rawIndices [ i ] ].emplace_back(i); }
+        for (u32 i = 0; i < numIndices; ++i) { indexRef [ m.raw_indices [ i ] ].emplace_back(i); }
 
         for (u32 i = 0; i < numVertices; ++i)
         {
@@ -82,7 +82,7 @@ namespace
                 m.indices [ refs [ j ] ] = (u32) m.vertices.size();
 
                 vertex& v  = m.vertices.emplace_back();
-                v.position = m.positions [ m.rawIndices [ refs [ j ] ] ];
+                v.position = m.positions [ m.raw_indices [ refs [ j ] ] ];
 
                 vec n1 = math::load_float3(&m.normals [ refs [ j ] ]);
                 if (!hard)
@@ -136,12 +136,12 @@ namespace
             {
                 m.indices [ refs [ j ] ] = (u32) m.vertices.size();
                 vertex& v                = oldVerts [ oldIndices [ refs [ j ] ] ];
-                v.uv                     = m.uvSets [ 0 ][ refs [ j ] ];
+                v.uv                     = m.uv_sets [ 0 ][ refs [ j ] ];
                 m.vertices.emplace_back(v);
 
                 for (u32 k = j + 1; k < numRefs; ++k)
                 {
-                    vec2& uv1 = m.uvSets [ 0 ][ refs [ k ] ];
+                    vec2& uv1 = m.uv_sets [ 0 ][ refs [ k ] ];
                     if (math::scalar_near_equal(v.uv.x, uv1.x) && math::scalar_near_equal(v.uv.y, uv1.y))
                     {
                         m.indices [ refs [ k ] ] = m.indices [ refs [ j ] ];
@@ -158,7 +158,7 @@ namespace
     {
         const u32 numVerts = (u32) m.vertices.size();
         LASSERT(numVerts);
-        m.packedVerticesStatic.reserve(numVerts);
+        m.packed_vertices_static.reserve(numVerts);
 
         for (u32 i = 0; i < numVerts; ++i)
         {
@@ -169,19 +169,19 @@ namespace
 
             // #TODO: Pack tangents
 
-            m.packedVerticesStatic.emplace_back(
+            m.packed_vertices_static.emplace_back(
                 packed_vertex::vertex_static { position, { 0, 0, 0 }, signs, { nX, nY }, {}, uv });
         }
     }
 
     void process_vertices(mesh& m, const geometry_import_settings& settings)
     {
-        LASSERT(m.rawIndices.size() % 3 == 0);
+        LASSERT(m.raw_indices.size() % 3 == 0);
         if (settings.calculateNormals || m.normals.empty()) { recalculate_normals(m); }
 
         process_normals(m, settings.smoothingAngle);
 
-        if (!m.uvSets.empty()) { process_uvs(m); }
+        if (!m.uv_sets.empty()) { process_uvs(m); }
 
         pack_vertices(m);
     }
@@ -238,7 +238,7 @@ namespace
         at += s;
 
         // lod id
-        s = m.lodId;
+        s = m.lod_id;
         memcpy(&buffer[at], &s, size32);
         at += size32;
 
@@ -267,12 +267,12 @@ namespace
         at += size32;
 
         // lod threshold
-        memcpy(&buffer[at], &m.lodThreshold, sizeof(f32));
+        memcpy(&buffer[at], &m.lod_threshold, sizeof(f32));
         at += sizeof(f32);
 
         // Vertex data
         s = vertexSize * numVerts;
-        memcpy(&buffer[at], m.packedVerticesStatic.data(), s);
+        memcpy(&buffer[at], m.packed_vertices_static.data(), s);
         at += s;
 
         // Index data
