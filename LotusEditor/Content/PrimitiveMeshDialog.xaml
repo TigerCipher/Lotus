@@ -57,12 +57,12 @@
                     <Border CornerRadius="3" BorderThickness="1" BorderBrush="{StaticResource Editor.Window.GrayBrush6}" Margin="5">
                         <StackPanel Margin="5,15,5,5">
                             <DockPanel Margin="5">
-                                <TextBlock Text="Width" Width="40" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                                <TextBlock Text="Width" Width="50" DockPanel.Dock="Left" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding Path=Value, ElementName=xSliderPlane}" Width="30" DockPanel.Dock="Right"/>
                                 <Slider Minimum="1" Maximum="10" HorizontalAlignment="Stretch" Interval="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" x:Name="xSliderPlane" ValueChanged="OnSlider_ValueChanged"/>
                             </DockPanel>
                             <DockPanel Margin="5">
-                                <TextBlock Text="Length" Width="40" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                                <TextBlock Text="Length" Width="50" DockPanel.Dock="Left" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding Path=Value, ElementName=zSliderPlane}" Width="30" DockPanel.Dock="Right"/>
                                 <Slider Minimum="1" Maximum="10" HorizontalAlignment="Stretch" Interval="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" x:Name="zSliderPlane" ValueChanged="OnSlider_ValueChanged"/>
                             </DockPanel>
@@ -75,11 +75,11 @@
                     <Border CornerRadius="3" BorderThickness="1" BorderBrush="{StaticResource Editor.Window.GrayBrush6}" Margin="5">
                         <StackPanel Margin="5,15,5,5">
                             <DockPanel Margin="5,5,5,0">
-                                <TextBlock Text="Width" Width="40" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                                <TextBlock Text="Width" Width="50" DockPanel.Dock="Left" VerticalAlignment="Center"/>
                                 <utl:ScalarBox x:Name="widthScalarBoxPlane" Value="1" ValueChanged="OnScalarBox_ValueChanged"/>
                             </DockPanel>
                             <DockPanel Margin="5,5,5,0">
-                                <TextBlock Text="Length" Width="40" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                                <TextBlock Text="Length" Width="50" DockPanel.Dock="Left" VerticalAlignment="Center"/>
                                 <utl:ScalarBox x:Name="lengthScalarBoxPlane" Value="1" ValueChanged="OnScalarBox_ValueChanged"/>
                             </DockPanel>
                         </StackPanel>
