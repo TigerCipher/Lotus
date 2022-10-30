@@ -88,7 +88,7 @@ namespace
 
         for (u32 j = 0; j < vertCount; ++j)
         {
-            for (u32 i = j; i < horizCount; ++i)
+            for (u32 i = 0; i < horizCount; ++i)
             {
                 const u32 index [ 4 ] {
                     i + j * rowLen,
@@ -111,7 +111,7 @@ namespace
         LASSERT(m.rawIndices.size() == numIndices);
 
         m.uvSets.resize(1);
-        for (u32 i = 0; i < numIndices; ++i) { m.uvSets [ 0 ].emplace_back(uvs [ i ]); }
+        for (u32 i = 0; i < numIndices; ++i) { m.uvSets [ 0 ].emplace_back(uvs [ m.rawIndices [ i ] ]); }
 
         return m;
     }

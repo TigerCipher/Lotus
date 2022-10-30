@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using LotusEditor.ContentToolsAPIStructs;
 using LotusEditor.DllWrapper;
+using LotusEditor.Editors.GeometryEditor;
 using LotusEditor.Utility.Controls;
 
 namespace LotusEditor.Content
@@ -72,6 +73,7 @@ namespace LotusEditor.Content
 
             var geometry = new Geometry();
             ContentToolsAPI.CreatePrimitiveMesh(geometry, info);
+            (DataContext as GeometryEditor).SetAsset(geometry);
         }
 
 

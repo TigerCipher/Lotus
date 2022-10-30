@@ -6,12 +6,16 @@
         xmlns:local="clr-namespace:LotusEditor.Content"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:utl="clr-namespace:LotusEditor.Utility.Controls"
+        xmlns:ed="clr-namespace:LotusEditor.Editors.GeometryEditor"
         mc:Ignorable="d" ResizeMode="NoResize"
         Foreground="{StaticResource Editor.FontColorBrush}"
         WindowStartupLocation="CenterScreen"
         UseLayoutRounding="True"
         Title="PrimitiveMeshDialog" Height="450" Width="800"
         Style="{StaticResource LotusDialogStyle}">
+    <Window.DataContext>
+        <ed:GeometryEditor/>
+    </Window.DataContext>
     <Window.Resources>
         <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>

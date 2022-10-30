@@ -34,7 +34,7 @@ namespace
     void recalculate_normals(mesh& m)
     {
         const u32 numIndices = (u32) m.rawIndices.size();
-        m.normals.reserve(numIndices);
+        m.normals.resize(numIndices);
 
         for (u32 i = 0; i < numIndices; ++i)
         {
@@ -76,7 +76,7 @@ namespace
         for (u32 i = 0; i < numVertices; ++i)
         {
             auto& refs    = indexRef [ i ];
-            u32   numRefs = (u32) indexRef.size();
+            u32   numRefs = (u32) refs.size();
             for (u32 j = 0; j < numRefs; ++j)
             {
                 m.indices [ refs [ j ] ] = (u32) m.vertices.size();
@@ -125,9 +125,9 @@ namespace
         LASSERT(numVerts && numIndices);
 
         utl::vector<utl::vector<u32>> indexRef(numVerts);
-        for (u32 i = 0; i < numIndices; ++i) { indexRef [ m.rawIndices [ i ] ].emplace_back(i); }
+        for (u32 i = 0; i < numIndices; ++i) { indexRef [ oldIndices [ i ] ].emplace_back(i); }
 
-        for (u32 i = 0; i < numIndices; ++i)
+        for (u32 i = 0; i < numVerts; ++i)
         {
             auto& refs    = indexRef [ i ];
             u32   numRefs = (u32) refs.size();
