@@ -95,6 +95,13 @@
             <!-- Cylinder settings -->
             <!-- Capsule settings -->
 
+            <ed:GeometryView DataContext="{Binding MeshRenderer}" Grid.Column="1"/>
+            <StackPanel Grid.Column="1" Margin="5" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" IsHitTestVisible="False">
+                <TextBlock Text="{Binding MeshRenderer.CameraPosition.X, StringFormat=G5}"/>
+                <TextBlock Text="{Binding MeshRenderer.CameraPosition.Y, StringFormat=G5}" Margin="10, 0"/>
+                <TextBlock Text="{Binding MeshRenderer.CameraPosition.Z, StringFormat=G5}" Margin="10, 0"/>
+            </StackPanel>
+
         </Grid>
 
     </DockPanel>

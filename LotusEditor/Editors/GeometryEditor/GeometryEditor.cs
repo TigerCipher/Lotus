@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using LotusEditor.Content;
+using LotusEditor.Utility;
 
 namespace LotusEditor.Editors.GeometryEditor
 {
@@ -42,7 +43,14 @@ namespace LotusEditor.Editors.GeometryEditor
         public Vector3D CameraDirection { get => _cameraDir; set { if (_cameraDir == value) return; _cameraDir = value; OnPropertyChanged(nameof(CameraDirection)); } }
 
         private Point3D _cameraPos = new(0, 0, 10);
-        public Point3D CameraPosition { get => _cameraPos; set { if (_cameraPos == value) return; _cameraPos = value; OnPropertyChanged(nameof(OffsetCameraPosition)); OnPropertyChanged(nameof(CameraPosition)); } }
+        public Point3D CameraPosition
+        {
+            get => _cameraPos; set
+            {
+                if (_cameraPos == value) return; _cameraPos = value;
+                CameraDirection = new Vector3D(-value.X, -value.Y, -value.Z); OnPropertyChanged(nameof(OffsetCameraPosition)); OnPropertyChanged(nameof(CameraPosition));
+            }
+        }
 
         private Point3D _cameraTarget = new(0, 0, 0);
         public Point3D CameraTarget { get => _cameraTarget; set { if (_cameraTarget == value) return; _cameraTarget = value; OnPropertyChanged(nameof(OffsetCameraPosition)); OnPropertyChanged(nameof(CameraTarget)); } }
@@ -95,7 +103,7 @@ namespace LotusEditor.Editors.GeometryEditor
                         // read normals
                         var normX = reader.ReadUInt16() * intervals - 1.0f;
                         var normY = reader.ReadUInt16() * intervals - 1.0f;
-                        var normZ = Math.Sqrt(Math.Clamp(1f - (normX + normX * normY), 0f, 1f)) * ((signs & 0x2) - 1f);
+                        var normZ = Math.Sqrt(Math.Clamp(1f - (normX * normX + normY * normY), 0f, 1f)) * ((signs & 0x2) - 1f);
                         var normal = new Vector3D(normX, normY, normZ);
                         vertexData.Normals.Add(normal);
                         avgNormal += normal;
@@ -160,7 +168,7 @@ namespace LotusEditor.Editors.GeometryEditor
         public Content.Geometry Geometry { get => _geometry; set { if (_geometry == value) return; _geometry = value; OnPropertyChanged(nameof(Geometry)); } }
 
         private MeshRenderer _meshRenderer;
-        public MeshRenderer MeshRenderer { get => _meshRenderer; set { if(_meshRenderer == value) return; _meshRenderer = value; OnPropertyChanged(nameof(MeshRenderer)); } }
+        public MeshRenderer MeshRenderer { get => _meshRenderer; set { if (_meshRenderer == value) return; _meshRenderer = value; OnPropertyChanged(nameof(MeshRenderer)); } }
 
 
         public void SetAsset(Content.Asset asset)
