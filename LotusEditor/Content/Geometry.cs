@@ -54,12 +54,43 @@ namespace LotusEditor.Content
         public ObservableCollection<MeshLOD> LODS { get; } = new();
     }
 
+    class GeometryImportSettings : ViewModelBase
+    {
+        private float _smoothingAngle;
+        public float SmoothingAngle { get => _smoothingAngle; set { if(_smoothingAngle == value) return; _smoothingAngle = value; OnPropertyChanged(nameof(SmoothingAngle)); } }
+
+        private bool _calculateNormals;
+        public bool CalculateNormals { get => _calculateNormals; set { if(_calculateNormals == value) return; _calculateNormals = value; OnPropertyChanged(nameof(CalculateNormals)); } }
+
+        private bool _calculateTangents;
+        public bool CalculateTangents { get => _calculateTangents; set { if(_calculateTangents == value) return; _calculateTangents = value; OnPropertyChanged(nameof(CalculateTangents)); } }
+
+        private bool _reverseHandedness;
+        public bool ReverseHandedness { get => _reverseHandedness; set { if(_reverseHandedness == value) return; _reverseHandedness = value; OnPropertyChanged(nameof(ReverseHandedness)); } }
+
+        private bool _importEmbededTextures;
+        public bool ImportEmbededTextures { get => _importEmbededTextures; set { if(_importEmbededTextures == value) return; _importEmbededTextures = value; OnPropertyChanged(nameof(ImportEmbededTextures)); } }
+
+        private bool _importAnimations;
+        public bool ImportAnimations { get => _importAnimations; set { if(_importAnimations == value) return; _importAnimations = value; OnPropertyChanged(nameof(ImportAnimations)); } }
+
+        public GeometryImportSettings()
+        {
+            SmoothingAngle = 178f;
+            CalculateNormals = false;
+            CalculateTangents = false;
+            ReverseHandedness = false;
+            ImportEmbededTextures = true;
+            ImportAnimations = true;
+        }
+    }
+
     internal class Geometry : Asset
     {
 
         private readonly List<LODGroup> _lodGroups = new();
 
-
+        public GeometryImportSettings ImportSettings { get; } = new();
 
         public Geometry() : base(AssetType.Mesh)
         {

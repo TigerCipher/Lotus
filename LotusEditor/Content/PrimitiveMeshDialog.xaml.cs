@@ -43,6 +43,10 @@ namespace LotusEditor.Content
             var uris = new List<Uri>
             {
                 new Uri("pack://application:,,,/Resources/PrimitiveMeshView/PlaneTexture.png"),
+                new Uri("pack://application:,,,/Resources/PrimitiveMeshView/PlaneTexture.png"),
+                new Uri("pack://application:,,,/Resources/PrimitiveMeshView/Checkermap.png"),
+                new Uri("pack://application:,,,/Resources/PrimitiveMeshView/PlaneTexture.png"),
+                new Uri("pack://application:,,,/Resources/PrimitiveMeshView/PlaneTexture.png"),
             };
 
             _textures.Clear();
@@ -81,6 +85,7 @@ namespace LotusEditor.Content
             if (!IsInitialized) return;
             var primitiveType = (PrimitiveMeshType)primitiveTypeComboBox.SelectedItem;
             var info = new PrimitiveCreateInfo() { Type = primitiveType };
+            var smoothingAngle = 0;
             switch (primitiveType)
             {
                 case PrimitiveMeshType.Plane:
@@ -94,7 +99,15 @@ namespace LotusEditor.Content
                 case PrimitiveMeshType.Cube:
                     return;
                 case PrimitiveMeshType.UvSphere:
-                    return;
+                {
+                    info.SegmentX = (int)xSliderUvSphere.Value;
+                    info.SegmentY = (int)ySliderUvSphere.Value;
+                    info.Size.X = Value(xScalarBoxUvSphere, 0.001f);
+                    info.Size.Y = Value(yScalarBoxUvSphere, 0.001f);
+                    info.Size.Z = Value(zScalarBoxUvSphere, 0.001f);
+                    smoothingAngle = (int)angleSliderUvSphere.Value;
+                    break;
+                }
                 case PrimitiveMeshType.IcoSphere:
                     return;
                 case PrimitiveMeshType.Cylinder:
@@ -104,6 +117,7 @@ namespace LotusEditor.Content
             }
 
             var geometry = new Geometry();
+            geometry.ImportSettings.SmoothingAngle = smoothingAngle;
             ContentToolsAPI.CreatePrimitiveMesh(geometry, info);
             (DataContext as GeometryEditor).SetAsset(geometry);
             TexturesCheckBox_OnClick(texturesCheckBox, null);

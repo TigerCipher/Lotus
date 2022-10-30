@@ -64,6 +64,7 @@ using mat4  = DirectX::XMFLOAT4X4;
 using mat4a = DirectX::XMFLOAT4X4A;
 
 constexpr f32 pi      = 3.1415926535897932384626433832795f;
+constexpr f32 two_pi  = 2.0f * pi;
 constexpr f32 epsilon = 1e-5f;
 
 namespace lotus::math
@@ -110,6 +111,7 @@ constexpr f32 unpack_to_float(u32 i, f32 min, f32 max)
     return unpack_to_unit_float<Bits>(i) * (max - min) + min;
 }
 
+// clang-format off
 
 inline vec load_float(const f32* src) { return DirectX::XMLoadFloat(src); }
 inline vec load_float2(const vec2* src) { return DirectX::XMLoadFloat2(src); }
@@ -127,6 +129,9 @@ inline vec cross_vec3(vec v1, vec v2) { return DirectX::XMVector3Cross(v1, v2); 
 inline vec reciprocal_length_vec3(const vec v1) { return DirectX::XMVector3ReciprocalLength(v1); }
 
 inline f32  scalar_cos(f32 value) { return DirectX::XMScalarCos(value); }
+inline f32 scalar_sin(f32 value) { return DirectX::XMScalarSin(value); }
 inline bool scalar_near_equal(f32 s1, f32 s2) { return DirectX::XMScalarNearEqual(s1, s2, epsilon); }
+
+// clang-format on
 
 } // namespace lotus::math
