@@ -143,7 +143,7 @@ public:
         frame.fence_value    = fence_value;
         m_cmd_queue->Signal(m_fence, fence_value);
 
-        m_frame_index = (m_frame_index + 1) & frame_buffer_count;
+        m_frame_index = (m_frame_index + 1) % frame_buffer_count;
     }
 
 private:
