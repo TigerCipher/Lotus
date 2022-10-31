@@ -15,36 +15,23 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: Renderer.h
-// Date File Created: 08/29/2022
+// File Name: D3D12Interface.h
+// Date File Created: 10/30/2022
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
 #pragma once
-
-#include "Lotus/Core/Common.h"
-#include "Lotus/Platform/Window.h"
-
+#include "Lotus/Graphics/GraphicsPlatformInterface.h"
 
 namespace lotus::graphics
 {
-class surface
-{};
+struct platform_interface;
 
-struct render_surface
+
+namespace d3d12
 {
-    platform::window window{};
-    surface          surface{};
-};
+void get_platform_interface(platform_interface& pinterface);
 
-enum class graphics_platform : u32
-{
-    d3d12 = 0,
-    //TODO: vulkan = 1
-};
-
-bool initialize(graphics_platform platform);
-
-void shutdown();
+} // namespace lotus::graphics::d3d12
 
 } // namespace lotus::graphics

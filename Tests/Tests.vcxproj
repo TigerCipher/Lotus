@@ -156,10 +156,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\TestRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityComponentSystemTest.h" />
     <ClInclude Include="src\Test.h" />
+    <ClInclude Include="src\TestRenderer.h" />
     <ClInclude Include="src\WindowTest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

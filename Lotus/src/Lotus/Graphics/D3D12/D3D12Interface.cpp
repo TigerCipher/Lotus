@@ -15,36 +15,23 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: Renderer.h
-// Date File Created: 08/29/2022
+// File Name: D3D12Interface.cpp
+// Date File Created: 10/30/2022
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
-#pragma once
+
+#include "D3D12Interface.h"
 
 #include "Lotus/Core/Common.h"
-#include "Lotus/Platform/Window.h"
+#include "Lotus/Graphics/Renderer.h"
+#include "D3D12Core.h"
 
-
-namespace lotus::graphics
+namespace lotus::graphics::d3d12
 {
-class surface
-{};
-
-struct render_surface
+void get_platform_interface(platform_interface& pinterface)
 {
-    platform::window window{};
-    surface          surface{};
-};
-
-enum class graphics_platform : u32
-{
-    d3d12 = 0,
-    //TODO: vulkan = 1
-};
-
-bool initialize(graphics_platform platform);
-
-void shutdown();
-
-} // namespace lotus::graphics
+    pinterface.initialize = core::initialize;
+    pinterface.shutdown = core::shutdown;
+}
+}
