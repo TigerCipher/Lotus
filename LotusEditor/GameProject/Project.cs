@@ -172,11 +172,9 @@ namespace LotusEditor.GameProject
             {
                 bw.Write(0); // entity type
                 bw.Write(entity.Components.Count);
-                Logger.Info($"Entity with {entity.Components.Count} components");
                 foreach (var comp in entity.Components)
                 {
                     bw.Write((int)comp.ToEnumType());
-                    Logger.Info($"Component of type {(int)comp.ToEnumType()}");
                     comp.WriteToBinary(bw);
                 }
             }
@@ -203,16 +201,16 @@ namespace LotusEditor.GameProject
 
             Debug.Assert(ActiveScene != null);
 
-            // await BuildGameDll(false);
-            LoadGameDll();
+            await BuildGameDll(false);
+            // LoadGameDll();
             SetCommands();
         }
 
-        private async Task BuildGameExe(bool showWindow = false)
+        private async Task BuildGameExe(bool showWindow = true)
         {
             try
             {
-                await Task.Run(() => VisualStudio.BuildSolution(this, ExeBuildConfig, false));
+                await Task.Run(() => VisualStudio.BuildSolution(this, ExeBuildConfig, showWindow));
                 if (VisualStudio.BuildSucceeded)
                 {
                     SaveToBinary();
@@ -231,7 +229,6 @@ namespace LotusEditor.GameProject
             try
             {
                 UnloadGameDll();
-
                 await Task.Run(() => VisualStudio.BuildSolution(this, DllBuildConfig, showWindow));
                 if (VisualStudio.BuildSucceeded)
                 {

@@ -74,42 +74,46 @@ namespace LotusEditor.GameDev
             IBindCtx bindCtx = null;
             try
             {
-                if (_vsInstance != null) return;
-
-                Logger.Info($"Attempting to open Visual Studio with solution {slnPath}");
-                // find vs instance
-                var hres = GetRunningObjectTable(0, out table);
-                if (hres < 0 || table == null)
-                    throw new COMException($"GetRunningObjectTable() returned HRESULT: {hres:X8}");
-
-                table.EnumRunning(out moniker);
-                moniker.Reset();
-
-                hres = CreateBindCtx(0, out bindCtx);
-                if (hres < 0 || bindCtx == null)
-                    throw new COMException($"CreateBindCtx() returned HRESULT: {hres:X8}");
-
-                var currentMoniker = new IMoniker[1];
-
-                while (moniker.Next(1, currentMoniker, IntPtr.Zero) == 0)
+                if (_vsInstance == null)
                 {
-                    var name = string.Empty;
-                    currentMoniker[0]?.GetDisplayName(bindCtx, null, out name);
-                    if (!name.Contains(_progId)) continue;
-                    hres = table.GetObject(currentMoniker[0], out object obj);
-                    if (hres < 0 || obj == null)
-                        throw new COMException($"RunningObjectTable GetObject returned HRESULT: {hres:X8}");
-                    var dte = obj as EnvDTE80.DTE2;
-                    var slnName = dte.Solution.FullName;
-                    if (slnName != slnPath) continue;
-                    _vsInstance = dte;
-                    break;
+
+                    Logger.Info($"Attempting to open Visual Studio with solution {slnPath}");
+                    // find vs instance
+                    var hres = GetRunningObjectTable(0, out table);
+                    if (hres < 0 || table == null)
+                        throw new COMException($"GetRunningObjectTable() returned HRESULT: {hres:X8}");
+
+                    table.EnumRunning(out moniker);
+                    moniker.Reset();
+
+                    hres = CreateBindCtx(0, out bindCtx);
+                    if (hres < 0 || bindCtx == null)
+                        throw new COMException($"CreateBindCtx() returned HRESULT: {hres:X8}");
+
+                    var currentMoniker = new IMoniker[1];
+
+                    while (moniker.Next(1, currentMoniker, IntPtr.Zero) == 0)
+                    {
+                        var name = string.Empty;
+                        currentMoniker[0]?.GetDisplayName(bindCtx, null, out name);
+                        if (!name.Contains(_progId)) continue;
+                        hres = table.GetObject(currentMoniker[0], out object obj);
+                        if (hres < 0 || obj == null)
+                            throw new COMException($"RunningObjectTable GetObject returned HRESULT: {hres:X8}");
+                        var dte = obj as EnvDTE80.DTE2;
+                        var slnName = dte.Solution.FullName;
+                        if (slnName != slnPath) continue;
+                        _vsInstance = dte;
+                        break;
+                    }
                 }
 
-                if (_vsInstance != null) return;
+                if (_vsInstance == null)
+                {
+                    var visualStudioType = Type.GetTypeFromProgID(_progId, true);
+                    _vsInstance = Activator.CreateInstance(visualStudioType) as EnvDTE80.DTE2;
 
-                var visualStudioType = Type.GetTypeFromProgID(_progId, true);
-                _vsInstance = Activator.CreateInstance(visualStudioType) as EnvDTE80.DTE2;
+                }
             }
             catch (Exception ex)
             {
@@ -222,45 +226,44 @@ namespace LotusEditor.GameDev
                 Logger.Error("Visual Studio is currently running a process");
                 return;
             }
-            try
-            {
-                OpenInstanceInternal(project.SolutionName);
-                BuildFinished = BuildSucceeded = false;
+            OpenInstanceInternal(project.SolutionName);
+            BuildFinished = BuildSucceeded = false;
 
-                CallOnSTAThread(() =>
+            CallOnSTAThread(() =>
+            {
+                _vsInstance.MainWindow.Visible = showWindow;
+                if (!_vsInstance.Solution.IsOpen)
                 {
-                    if (_vsInstance.Solution.IsOpen) return;
                     Logger.Info($"Opening Visual Studio solution {project.SolutionName}");
                     _vsInstance.Solution.Open(project.SolutionName);
-                });
-
-                _vsInstance.MainWindow.Visible = showWindow;
+                }
 
                 _vsInstance.Events.BuildEvents.OnBuildProjConfigBegin += OnBuildBegin;
                 _vsInstance.Events.BuildEvents.OnBuildProjConfigDone += OnBuildDone;
+            });
 
-                var configName = GetConfigName(buildConfig);
-
+            var configName = GetConfigName(buildConfig);
+            try
+            {
 
                 foreach (var pdb in Directory.GetFiles(Path.Combine($"{project.Location}", $@"x64\{configName}"),
-                            "*.pdb"))
+                             "*.pdb"))
                 {
                     File.Delete(pdb);
                 }
-
-                CallOnSTAThread(() =>
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+            CallOnSTAThread(() =>
                 {
                     _vsInstance.Solution.SolutionBuild.SolutionConfigurations.Item(configName).Activate();
                     _vsInstance.ExecuteCommand("Build.BuildSolution");
                     _resetEvent.Wait();
                     _resetEvent.Reset();
                 });
-            }
-            catch (Exception e)
-            {
-                Logger.Error($"Failed to build solution: {e.Message}");
-                Debug.WriteLine(e.Message);
-            }
+
         }
 
         public static void BuildSolution(Project project, BuildConfiguration buildConfig, bool showWindow = true)

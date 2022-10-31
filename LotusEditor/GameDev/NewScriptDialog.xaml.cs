@@ -31,12 +31,12 @@ namespace {1}
 {{
 LOTUS_REGISTER_SCRIPT({0});
 
-void {0}::OnStart()
+void {0}::on_start()
 {{
     // Perform initialization
 }}
 
-void {0}::Update(lotus::Timestep ts)
+void {0}::update(lotus::timestep ts)
 {{
     // Perform logic
 }}
@@ -51,12 +51,12 @@ void {0}::Update(lotus::Timestep ts)
 namespace {1}
 {{
 
-class {0} : public lotus::script::ScriptableEntity
+class {0} : public lotus::script::scriptable_entity
 {{
 public:
-    constexpr explicit {0}(lotus::entity::Entity entity) : lotus::script::ScriptableEntity(entity) {{}}
-    void OnStart() override;
-    void Update(lotus::Timestep ts) override;
+    constexpr explicit {0}(lotus::entity::entity entity) : lotus::script::scriptable_entity(entity) {{}}
+    void on_start() override;
+    void update(lotus::timestep ts) override;
 private:
 }};
 

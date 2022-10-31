@@ -39,79 +39,82 @@ namespace lotus::content
 
 namespace
 {
-    enum ComponentType
-    {
-        TRANSFORM,
-        SCRIPT,
-        COUNT
-    };
+enum component_type
+{
+    TRANSFORM,
+    SCRIPT,
+    COUNT
+};
 
-    using comp_type = bool (*)(const byte*&, entity::create_info&);
+using comp_type = bool (*)(const byte*&, entity::create_info&);
 
-    utl::vector<entity::Entity> entities;
-    transform::create_info      transformInfo;
-    script::create_info         scriptInfo;
+utl::vector<entity::entity> entities;
+transform::create_info      transform_info;
+script::create_info         script_info;
 
-    bool read_transform(const byte*& data, entity::create_info& info)
-    {
-        LASSERT(!info.transform);
-        using namespace DirectX;
+bool read_transform(const byte*& data, entity::create_info& info)
+{
+    LASSERT(!info.transform);
+    using namespace DirectX;
 
-        f32 rotation [ 3 ];
+    f32 rotation[3];
 
-        memcpy(&transformInfo.position [ 0 ], data, sizeof(transformInfo.position));
-        data += sizeof(transformInfo.position);
+    memcpy(&transform_info.position[0], data, sizeof(transform_info.position));
+    data += sizeof(transform_info.position);
 
-        memcpy(&rotation [ 0 ], data, sizeof(rotation));
-        data += sizeof(rotation);
+    memcpy(&rotation[0], data, sizeof(rotation));
+    data += sizeof(rotation);
 
-        memcpy(&transformInfo.scale [ 0 ], data, sizeof(transformInfo.scale));
-        data += sizeof(transformInfo.scale);
+    memcpy(&transform_info.scale[0], data, sizeof(transform_info.scale));
+    data += sizeof(transform_info.scale);
 
-        vec3a rot { &rotation [ 0 ] };
-        vec   quat { XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3A(&rot)) };
-        vec4a rotQuad {};
-        XMStoreFloat4A(&rotQuad, quat);
-        memcpy(&transformInfo.rotation [ 0 ], &rotQuad.x, sizeof(transformInfo.rotation));
+    vec3a rot{&rotation[0]};
+    // TODO: Move XM functions to math util
+    vec   quat{XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3A(&rot))};
+    vec4a rotQuad{};
+    XMStoreFloat4A(&rotQuad, quat);
+    memcpy(&transform_info.rotation[0], &rotQuad.x, sizeof(transform_info.rotation));
 
-        info.transform = &transformInfo;
-        return true;
-    }
+    info.transform = &transform_info;
+    return true;
+}
 
-    bool read_script(const byte*& data, entity::create_info& info)
-    {
-        LASSERT(!info.script);
-        const u32 nameLength = *data;
-        data += sizeof(u32);
+bool read_script(const byte*& data, entity::create_info& info)
+{
+    LASSERT(!info.script);
+    const u32 name_length = *data;
+    data += sizeof(u32);
 
-        if (!nameLength) return false;
+    if (!name_length)
+        return false;
 
-        LASSERT(nameLength < 256);
-        char scriptName [ 256 ];
-        memcpy(&scriptName [ 0 ], data, nameLength);
-        data += nameLength;
+    LASSERT(name_length < 256);
+    char scriptName[256];
+    memcpy(&scriptName[0], data, name_length);
+    data += name_length;
 
-        scriptName [ nameLength ] = 0; // Null terminate the script name
+    scriptName[name_length] = 0; // Null terminate the script name
 
-        scriptInfo.scriptCreator = script::detail::get_script_creator(string_hash()(scriptName));
+    script_info.script_creator = script::detail::get_script_creator(string_hash()(scriptName));
 
-        info.script = &scriptInfo;
-        return scriptInfo.scriptCreator != nullptr;
-    }
+    info.script = &script_info;
+    return script_info.script_creator != nullptr;
+}
 
-    using comp_reader = bool (*)(const byte*&, entity::create_info&);
+using comp_reader = bool (*)(const byte*&, entity::create_info&);
 
-    comp_reader compReaders [] { read_transform, read_script };
+comp_reader comp_readers[]{read_transform, read_script};
 
-    static_assert(_countof(compReaders) == ComponentType::COUNT);
+static_assert(_countof(comp_readers) == component_type::COUNT);
 
 } // namespace
 
 bool load_game()
 {
-    wchar_t path [ MAX_PATH ];
-    const u32 length = GetModuleFileName(nullptr, &path [ 0 ], MAX_PATH);
-    if (!length || GetLastError() == ERROR_INSUFFICIENT_BUFFER) return false;
+    wchar_t   path[MAX_PATH];
+    const u32 length = GetModuleFileName(nullptr, &path[0], MAX_PATH);
+    if (!length || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+        return false;
 
     std::filesystem::path p = path;
     SetCurrentDirectory(p.parent_path().wstring().c_str());
@@ -124,34 +127,38 @@ bool load_game()
     const byte*   at     = buffer.data();
     constexpr u32 size32 = sizeof(u32);
 
-    const u32 numEnts = *at;
+    const u32 num_ents = *at;
     at += size32;
 
-    if (!numEnts) return false;
+    if (!num_ents)
+        return false;
 
-    for (u32 i = 0; i < numEnts; ++i)
+    for (u32 i = 0; i < num_ents; ++i)
     {
         entity::create_info info;
-        const u32           entityType = *at;
+        const u32           entity_type = *at; // TODO
         at += size32;
-        const u32 compCount = *at;
+        const u32 comp_count = *at;
         at += size32;
 
-        if (!compCount) return false;
+        if (!comp_count)
+            return false;
 
-        for (u32 compIndex = 0; compIndex < compCount; ++compIndex)
+        for (u32 comp_index = 0; comp_index < comp_count; ++comp_index)
         {
-            const u32 compType = *at;
+            const u32 comp_type = *at;
             at += size32;
-            LASSERT(compIndex == 0 || compIndex == 1);
-            LASSERT(compType < ComponentType::COUNT);
+            LASSERT(comp_index == 0 || comp_index == 1);
+            LASSERT(comp_type < component_type::COUNT);
 
-            if (!compReaders [ compType ](at, info)) return false;
+            if (!comp_readers[comp_type](at, info))
+                return false;
         }
 
         LASSERT(info.transform);
-        entity::Entity ent(entity::create(info));
-        if (!ent.IsValid()) return false;
+        entity::entity ent(entity::create(info));
+        if (!ent.is_valid())
+            return false;
         entities.emplace_back(ent);
     }
 
@@ -161,6 +168,9 @@ bool load_game()
 
 void unload_game()
 {
-    for (auto ent : entities) { entity::remove(ent.GetId()); }
+    for (auto ent : entities)
+    {
+        entity::remove(ent.get_id());
+    }
 }
 } // namespace lotus::content

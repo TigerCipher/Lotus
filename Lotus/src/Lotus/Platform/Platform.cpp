@@ -45,7 +45,7 @@ namespace
 
     uint32 add_to_windows(window_info info)
     {
-        u32 id = InvalidIdU32;
+        u32 id = invalid_id_u32;
         if (availableSlots.empty())
         {
             id = (u32) windows.size();
@@ -54,7 +54,7 @@ namespace
         {
             id = availableSlots.back();
             availableSlots.pop_back();
-            LASSERT(id != InvalidIdU32);
+            LASSERT(id != invalid_id_u32);
             windows [ id ] = info;
         }
 
@@ -179,7 +179,7 @@ namespace
 
 } // namespace
 
-Window create_window(const window_create_info* const info)
+window create_window(const window_create_info* const info)
 {
     window_proc   callback = info ? info->callback : nullptr;
     window_handle parent   = info ? info->parent : nullptr;
@@ -237,7 +237,7 @@ Window create_window(const window_create_info* const info)
         ShowWindow(winInfo.hwnd, SW_SHOWNORMAL);
         UpdateWindow(winInfo.hwnd);
 
-        return Window(id);
+        return window(id);
     }
 
     return {};
@@ -257,56 +257,56 @@ void remove_window(const window_id id)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Window::SetFullscreen(const bool fullscreen) const
+void window::set_fullscreen(const bool fullscreen) const
 {
-    LASSERT(IsValid());
-    set_window_fullscreen(mId, fullscreen);
+    LASSERT(is_valid());
+    set_window_fullscreen(m_id, fullscreen);
 }
 
-bool Window::IsFullscreen() const
+bool window::is_fullscreen() const
 {
-    LASSERT(IsValid());
-    return is_window_fullscreen(mId);
+    LASSERT(is_valid());
+    return is_window_fullscreen(m_id);
 }
 
-void Window::SetCaption(const wchar_t* caption) const
+void window::set_caption(const wchar_t* caption) const
 {
-    LASSERT(IsValid());
-    set_window_caption(mId, caption);
+    LASSERT(is_valid());
+    set_window_caption(m_id, caption);
 }
 
-vec2u Window::Size() const
+vec2u window::size() const
 {
-    LASSERT(IsValid());
-    return get_window_size(mId);
+    LASSERT(is_valid());
+    return get_window_size(m_id);
 }
 
-vec4u Window::Rect() const
+vec4u window::rect() const
 {
-    LASSERT(IsValid());
-    return get_window_rect(mId);
+    LASSERT(is_valid());
+    return get_window_rect(m_id);
 }
 
-void Window::Resize(const uint32 width, const uint32 height) const
+void window::resize(const uint32 width, const uint32 height) const
 {
-    LASSERT(IsValid());
-    resize_window(mId, width, height);
+    LASSERT(is_valid());
+    resize_window(m_id, width, height);
 }
 
-uint32 Window::Width() const { return Size().x; }
+uint32 window::width() const { return size().x; }
 
-uint32 Window::Height() const { return Size().y; }
+uint32 window::height() const { return size().y; }
 
-bool Window::IsClosed() const
+bool window::is_closed() const
 {
-    LASSERT(IsValid());
-    return is_window_closed(mId);
+    LASSERT(is_valid());
+    return is_window_closed(m_id);
 }
 
-void* Window::Handle() const
+void* window::handle() const
 {
-    LASSERT(IsValid());
-    return get_window_handle(mId);
+    LASSERT(is_valid());
+    return get_window_handle(m_id);
 }
 
 } // namespace lotus::platform

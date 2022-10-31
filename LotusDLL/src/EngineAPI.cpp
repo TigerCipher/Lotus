@@ -85,7 +85,7 @@ EDITOR_INTERFACE uint32 CreateRenderSurface(HWND host, int32 width, int32 height
 {
     const platform::window_create_info info { nullptr, host, nullptr, 0, 0, width, height };
     graphics::render_surface     surface { platform::create_window(&info), {} };
-    LASSERT(surface.window.IsValid());
+    LASSERT(surface.window.is_valid());
     surfaces.emplace_back(surface);
 
     return (u32) surfaces.size() - 1;
@@ -94,17 +94,17 @@ EDITOR_INTERFACE uint32 CreateRenderSurface(HWND host, int32 width, int32 height
 EDITOR_INTERFACE void RemoveRenderSurface(uint32 id)
 {
     LASSERT(id < surfaces.size());
-    platform::remove_window(surfaces [ id ].window.GetId());
+    platform::remove_window(surfaces [ id ].window.get_id());
 }
 
 EDITOR_INTERFACE HWND GetWindowHandle(uint32 id)
 {
     LASSERT(id < surfaces.size());
-    return (HWND) surfaces [ id ].window.Handle();
+    return (HWND) surfaces [ id ].window.handle();
 }
 
 EDITOR_INTERFACE void ResizeRenderSurface(uint32 id)
 {
     LASSERT(id < surfaces.size());
-    surfaces [ id ].window.Resize(0, 0);
+    surfaces [ id ].window.resize(0, 0);
 }

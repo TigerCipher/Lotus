@@ -62,7 +62,7 @@ struct script_component
     script::create_info to_create_info()
     {
         script::create_info info;
-        info.scriptCreator = scriptCreator;
+        info.script_creator = scriptCreator;
         return info;
     }
 };
@@ -74,7 +74,7 @@ struct EntityDesc
 };
 
 
-entity::Entity EntityFromId(id::id_type id) { return entity::Entity { entity::entity_id { id } }; }
+entity::entity EntityFromId(id::id_type id) { return entity::entity { entity::entity_id { id } }; }
 
 
 } // namespace
@@ -87,7 +87,7 @@ EDITOR_INTERFACE id::id_type CreateEntity(EntityDesc* e)
     script::create_info    scriptInfo = desc.script.to_create_info();
     entity::create_info    entity    = { &transform, &scriptInfo };
 
-    return entity::create(entity).GetId();
+    return entity::create(entity).get_id();
 }
 
 EDITOR_INTERFACE void RemoveEntity(id::id_type id)

@@ -28,7 +28,7 @@
 using namespace lotus;
 
 constexpr u32    numWindows = 4;
-platform::Window windows [ numWindows ];
+platform::window windows [ numWindows ];
 
 
 LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -40,7 +40,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         bool all = true;
         for (auto& window : windows)
         {
-            if (!window.IsClosed()) all = false;
+            if (!window.is_closed()) all = false;
         }
 
         if (all)
@@ -54,8 +54,8 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     case WM_SYSCHAR:
         if (wparam == VK_RETURN && (HIWORD(lparam) & KF_ALTDOWN))
         {
-            platform::Window win(platform::window_id { (id::id_type) GetWindowLongPtr(hwnd, GWLP_USERDATA) });
-            win.SetFullscreen(!win.IsFullscreen());
+            platform::window win(platform::window_id { (id::id_type) GetWindowLongPtr(hwnd, GWLP_USERDATA) });
+            win.set_fullscreen(!win.is_fullscreen());
             return 0;
         }
         break;
@@ -81,7 +81,7 @@ public:
         for (u32 i = 0; i < numWindows; ++i)
         {
             windows [ i ] = platform::create_window(&info [ i ]);
-            int w         = windows [ i ].Width();
+            int w         = windows [ i ].width();
             int a         = 0;
         }
 
@@ -91,6 +91,6 @@ public:
 
     void Shutdown() override
     {
-        for (auto& window : windows) { platform::remove_window(window.GetId()); }
+        for (auto& window : windows) { platform::remove_window(window.get_id()); }
     }
 };

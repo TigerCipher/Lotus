@@ -34,7 +34,7 @@ struct create_info
     f32 scale [ 3 ] { 1.0f, 1.0f, 1.0f };
 };
 
-Component create(const create_info& info, entity::Entity entity);
+Component create(const create_info& info, entity::entity entity);
 void      remove(Component comp);
 
 } // namespace lotus::transform

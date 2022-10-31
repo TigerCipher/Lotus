@@ -31,18 +31,18 @@ L_TYPED_ID(transform_id)
 class Component final
 {
 public:
-    constexpr explicit Component(const transform_id id) : mId(id) { }
-    constexpr Component() : mId(id::InvalidId) { }
+    constexpr explicit Component(const transform_id id) : m_id(id) {}
+    constexpr Component() : m_id(id::invalid_id) {}
 
-    constexpr transform_id GetId() const { return mId; }
+    constexpr transform_id get_id() const { return m_id; }
 
-    constexpr bool IsValid() const { return id::is_valid(mId); }
+    constexpr bool is_valid() const { return id::is_valid(m_id); }
 
-    vec3 Position() const;
-    vec4 Rotation() const;
-    vec3 Scale() const;
+    vec3 position() const;
+    vec4 rotation() const;
+    vec3 scale() const;
 
 private:
-    transform_id mId;
+    transform_id m_id;
 };
-} // namespace lotus
+} // namespace lotus::transform

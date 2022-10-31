@@ -29,18 +29,18 @@ namespace lotus::script
 L_TYPED_ID(script_id)
 
 
-class Component final
+class component final
 {
 public:
-    constexpr explicit Component(const script_id id) : mId(id) { }
-    constexpr Component() : mId(id::InvalidId) { }
+    constexpr explicit component(const script_id id) : m_id(id) {}
+    constexpr component() : m_id(id::invalid_id) {}
 
-    constexpr script_id GetId() const { return mId; }
+    constexpr script_id get_id() const { return m_id; }
 
-    constexpr bool IsValid() const { return id::is_valid(mId); }
+    constexpr bool is_valid() const { return id::is_valid(m_id); }
 
 
 private:
-    script_id mId;
+    script_id m_id;
 };
-} // namespace lotus
+} // namespace lotus::script

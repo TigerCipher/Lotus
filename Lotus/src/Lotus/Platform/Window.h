@@ -27,33 +27,33 @@ namespace lotus::platform
 {
 L_TYPED_ID(window_id)
 
-class Window
+class window
 {
 public:
-    constexpr Window() = default;
-    constexpr explicit Window(const window_id id) : mId(id) { }
+    constexpr window() = default;
+    constexpr explicit window(const window_id id) : m_id(id) {}
 
-    constexpr window_id GetId() const { return mId; }
+    constexpr window_id get_id() const { return m_id; }
 
-    constexpr bool IsValid() const { return id::is_valid(mId); }
+    constexpr bool is_valid() const { return id::is_valid(m_id); }
 
-    void SetFullscreen(bool fullscreen) const;
-    bool IsFullscreen() const;
-    void SetCaption(const wchar_t* caption) const;
+    void set_fullscreen(bool fullscreen) const;
+    bool is_fullscreen() const;
+    void set_caption(const wchar_t* caption) const;
 
-    vec4u Rect() const;
-    vec2u Size() const;
-    void  Resize(uint32 width, uint32 height) const;
+    vec4u rect() const;
+    vec2u size() const;
+    void  resize(uint32 width, uint32 height) const;
 
-    uint32 Width() const;
-    uint32 Height() const;
+    uint32 width() const;
+    uint32 height() const;
 
-    bool IsClosed() const;
+    bool is_closed() const;
 
-    void* Handle() const;
+    void* handle() const;
 
 private:
-    window_id mId { id::InvalidId };
+    window_id m_id{id::invalid_id};
 };
 
 

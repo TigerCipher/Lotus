@@ -65,7 +65,7 @@ struct mesh
     std::string                               name;
     utl::vector<packed_vertex::vertex_static> packed_vertices_static;
     f32                                       lod_threshold = -1.0f;
-    u32                                       lod_id{InvalidIdU32};
+    u32                                       lod_id{invalid_id_u32};
 };
 
 struct lod_group

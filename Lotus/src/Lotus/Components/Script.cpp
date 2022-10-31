@@ -30,10 +30,10 @@ namespace
 {
     using script_registry = std::unordered_map<size_t, detail::script_creator>;
 
-    utl::vector<detail::script_ptr> entityScripts;
-    utl::vector<id::id_type>        idMapping;
+    utl::vector<detail::script_ptr> entity_scripts;
+    utl::vector<id::id_type>        id_mapping;
     utl::vector<id::gen_type>       generations;
-    utl::deque<script_id>           freeIds;
+    utl::deque<script_id>           free_ids;
 
     script_registry& registry()
     {
@@ -46,10 +46,10 @@ namespace
     {
         LASSERT(id::is_valid(scriptId));
         const id::id_type index = id::index(scriptId);
-        LASSERT((index < generations.size() && idMapping [ index ] < entityScripts.size()) &&
+        LASSERT((index < generations.size() && id_mapping [ index ] < entity_scripts.size()) &&
                 generations [ index ] == id::generation(scriptId));
-        return (generations [ index ] == id::generation(scriptId)) && entityScripts [ idMapping [ index ] ] &&
-               entityScripts [ idMapping [ index ] ]->IsValid();
+        return (generations [ index ] == id::generation(scriptId)) && entity_scripts [ id_mapping [ index ] ] &&
+               entity_scripts [ id_mapping [ index ] ]->is_valid();
     }
 
 #ifdef L_EDITOR
@@ -90,48 +90,48 @@ namespace detail
 } // namespace detail
 
 
-Component create(const create_info& info, const entity::Entity entity)
+component create(const create_info& info, const entity::entity entity)
 {
-    LASSERT(entity.IsValid() && info.scriptCreator);
+    LASSERT(entity.is_valid() && info.script_creator);
     script_id scriptId;
 
-    if (freeIds.size() > id::MinDeletedElements)
+    if (free_ids.size() > id::min_deleted_elements)
     {
-        scriptId = freeIds.front();
+        scriptId = free_ids.front();
         LASSERT(!exists(scriptId));
-        freeIds.pop_front();
+        free_ids.pop_front();
         scriptId = script_id { id::new_generation(scriptId) };
         ++generations [ id::index(scriptId) ];
     } else
     {
-        scriptId = script_id { (id::id_type) idMapping.size() };
-        idMapping.emplace_back();
+        scriptId = script_id { (id::id_type) id_mapping.size() };
+        id_mapping.emplace_back();
         generations.push_back(0);
     }
 
     LASSERT(id::is_valid(scriptId));
-    const id::id_type index = (id::id_type) entityScripts.size();
-    entityScripts.emplace_back(info.scriptCreator(entity));
-    LASSERT(entityScripts.back()->GetId() == entity.GetId());
+    const id::id_type index = (id::id_type) entity_scripts.size();
+    entity_scripts.emplace_back(info.script_creator(entity));
+    LASSERT(entity_scripts.back()->get_id() == entity.get_id());
 
-    idMapping [ id::index(scriptId) ] = index;
-    return Component(scriptId);
+    id_mapping [ id::index(scriptId) ] = index;
+    return component(scriptId);
 }
 
-void remove(const Component comp)
+void remove(const component comp)
 {
-    assert(comp.IsValid() && exists(comp.GetId()));
-    const script_id   id     = comp.GetId();
-    const id::id_type index  = idMapping [ id::index(id) ];
-    const script_id   lastId = entityScripts.back()->Script().GetId();
-    utl::erase_unordered(entityScripts, index);
-    idMapping [ id::index(lastId) ] = index;
-    idMapping [ id::index(id) ]     = id::InvalidId;
+    assert(comp.is_valid() && exists(comp.get_id()));
+    const script_id   id     = comp.get_id();
+    const id::id_type index  = id_mapping [ id::index(id) ];
+    const script_id   lastId = entity_scripts.back()->script().get_id();
+    utl::erase_unordered(entity_scripts, index);
+    id_mapping [ id::index(lastId) ] = index;
+    id_mapping [ id::index(id) ]     = id::invalid_id;
 }
 
-void update_all(Timestep ts)
+void update_all(timestep ts)
 {
-    for (const auto& scr : entityScripts) { scr->Update(ts); }
+    for (const auto& scr : entity_scripts) { scr->update(ts); }
 }
 } // namespace lotus::script
 

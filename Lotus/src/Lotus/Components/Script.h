@@ -28,11 +28,11 @@ namespace lotus::script
 
 struct create_info
 {
-    detail::script_creator scriptCreator;
+    detail::script_creator script_creator;
 };
 
-Component create(const create_info& info, entity::Entity entity);
-void      remove(Component comp);
-void      update_all(Timestep ts);
+component create(const create_info& info, entity::entity entity);
+void      remove(component comp);
+void      update_all(timestep ts);
 
 } // namespace lotus::script

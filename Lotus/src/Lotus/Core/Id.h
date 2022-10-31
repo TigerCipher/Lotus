@@ -33,59 +33,65 @@ using id_type = uint32;
 
 namespace detail
 {
-    constexpr uint32  GenerationBits = 10;
-    constexpr uint32  IndexBits      = sizeof(id_type) * 8 - GenerationBits;
-    constexpr id_type IndexMask      = (id_type { 1 } << IndexBits) - 1;
-    constexpr id_type GenerationMask = (id_type { 1 } << GenerationBits) - 1;
+constexpr uint32  generation_bits = 10;
+constexpr uint32  index_bits      = sizeof(id_type) * 8 - generation_bits;
+constexpr id_type index_mask      = (id_type{1} << index_bits) - 1;
+constexpr id_type generation_mask = (id_type{1} << generation_bits) - 1;
 } // namespace detail
 
 #pragma warning(disable : 4245)
-constexpr id_type InvalidId          = -1;
-constexpr uint32  MinDeletedElements = 1024;
+constexpr id_type invalid_id           = -1;
+constexpr uint32  min_deleted_elements = 1024;
 
 using gen_type =
-    std::conditional_t<detail::GenerationBits <= 16, std::conditional_t<detail::GenerationBits <= 8, u8, u16>, u32>;
+    std::conditional_t<detail::generation_bits <= 16, std::conditional_t<detail::generation_bits <= 8, u8, u16>, u32>;
 
-static_assert(sizeof(gen_type) * 8 >= detail::GenerationBits);
+static_assert(sizeof(gen_type) * 8 >= detail::generation_bits);
 static_assert(sizeof(id_type) - sizeof(gen_type) > 0);
 
-constexpr bool is_valid(const id_type id) { return id != InvalidId; }
+constexpr bool is_valid(const id_type id)
+{
+    return id != invalid_id;
+}
 
 constexpr id_type index(const id_type id)
 {
-    id_type i = id & detail::IndexMask;
-    LASSERT(i != detail::IndexMask);
-    return id & detail::IndexMask;
+    id_type i = id & detail::index_mask;
+    LASSERT(i != detail::index_mask);
+    return id & detail::index_mask;
 }
 
-constexpr id_type generation(const id_type id) { return (id >> detail::IndexBits) & detail::GenerationMask; }
+constexpr id_type generation(const id_type id)
+{
+    return (id >> detail::index_bits) & detail::generation_mask;
+}
 
 constexpr id_type new_generation(const id_type id)
 {
     const id_type gen = generation(id) + 1;
-    LASSERT(gen < ((u64) 1 << detail::GenerationBits) - 1);
-    return index(id) | (gen << detail::IndexBits);
+    LASSERT(gen < ((u64) 1 << detail::generation_bits) - 1);
+    return index(id) | (gen << detail::index_bits);
 }
 
 
 #ifdef L_DEBUG
 namespace detail
 {
-    struct id_base
-    {
-        constexpr explicit id_base(const id_type id) : mId(id) { }
-        constexpr operator id_type() const { return mId; }
+struct id_base
+{
+    constexpr explicit id_base(const id_type id) : m_id(id) {}
+    constexpr operator id_type() const { return m_id; }
 
-    private:
-        id_type mId;
-    };
+private:
+    id_type m_id;
+};
 } // namespace detail
 
     #define L_TYPED_ID(name)                                                                                           \
         struct name final : id::detail::id_base                                                                        \
         {                                                                                                              \
-            constexpr explicit name(const id::id_type id) : id_base(id) { }                                            \
-            constexpr name() : id_base(0) { }                                                                          \
+            constexpr explicit name(const id::id_type id) : id_base(id) {}                                             \
+            constexpr name() : id_base(0) {}                                                                           \
         };
 
 #else

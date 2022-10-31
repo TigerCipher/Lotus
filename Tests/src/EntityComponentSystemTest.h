@@ -69,10 +69,10 @@ private:
         while (count > 0)
         {
             ++mAdded;
-            entity::Entity ent = create(entityDesc);
-            LASSERT(ent.IsValid());
+            entity::entity ent = create(entityDesc);
+            LASSERT(ent.is_valid());
             mEntities.push_back(ent);
-            LASSERT(is_alive(ent.GetId()));
+            LASSERT(is_alive(ent.get_id()));
             --count;
         }
     }
@@ -84,13 +84,13 @@ private:
         while (count > 0)
         {
             const uint32         index = (uint32) rand() % (uint32) mEntities.size();
-            const entity::Entity ent   = mEntities [ index ];
-            LASSERT(ent.IsValid());
-            if (ent.IsValid())
+            const entity::entity ent   = mEntities [ index ];
+            LASSERT(ent.is_valid());
+            if (ent.is_valid())
             {
-                entity::remove(ent.GetId());
+                entity::remove(ent.get_id());
                 mEntities.erase(mEntities.begin() + index);
-                LASSERT(!is_alive(ent.GetId()));
+                LASSERT(!is_alive(ent.get_id()));
                 ++mRemoved;
             }
             --count;
@@ -104,7 +104,7 @@ private:
     }
 
 private:
-    utl::vector<entity::Entity> mEntities;
+    utl::vector<entity::entity> mEntities;
 
     uint32 mAdded { 0 };
     uint32 mRemoved { 0 };

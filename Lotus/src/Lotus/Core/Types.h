@@ -60,10 +60,10 @@ using s32 = int32_t;
 using s64 = int64_t;
 
 
-constexpr uint8  InvalidIdU8  = 0xffui8;
-constexpr uint16 InvalidIdU16 = 0xffffui16;
-constexpr uint32 InvalidIdU32 = 0xffff'ffffui32;
-constexpr uint64 InvalidIdU64 = 0xffff'ffff'ffff'ffffui64;
+constexpr uint8  invalid_id_u8  = 0xffui8;
+constexpr uint16 invalid_id_u16 = 0xffffui16;
+constexpr uint32 invalid_id_u32 = 0xffff'ffffui32;
+constexpr uint64 invalid_id_u64 = 0xffff'ffff'ffff'ffffui64;
 
 
 using f32 = float;

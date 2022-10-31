@@ -41,6 +41,6 @@ struct window_create_info
     int32          height   = 1080;
 };
 
-Window create_window(const window_create_info* const info = nullptr);
+window create_window(const window_create_info* const info = nullptr);
 void   remove_window(window_id id);
 } // namespace lotus::platform

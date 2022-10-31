@@ -41,7 +41,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     {
     case WM_DESTROY:
     {
-        if (gameWindow.window.IsClosed())
+        if (gameWindow.window.is_closed())
         {
             PostQuitMessage(0);
             return 0;
@@ -52,7 +52,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     case WM_SYSCHAR:
         if (wparam == VK_RETURN && (HIWORD(lparam) & KF_ALTDOWN))
         {
-            gameWindow.window.SetFullscreen(!gameWindow.window.IsFullscreen());
+            gameWindow.window.set_fullscreen(!gameWindow.window.is_fullscreen());
             return 0;
         }
         break;
@@ -73,7 +73,7 @@ bool engine_initialize()
 
     gameWindow.window = platform::create_window(&info);
 
-    if (!gameWindow.window.IsValid()) return false;
+    if (!gameWindow.window.is_valid()) return false;
 
     return true;
 }
@@ -85,7 +85,7 @@ void engine_update()
 
 void engine_shutdown()
 {
-    platform::remove_window(gameWindow.window.GetId());
+    platform::remove_window(gameWindow.window.get_id());
     content::unload_game();
 }
 
