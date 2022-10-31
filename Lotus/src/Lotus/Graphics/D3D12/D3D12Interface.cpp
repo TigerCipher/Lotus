@@ -33,5 +33,6 @@ void get_platform_interface(platform_interface& pinterface)
 {
     pinterface.initialize = core::initialize;
     pinterface.shutdown = core::shutdown;
+    pinterface.render = core::render;
 }
 }

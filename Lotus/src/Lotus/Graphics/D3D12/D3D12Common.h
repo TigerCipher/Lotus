@@ -57,11 +57,24 @@
         OutputDebugString(name);                                                                                       \
         OutputDebugString(L"\n")
 
+    #define NAME_D3D_OBJ_INDEXED(obj, i, name)                                                                         \
+        {                                                                                                              \
+            wchar_t fullname[128];                                                                                     \
+            if (swprintf(fullname, L"%s[%u]", name, i) > 0)                                                            \
+            {                                                                                                          \
+                obj->SetName(name);                                                                                    \
+                OutputDebugString(L"::D3D12 Object Created: ");                                                        \
+                OutputDebugString(fullname);                                                                           \
+                OutputDebugString(L"\n");                                                                              \
+            }                                                                                                          \
+        }
+
 #else
     #ifndef DX_CALL
         #define DX_CALL(x) x
     #endif
     #define NAME_D3D_OBJ(obj, name)
+    #define NAME_D3D_OBJ_INDEXED(obj, i, name)
 #endif
 
 template<typename T>
@@ -76,12 +89,4 @@ constexpr cptr<T> create_com(Args&&... args)
     return Microsoft::WRL::Make<T>(std::forward<Args>(args)...);
 }
 
-template<typename T>
-constexpr void release(T*& resource)
-{
-    if (resource)
-    {
-        resource->Release();
-        resource = nullptr;
-    }
-}
+constexpr u32 frame_buffer_count = 3;

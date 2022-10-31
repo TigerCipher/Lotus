@@ -47,4 +47,6 @@ bool initialize(graphics_platform platform);
 
 void shutdown();
 
+void render();
+
 } // namespace lotus::graphics

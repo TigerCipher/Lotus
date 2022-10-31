@@ -25,10 +25,11 @@
 
 #include "Lotus/Platform/Platform.h"
 #include "Lotus/Graphics/Renderer.h"
+#if TEST_RENDERER
 
 using namespace lotus;
 
-constexpr u32    numWindows = 4;
+constexpr u32 numWindows = 4;
 
 graphics::render_surface surfaces[numWindows];
 
@@ -56,7 +57,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     case WM_SYSCHAR:
         if (wparam == VK_RETURN && (HIWORD(lparam) & KF_ALTDOWN))
         {
-            platform::window win(platform::window_id{(id::id_type) GetWindowLongPtr(hwnd, GWLP_USERDATA)});
+            platform::window win(platform::window_id{ (id::id_type) GetWindowLongPtr(hwnd, GWLP_USERDATA) });
             win.set_fullscreen(!win.is_fullscreen());
             return 0;
         }
@@ -81,13 +82,14 @@ void destroy_render_surface(graphics::render_surface& surface)
 bool EngineTest::Init()
 {
     bool result = graphics::initialize(graphics::graphics_platform::d3d12);
-    if (!result) return result;
+    if (!result)
+        return result;
 
     platform::window_create_info info[numWindows]{
-        {&winproc, nullptr, L"Test Window 1", 100, 100, 400, 800},
-        {&winproc, nullptr, L"Test Window 2", 200, 200, 400, 400},
-        {&winproc, nullptr, L"Test Window 3", 300, 300, 800, 400},
-        {&winproc, nullptr, L"Test Window 4", 400, 400, 800, 600},
+        { &winproc, nullptr, L"Test Window 1", 100, 100, 400, 800 },
+        { &winproc, nullptr, L"Test Window 2", 200, 200, 400, 400 },
+        { &winproc, nullptr, L"Test Window 3", 300, 300, 800, 400 },
+        { &winproc, nullptr, L"Test Window 4", 400, 400, 800, 600 },
     };
 
     static_assert(_countof(info) == _countof(surfaces));
@@ -102,6 +104,7 @@ bool EngineTest::Init()
 void EngineTest::Run()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    graphics::render();
 }
 
 void EngineTest::Shutdown()
@@ -113,3 +116,5 @@ void EngineTest::Shutdown()
 
     graphics::shutdown();
 }
+
+#endif

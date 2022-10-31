@@ -50,4 +50,5 @@ TabWidth: 4
 AccessModifierOffset: -4
 ContinuationIndentWidth: 4
 PointerAlignment: Left
+Cpp11BracedListStyle: false
 ...

@@ -57,4 +57,8 @@ void shutdown()
     gfx.shutdown();
 }
 
+void render()
+{
+    gfx.render();
+}
 } // namespace lotus::graphics

@@ -22,6 +22,9 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
+#define TEST_ECS      0
+#define TEST_WINDOWS  0
+#define TEST_RENDERER 1
 
 #include <thread>
 

@@ -23,12 +23,11 @@
 
 #pragma comment(lib, "Lotus.lib")
 
-#define TEST_ECS      0
-#define TEST_WINDOWS  0
-#define TEST_RENDERER 1
+
+#include "Test.h"
 
 #if TEST_ECS
-    #include "EntityComponentSystemTest.h"
+#include "EntityComponentSystemTest.h"
 #elif TEST_WINDOWS
     #include "WindowTest.h"
 #elif TEST_RENDERER
