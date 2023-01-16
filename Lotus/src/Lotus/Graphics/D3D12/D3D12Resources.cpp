@@ -61,6 +61,13 @@ bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
         m_free_handles[i] = i;
     }
 
+    #ifdef L_DEBUG
+    for (u32 i = 0; i < frame_buffer_count; ++i)
+    {
+        LASSERT(m_deferred_free_indices[i].empty());
+    }
+    #endif
+
     m_descriptor_size = device->GetDescriptorHandleIncrementSize(m_type);
     m_cpu_start = m_heap->GetCPUDescriptorHandleForHeapStart();
     m_gpu_start = is_shader_visible ? m_heap->GetGPUDescriptorHandleForHeapStart() : D3D12_GPU_DESCRIPTOR_HANDLE{ 0 };
@@ -68,7 +75,28 @@ bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
     return true;
 }
 
-void descriptor_heap::release() {}
+void descriptor_heap::process_deferred_free(u32 frame_index)
+{
+    std::lock_guard lock(m_mutex);
+    LASSERT(frame_index < frame_buffer_count);
+
+    utl::vector<u32>& indices = m_deferred_free_indices[frame_index];
+    if (!indices.empty())
+    {
+        for (auto idx : indices)
+        {
+            --m_size;
+            m_free_handles[m_size] = idx;
+        }
+        indices.clear();
+    }
+}
+
+void descriptor_heap::release()
+{
+    LASSERT(!m_size);
+    core::deferred_release(m_heap);
+}
 
 descriptor_handle descriptor_heap::allocate()
 {
@@ -102,6 +130,10 @@ void descriptor_heap::free(descriptor_handle& handle)
     LASSERT(handle.index < m_capacity);
     const u32 index = (u32) (handle.cpu.ptr - m_cpu_start.ptr) / m_descriptor_size;
     LASSERT(handle.index == index);
+
+    const u32 frame_index = core::current_frame_index();
+    m_deferred_free_indices[frame_index].push_back(index);
+    core::set_derferred_releases_flag();
 
     handle = {};
 }

@@ -53,6 +53,7 @@ public:
     ~descriptor_heap() { LASSERT(!m_heap); }
 
     bool initialize(u32 capacity, bool is_shader_visible);
+    void process_deferred_free(u32 frame_index);
     void release();
 
     [[nodiscard]] descriptor_handle allocate();
@@ -72,6 +73,7 @@ private:
     D3D12_CPU_DESCRIPTOR_HANDLE      m_cpu_start{};
     D3D12_GPU_DESCRIPTOR_HANDLE      m_gpu_start{};
     Scope<u32[]>                     m_free_handles{};
+    utl::vector<u32>                 m_deferred_free_indices[frame_buffer_count]{};
     std::mutex                       m_mutex;
     u32                              m_capacity{ 0 };
     u32                              m_size{ 0 };
