@@ -39,4 +39,7 @@ constexpr void release(T*& resource)
         resource = nullptr;
     }
 }
+
+ID3D12Device* const device();
+
 } // namespace lotus::graphics::d3d12::core

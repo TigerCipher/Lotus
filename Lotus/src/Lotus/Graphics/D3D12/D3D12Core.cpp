@@ -319,4 +319,10 @@ void render()
 
     gfx_command.end_frame();
 }
+
+ID3D12Device* const device()
+{
+    return main_device;
+}
+
 } // namespace lotus::graphics::d3d12::core

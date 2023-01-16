@@ -221,6 +221,7 @@
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Common.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Core.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Interface.h" />
+    <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Resources.h" />
     <ClInclude Include="src\Lotus\Graphics\GraphicsPlatformInterface.h" />
     <ClInclude Include="src\Lotus\Graphics\Renderer.h" />
     <ClInclude Include="src\Lotus\Platform\Platform.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="src\Lotus\Core\EntryPoint.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Core.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Interface.cpp" />
+    <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Resources.cpp" />
     <ClCompile Include="src\Lotus\Graphics\Renderer.cpp" />
     <ClCompile Include="src\Lotus\Platform\Platform.cpp" />
   </ItemGroup>
