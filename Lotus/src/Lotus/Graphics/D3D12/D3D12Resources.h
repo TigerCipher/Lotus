@@ -68,10 +68,10 @@ public:
     constexpr bool                        is_shader_visible() const { return m_gpu_start.ptr != 0; }
 
 private:
-    ID3D12DescriptorHeap*            m_heap;
+    ID3D12DescriptorHeap*            m_heap{ nullptr };
     D3D12_CPU_DESCRIPTOR_HANDLE      m_cpu_start{};
     D3D12_GPU_DESCRIPTOR_HANDLE      m_gpu_start{};
-    Scope<u32[]>                     m_free_handles{};
+    scope<u32[]>                     m_free_handles{};
     utl::vector<u32>                 m_deferred_free_indices[frame_buffer_count]{};
     std::mutex                       m_mutex;
     u32                              m_capacity{ 0 };

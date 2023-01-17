@@ -67,7 +67,7 @@ protected:
 
 namespace detail
 {
-using script_ptr     = Scope<scriptable_entity>;
+using script_ptr     = scope<scriptable_entity>;
 using script_creator = script_ptr (*)(entity::entity entity);
 
 byte register_script(size_t tag, script_creator func);

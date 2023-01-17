@@ -52,7 +52,7 @@ bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
     if (FAILED(hr))
         return false;
 
-    m_free_handles = std::move(CreateScope<u32[]>(capacity));
+    m_free_handles = std::move(create_scope<u32[]>(capacity));
     m_capacity     = capacity;
     m_size         = 0;
 

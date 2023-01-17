@@ -78,24 +78,24 @@ using UniquePtr = std::unique_ptr<T>;
 
 // Scope as well as above in case I decide to make my own version of unique ptr
 template<typename T>
-using Scope = std::unique_ptr<T>;
+using scope = std::unique_ptr<T>;
 
 template<typename T>
 using SharedPtr = std::shared_ptr<T>;
 
 // Ref as well as above in case I decide to make my own version of shared ptr
 template<typename T>
-using Ref = std::shared_ptr<T>;
+using ref = std::shared_ptr<T>;
 
 
 template<typename T, typename... Args>
-constexpr Scope<T> CreateScope(Args&&... args)
+constexpr scope<T> create_scope(Args&&... args)
 {
     return std::make_unique<T>(std::forward<Args>(args)...);
 }
 
 template<typename T, typename... Args>
-constexpr Ref<T> CreateRef(Args&&... args)
+constexpr ref<T> create_ref(Args&&... args)
 {
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
