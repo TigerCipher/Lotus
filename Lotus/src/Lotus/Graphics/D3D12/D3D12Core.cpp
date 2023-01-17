@@ -237,7 +237,7 @@ D3D_FEATURE_LEVEL get_max_feature_level(IDXGIAdapter4* adapter)
     feat_level_info.pFeatureLevelsRequested = feat_levels;
 
     cptr<ID3D12Device> device;
-    DX_CALL(D3D12CreateDevice(adapter, min_feature_level, IID_PPV_ARGS(&device)))
+    DX_CALL(D3D12CreateDevice(adapter, min_feature_level, L_PTR(&device)))
     DX_CALL(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &feat_level_info, sizeof(feat_level_info)))
     return feat_level_info.MaxSupportedFeatureLevel;
 }
@@ -284,7 +284,7 @@ bool initialize()
 #ifdef L_DEBUG
     {
         cptr<ID3D12Debug3> debug_interface;
-        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug_interface))))
+        if (SUCCEEDED(D3D12GetDebugInterface(L_PTR(&debug_interface))))
         {
             debug_interface->EnableDebugLayer();
         } else
@@ -299,7 +299,7 @@ bool initialize()
 #endif
 
     HRESULT hr = S_OK;
-    DX_CALL(hr = CreateDXGIFactory2(dxgi_factory_flags, IID_PPV_ARGS(&dxgi_factory)));
+    DX_CALL(hr = CreateDXGIFactory2(dxgi_factory_flags, L_PTR(&dxgi_factory)));
     if (FAILED(hr))
         return failed_init();
 
@@ -316,7 +316,7 @@ bool initialize()
         return false;
 
     // Create d3d12 device (aka our virtual gpu)
-    DX_CALL(hr = D3D12CreateDevice(main_adapter.Get(), max_feature_level, IID_PPV_ARGS(&main_device)))
+    DX_CALL(hr = D3D12CreateDevice(main_adapter.Get(), max_feature_level, L_PTR(&main_device)))
     if (FAILED(hr))
         return failed_init();
 
@@ -380,7 +380,7 @@ void shutdown()
         }
 
         cptr<ID3D12DebugDevice2> debug_device;
-        DX_CALL(main_device->QueryInterface(IID_PPV_ARGS(&debug_device)));
+        DX_CALL(main_device->QueryInterface(L_PTR(&debug_device)));
         release(main_device);
         DX_CALL(
             debug_device->ReportLiveDeviceObjects(D3D12_RLDO_SUMMARY | D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL));
@@ -434,9 +434,9 @@ DXGI_FORMAT default_render_target_format()
 surface create_surface(platform::window window)
 {
     surfaces.emplace_back(window);
-    surface_id id {(u32)surfaces.size() - 1};
+    surface_id id{ (u32) surfaces.size() - 1 };
     surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue(), render_target_format);
-    return surface{id};
+    return surface{ id };
 }
 
 void remove_surface(surface_id id)
@@ -452,7 +452,7 @@ void resize_surface(surface_id id, u32 width, u32 height)
     surfaces[id].resize();
 }
 
-u32  surface_width(surface_id id)
+u32 surface_width(surface_id id)
 {
     return surfaces[id].width();
 }
@@ -473,7 +473,7 @@ void render_surface(surface_id id)
         process_deferred_releases(frame_index);
     }
 
-    const d3d12_surface& surface{surfaces[id]};
+    const d3d12_surface& surface{ surfaces[id] };
     surface.present();
 
     gfx_command.end_frame();

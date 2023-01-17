@@ -66,7 +66,7 @@ void d3d12_surface::create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue
     const auto       hwnd = (HWND) m_window.handle();
     DX_CALL(factory->CreateSwapChainForHwnd(cmd_queue, hwnd, &desc, nullptr, nullptr, &swap_chain));
     DX_CALL(factory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER));
-    DX_CALL(swap_chain->QueryInterface(IID_PPV_ARGS(&m_swap_chan)));
+    DX_CALL(swap_chain->QueryInterface(L_PTR(&m_swap_chan)));
     core::release(swap_chain);
 
     m_current_backbuffer_index = m_swap_chan->GetCurrentBackBufferIndex();

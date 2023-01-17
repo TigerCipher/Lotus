@@ -78,6 +78,12 @@
     #define NAME_D3D_OBJ_INDEXED(obj, i, name)
 #endif
 
+/**
+ * \brief Obtains the interface pointer. Short hand for IID_PPV_ARGS
+ * \param x Address of the pointer to retrieve
+ */
+#define L_PTR(x) IID_PPV_ARGS((x))
+
 template<typename T>
 using comptr = Microsoft::WRL::ComPtr<T>;
 
