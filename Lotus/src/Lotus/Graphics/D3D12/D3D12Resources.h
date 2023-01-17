@@ -36,18 +36,17 @@ struct descriptor_handle
     constexpr bool is_valid() const { return cpu.ptr != 0; }
     constexpr bool is_shader_visible() const { return gpu.ptr != 0; }
 
-    #ifdef L_DEBUG
+#ifdef L_DEBUG
     friend class descriptor_heap;
     descriptor_heap* container{ nullptr };
     u32              index{ invalid_id_u32 };
-    #endif
+#endif
 };
 
 class descriptor_heap
 {
 public:
-    explicit descriptor_heap(D3D12_DESCRIPTOR_HEAP_TYPE type) :
-        m_type(type) {}
+    explicit descriptor_heap(D3D12_DESCRIPTOR_HEAP_TYPE type) : m_type(type) {}
 
     DISABLE_COPY_AND_MOVE(descriptor_heap);
     ~descriptor_heap() { LASSERT(!m_heap); }

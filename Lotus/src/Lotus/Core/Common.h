@@ -39,7 +39,7 @@
 #ifdef L_EDITOR
     #define L_EXPORT extern "C" __declspec(dllexport)
 #else
-#define L_EXPORT
+    #define L_EXPORT
 #endif
 
 
@@ -55,28 +55,28 @@
     (x) = nullptr;
 
 #ifdef L_DEBUG
-// May very well end up using custom asserts with better logging
-#define LASSERT(condition) assert(condition)
-#define L_DBG(x)           x
+    // May very well end up using custom asserts with better logging
+    #define LASSERT(condition) assert(condition)
+    #define L_DBG(x)           x
 #else
     #define LASSERT(condition) (void(0))
     #define L_DBG(x)           (void(0))
 #endif
 
 #ifndef DISABLE_COPY
-#define DISABLE_COPY(T)                                                                                                \
+    #define DISABLE_COPY(T)                                                                                            \
         explicit T(const T&)   = delete;                                                                               \
         T& operator=(const T&) = delete
 #endif
 
 #ifndef DISABLE_MOVE
-#define DISABLE_MOVE(T)                                                                                                \
+    #define DISABLE_MOVE(T)                                                                                            \
         explicit T(T&&)   = delete;                                                                                    \
         T& operator=(T&&) = delete
 #endif
 
 #ifndef DISABLE_COPY_AND_MOVE
-#define DISABLE_COPY_AND_MOVE(T)                                                                                       \
+    #define DISABLE_COPY_AND_MOVE(T)                                                                                   \
         DISABLE_COPY(T);                                                                                               \
         DISABLE_MOVE(T)
 
@@ -100,8 +100,8 @@
 
 
 #ifdef _WIN64
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+    #define WIN32_LEAN_AND_MEAN
+    #include <Windows.h>
 #else
     #error Currently only Windows x64 is supported. No current plans to change this
 #endif

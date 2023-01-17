@@ -44,8 +44,8 @@ bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
     D3D12_DESCRIPTOR_HEAP_DESC desc{};
     desc.Flags = is_shader_visible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     desc.NumDescriptors = capacity;
-    desc.Type = m_type;
-    desc.NodeMask = 0;
+    desc.Type           = m_type;
+    desc.NodeMask       = 0;
 
     HRESULT hr = S_OK;
     DX_CALL(hr = device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_heap)));
@@ -61,15 +61,15 @@ bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
         m_free_handles[i] = i;
     }
 
-    #ifdef L_DEBUG
+#ifdef L_DEBUG
     for (u32 i = 0; i < frame_buffer_count; ++i)
     {
         LASSERT(m_deferred_free_indices[i].empty());
     }
-    #endif
+#endif
 
     m_descriptor_size = device->GetDescriptorHandleIncrementSize(m_type);
-    m_cpu_start = m_heap->GetCPUDescriptorHandleForHeapStart();
+    m_cpu_start       = m_heap->GetCPUDescriptorHandleForHeapStart();
     m_gpu_start = is_shader_visible ? m_heap->GetGPUDescriptorHandleForHeapStart() : D3D12_GPU_DESCRIPTOR_HANDLE{ 0 };
 
     return true;
