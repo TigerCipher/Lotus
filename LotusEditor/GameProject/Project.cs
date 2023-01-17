@@ -59,8 +59,8 @@ namespace LotusEditor.GameProject
         }
 
 
+        public static Project Current => Application.Current.MainWindow?.DataContext as Project;
 
-        public static Project Current => Application.Current.MainWindow.DataContext as Project;
 
         public static History HistoryManager { get; } = new();
         public static History SelectionHistoryManager { get; } = new();
