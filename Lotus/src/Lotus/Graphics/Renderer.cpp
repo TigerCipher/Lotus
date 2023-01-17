@@ -47,6 +47,30 @@ bool set_platform_interface(graphics_platform platform)
 }
 } // namespace
 
+void   surface::resize(u32 width, u32 height) const
+{
+    LASSERT(is_valid());
+    gfx.surface.resize(m_id, width, height);
+}
+
+u32 surface::width() const
+{
+    LASSERT(is_valid());
+    return gfx.surface.width(m_id);
+}
+
+u32 surface::height() const
+{
+    LASSERT(is_valid());
+    return gfx.surface.height(m_id);
+}
+
+void surface::render() const
+{
+    LASSERT(is_valid());
+    gfx.surface.render(m_id);
+}
+
 bool initialize(graphics_platform platform)
 {
     return set_platform_interface(platform) && gfx.initialize();
@@ -57,8 +81,16 @@ void shutdown()
     gfx.shutdown();
 }
 
-void render()
+
+surface create_surface(platform::window window)
 {
-    gfx.render();
+    return gfx.surface.create(window);
 }
+
+void remove_surface(surface_id id)
+{
+    LASSERT(id::is_valid(id));
+    gfx.surface.remove(id);
+}
+
 } // namespace lotus::graphics

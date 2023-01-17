@@ -27,13 +27,58 @@
 #define TEST_RENDERER 1
 
 #include <thread>
+#include <chrono>
+#include <string>
+
+
+#include <Lotus/Core/Types.h>
+
+#include <Windows.h>
+
 
 class Test
 {
 public:
-    virtual ~Test() = default;
+    virtual ~Test()         = default;
     virtual bool Init()     = 0;
     virtual void Run()      = 0;
     virtual void Shutdown() = 0;
 };
 
+class timer
+{
+public:
+    using clock = std::chrono::high_resolution_clock;
+    using time_stamp = std::chrono::steady_clock::time_point;
+
+    void begin()
+    {
+        m_start = clock::now();
+    }
+
+    void end()
+    {
+        auto dt = clock::now() - m_start;
+        m_avg_ms += ((f32)std::chrono::duration_cast<std::chrono::milliseconds>(dt).count() - m_avg_ms) / (f32)m_counter;
+        ++m_counter;
+
+        if(std::chrono::duration_cast<std::chrono::seconds>(clock::now() - m_seconds).count() >= 1)
+        {
+            OutputDebugStringA("Avg. Frame (ms): ");
+            OutputDebugStringA(std::to_string(m_avg_ms).c_str());
+            OutputDebugStringA((" " + std::to_string(m_counter)).c_str());
+            OutputDebugStringA(" fps");
+            OutputDebugStringA("\n");
+            m_avg_ms = 0.0f;
+            m_counter = 1;
+            m_seconds = clock::now();
+        }
+    }
+
+private:
+    f32 m_avg_ms{0.0f};
+    u32 m_counter{0};
+
+    time_stamp m_start;
+    time_stamp m_seconds{clock::now()};
+};

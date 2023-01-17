@@ -28,8 +28,29 @@
 
 namespace lotus::graphics
 {
+
+L_TYPED_ID(surface_id)
+
 class surface
-{};
+{
+public:
+    constexpr surface() = default;
+    constexpr explicit surface(const surface_id id) : m_id(id) {}
+
+    constexpr surface_id get_id() const { return m_id; }
+
+    constexpr bool is_valid() const { return id::is_valid(m_id); }
+
+    void  resize(u32 width, u32 height) const;
+
+    u32 width() const;
+    u32 height() const;
+
+    void render() const;
+
+private:
+    surface_id m_id{id::invalid_id};
+};
 
 struct render_surface
 {
@@ -47,6 +68,7 @@ bool initialize(graphics_platform platform);
 
 void shutdown();
 
-void render();
+surface create_surface(platform::window window);
+void remove_surface(surface_id id);
 
 } // namespace lotus::graphics

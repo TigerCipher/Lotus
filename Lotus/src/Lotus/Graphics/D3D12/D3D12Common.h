@@ -24,6 +24,7 @@
 
 #include "Lotus/Core/Common.h"
 #include "Lotus/Graphics/Renderer.h"
+#include "Lotus/Platform/Window.h"
 
 #include <dxgi1_6.h>
 #include <d3d12.h>

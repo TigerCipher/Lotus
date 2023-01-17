@@ -32,7 +32,13 @@ namespace lotus::graphics::d3d12
 void get_platform_interface(platform_interface& pinterface)
 {
     pinterface.initialize = core::initialize;
-    pinterface.shutdown = core::shutdown;
-    pinterface.render = core::render;
+    pinterface.shutdown   = core::shutdown;
+
+    pinterface.surface.create = core::create_surface;
+    pinterface.surface.remove = core::remove_surface;
+    pinterface.surface.resize = core::resize_surface;
+    pinterface.surface.width  = core::surface_width;
+    pinterface.surface.height = core::surface_height;
+    pinterface.surface.render = core::render_surface;
 }
 }

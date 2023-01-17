@@ -31,7 +31,11 @@ using namespace lotus;
 
 constexpr u32 numWindows = 4;
 
+timer timer;
+
 graphics::render_surface surfaces[numWindows];
+
+void destroy_render_surface(graphics::render_surface& surface);
 
 LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -42,8 +46,17 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         bool all = true;
         for (auto& s : surfaces)
         {
-            if (!s.window.is_closed())
-                all = false;
+            if(s.window.is_valid())
+            {
+                if (s.window.is_closed())
+                {
+                    destroy_render_surface(s);
+                } else
+                {
+                    all = false;
+                }
+
+            }
         }
 
         if (all)
@@ -62,6 +75,12 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
             return 0;
         }
         break;
+    case WM_KEYDOWN:
+        if(wparam == VK_ESCAPE)
+        {
+            PostMessage(hwnd, WM_CLOSE, 0, 0);
+            return 0;
+        }
 
     default: break;
     }
@@ -72,11 +91,15 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 void create_render_surface(graphics::render_surface& surface, platform::window_create_info info)
 {
     surface.window = platform::create_window(&info);
+    surface.surface = graphics::create_surface(surface.window);
 }
 
 void destroy_render_surface(graphics::render_surface& surface)
 {
-    platform::remove_window(surface.window.get_id());
+    graphics::render_surface temp{surface};
+    surface = {};
+    if(temp.surface.is_valid()) graphics::remove_surface(temp.surface.get_id());
+    if(temp.window.is_valid()) platform::remove_window(temp.window.get_id());
 }
 
 bool EngineTest::Init()
@@ -103,8 +126,16 @@ bool EngineTest::Init()
 }
 void EngineTest::Run()
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    graphics::render();
+    timer.begin();
+    // std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    for (u32 i = 0; i < numWindows; ++i)
+    {
+        if(surfaces[i].surface.is_valid())
+        {
+            surfaces[i].surface.render();
+        }
+    }
+    timer.end();
 }
 
 void EngineTest::Shutdown()
