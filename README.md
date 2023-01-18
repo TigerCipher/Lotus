@@ -14,7 +14,8 @@ ___
  + [ ] Direct3D 12 support
    + In progress
  + [ ] Lotus managed pointer/memory types
- + [ ] Lotus managed lists and vectors
+ + [X] Lotus managed lists and vectors
+   + Vectors and free lists are implemented currently
  + [ ] Textures
  + [ ] Forward Lighting
  + [ ] HLSL shaders
