@@ -64,6 +64,8 @@ public:
         }
         return *this;
     }
+#else
+    DISABLE_COPY_AND_MOVE(d3d12_surface);
 #endif
 
     void create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue* cmd_queue, DXGI_FORMAT format);

@@ -230,8 +230,10 @@
     <ClInclude Include="src\Lotus\EngineApi\GameEntity.h" />
     <ClInclude Include="src\Lotus\EngineApi\ScriptComponent.h" />
     <ClInclude Include="src\Lotus\EngineApi\TransformComponent.h" />
+    <ClInclude Include="src\Lotus\Util\FreeList.h" />
     <ClInclude Include="src\Lotus\Util\MathUtil.h" />
     <ClInclude Include="src\Lotus\Util\Util.h" />
+    <ClInclude Include="src\Lotus\Util\Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lotus\Components\Entity.cpp" />

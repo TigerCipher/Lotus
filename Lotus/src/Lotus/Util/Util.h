@@ -22,7 +22,7 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#define USE_STL_VECTOR 1
+#define USE_STL_VECTOR 0
 #define USE_STL_DEQUE  1
 
 #if USE_STL_VECTOR
@@ -46,6 +46,19 @@ void erase_unordered(std::vector<T>& vec, size_t index)
 }
 
 } // namespace lotus::utl
+
+#else
+#include "Vector.h"
+
+namespace lotus::utl
+{
+template<typename T>
+void erase_unordered(vector<T>& v, size_t index)
+{
+    v.erase_unordered(index);
+}
+}
+
 #endif
 
 #if USE_STL_DEQUE
@@ -56,3 +69,6 @@ template<typename T>
 using deque = std::deque<T>;
 } // namespace lotus::utl
 #endif
+
+
+#include "FreeList.h"

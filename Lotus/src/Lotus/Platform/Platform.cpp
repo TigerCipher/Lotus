@@ -39,33 +39,7 @@ namespace
         bool  closed     = false;
     };
 
-    utl::vector<window_info> windows;
-
-    utl::vector<u32> availableSlots;
-
-    uint32 add_to_windows(window_info info)
-    {
-        u32 id = invalid_id_u32;
-        if (availableSlots.empty())
-        {
-            id = (u32) windows.size();
-            windows.emplace_back(info);
-        } else
-        {
-            id = availableSlots.back();
-            availableSlots.pop_back();
-            LASSERT(id != invalid_id_u32);
-            windows [ id ] = info;
-        }
-
-        return id;
-    }
-
-    void remove_from_windows(uint32 id)
-    {
-        LASSERT(id < windows.size());
-        availableSlots.emplace_back(id);
-    }
+    utl::free_list<window_info> windows;
 
     window_info& get_from_id(window_id id)
     {
@@ -227,7 +201,7 @@ window create_window(const window_create_info* const info)
     if (winInfo.hwnd)
     {
         L_DBG(SetLastError(0));
-        const window_id id { add_to_windows(winInfo) };
+        const window_id id { windows.add(winInfo) };
 
         SetWindowLongPtr(winInfo.hwnd, GWLP_USERDATA, (LONG_PTR) id);
 
@@ -247,7 +221,7 @@ void remove_window(const window_id id)
 {
     const window_info& info = get_from_id(id);
     DestroyWindow(info.hwnd);
-    remove_from_windows(id);
+    windows.remove(id);
 }
 
 

@@ -178,14 +178,15 @@ private:
     u32                         m_frame_index = 0;
 };
 
+using surface_collection = utl::free_list<d3d12_surface>;
 
 constexpr D3D_FEATURE_LEVEL min_feature_level    = D3D_FEATURE_LEVEL_11_0;
 constexpr DXGI_FORMAT       render_target_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-ID3D12Device8*             main_device  = nullptr;
-IDXGIFactory7*             dxgi_factory = nullptr;
-d3d12_command              gfx_command;
-utl::vector<d3d12_surface> surfaces;
+ID3D12Device8*     main_device  = nullptr;
+IDXGIFactory7*     dxgi_factory = nullptr;
+d3d12_command      gfx_command;
+surface_collection surfaces;
 
 descriptor_heap rtv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);         // render targets
 descriptor_heap dsv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);         // depth stencils
@@ -433,8 +434,7 @@ DXGI_FORMAT default_render_target_format()
 
 surface create_surface(platform::window window)
 {
-    surfaces.emplace_back(window);
-    surface_id id{ (u32) surfaces.size() - 1 };
+    surface_id id{ surfaces.add(window) };
     surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue(), render_target_format);
     return surface{ id };
 }
@@ -442,8 +442,7 @@ surface create_surface(platform::window window)
 void remove_surface(surface_id id)
 {
     gfx_command.flush();
-    surfaces[id].~d3d12_surface();
-    // surfaces[id] = d3d12_surface{};
+    surfaces.remove(id);
 }
 
 void resize_surface(surface_id id, u32 width, u32 height)
