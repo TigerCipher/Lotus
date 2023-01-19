@@ -34,27 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <COMReference Include="EnvDTE80">
-      <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>0</VersionMinor>
-      <VersionMajor>8</VersionMajor>
-      <Guid>1a31287a-4d7d-413e-8e32-3b374931bd89</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="EnvDTE">
-      <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>0</VersionMinor>
-      <VersionMajor>8</VersionMajor>
-      <Guid>80cc9f66-e7d8-4ddd-85b6-d9e6cd0e93e2</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-
-  <ItemGroup>
     <Resource Include="Resources\PrimitiveMeshView\Checkermap.png" />
     <Resource Include="Resources\PrimitiveMeshView\PlaneTexture.png" />
   </ItemGroup>
@@ -75,6 +54,11 @@
 
   <ItemGroup>
     <Page Include="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="envdte" Version="17.4.33103.184" />
+    <PackageReference Include="envdte80" Version="17.4.33103.184" />
   </ItemGroup>
 
 </Project>
