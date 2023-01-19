@@ -33,7 +33,7 @@ template<typename T>
 using vector = std::vector<T>;
 
 template<typename T>
-void erase_unordered(std::vector<T>& vec, size_t index)
+void erase_unordered(T& vec, size_t index)
 {
     if (vec.size() > 1)
     {
@@ -53,7 +53,7 @@ void erase_unordered(std::vector<T>& vec, size_t index)
 namespace lotus::utl
 {
 template<typename T>
-void erase_unordered(vector<T>& v, size_t index)
+void erase_unordered(T& v, size_t index)
 {
     v.erase_unordered(index);
 }

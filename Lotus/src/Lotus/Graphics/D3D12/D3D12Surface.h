@@ -31,6 +31,8 @@ namespace lotus::graphics::d3d12
 class d3d12_surface
 {
 public:
+    constexpr static u32 buffer_count{3};
+
     explicit d3d12_surface(platform::window window) : m_window(window) { LASSERT(m_window.handle()); }
 
     ~d3d12_surface() { release(); }
@@ -46,7 +48,7 @@ public:
         m_allow_tearing(o.m_allow_tearing),
         m_present_flags(o.m_present_flags)
     {
-        for (u32 i = 0; i < frame_buffer_count; ++i)
+        for (u32 i = 0; i < buffer_count; ++i)
         {
             m_render_target_data[i].resource = o.m_render_target_data[i].resource;
             m_render_target_data[i].rtv      = o.m_render_target_data[i].rtv;
@@ -106,7 +108,7 @@ private:
     {
         m_window    = {};
         m_swap_chan = nullptr;
-        for (u32 i = 0; i < frame_buffer_count; ++i)
+        for (u32 i = 0; i < buffer_count; ++i)
         {
             m_render_target_data[i] = {};
         }
@@ -121,7 +123,7 @@ private:
     {
         m_window    = o.m_window;
         m_swap_chan = o.m_swap_chan;
-        for (u32 i = 0; i < frame_buffer_count; ++i)
+        for (u32 i = 0; i < buffer_count; ++i)
         {
             m_render_target_data[i] = o.m_render_target_data[i];
         }
@@ -141,7 +143,7 @@ private:
 
     platform::window   m_window{};
     IDXGISwapChain4*   m_swap_chan{ nullptr };
-    render_target_data m_render_target_data[frame_buffer_count]{};
+    render_target_data m_render_target_data[buffer_count]{};
     mutable u32        m_current_backbuffer_index{ 0 };
     u32                m_allow_tearing{ 0 };
     u32                m_present_flags{ 0 };

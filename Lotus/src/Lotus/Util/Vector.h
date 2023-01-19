@@ -98,9 +98,9 @@ public:
         }
         LASSERT(m_size < m_capacity);
 
-        new (std::addressof(m_data[m_size])) T(std::forward<Params>(p)...);
+        T* const item = new (std::addressof(m_data[m_size])) T(std::forward<Params>(p)...);
         ++m_size;
-        return m_data[m_size - 1];
+        return *item;
     }
 
     constexpr void resize(u64 new_size)
@@ -120,6 +120,8 @@ public:
             {
                 destruct_range(new_size, m_size);
             }
+
+            m_size = new_size;
         }
 
         LASSERT(new_size == m_size);
@@ -142,6 +144,8 @@ public:
             {
                 destruct_range(new_size, m_size);
             }
+
+            m_size = new_size;
         }
 
         LASSERT(new_size == m_size);
@@ -216,9 +220,9 @@ public:
     {
         if (this == std::addressof(o))
             return;
-        auto temp(o);
-        o     = *this;
-        *this = temp;
+        auto temp(std::move(o));
+        o.move(*this);
+        *this = std::move(temp);
     }
 
     constexpr T* data() { return m_data; }

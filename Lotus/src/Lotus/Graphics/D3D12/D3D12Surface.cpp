@@ -101,7 +101,7 @@ void d3d12_surface::release()
 
 void d3d12_surface::finalize()
 {
-    for (u32 i = 0; i < frame_buffer_count; ++i)
+    for (u32 i = 0; i < buffer_count; ++i)
     {
         render_target_data& data = m_render_target_data[i];
         LASSERT(!data.resource);
