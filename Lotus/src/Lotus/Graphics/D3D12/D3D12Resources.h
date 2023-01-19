@@ -79,4 +79,176 @@ private:
     u32                              m_descriptor_size{};
     const D3D12_DESCRIPTOR_HEAP_TYPE m_type{};
 };
+
+struct d3d12_texture_init_info
+{
+    ID3D12Heap1*                     heap{ nullptr };
+    ID3D12Resource*                  resource{ nullptr };
+    D3D12_SHADER_RESOURCE_VIEW_DESC* srv_desc{ nullptr };
+    D3D12_RESOURCE_DESC*             desc{ nullptr };
+    D3D12_RESOURCE_ALLOCATION_INFO1  allocation_info{};
+    D3D12_RESOURCE_STATES            initial_state{};
+    D3D12_CLEAR_VALUE                clear_value{};
+};
+
+class d3d12_texture
+{
+public:
+    constexpr static u32 max_mips{ 14 }; // supports 16k resolution
+    d3d12_texture()  = default;
+    ~d3d12_texture()
+    {
+        release();
+    }
+    explicit d3d12_texture(d3d12_texture_init_info info);
+    DISABLE_COPY(d3d12_texture);
+
+    constexpr d3d12_texture(d3d12_texture&& o) : m_resource(o.m_resource), m_srv(o.m_srv) { o.reset(); }
+
+    constexpr d3d12_texture& operator=(d3d12_texture&& o)
+    {
+        LASSERT(this != &o);
+        if (this != &o)
+        {
+            release();
+            move(o);
+        }
+        return *this;
+    }
+
+    void release();
+
+
+    constexpr ID3D12Resource* const resource() const { return m_resource; }
+    constexpr descriptor_handle     srv() const { return m_srv; }
+
+private:
+    constexpr void reset()
+    {
+        m_resource = nullptr;
+        m_srv      = {};
+    }
+
+    constexpr void move(d3d12_texture& o)
+    {
+        m_resource = o.m_resource;
+        m_srv      = o.m_srv;
+        o.reset();
+    }
+
+    ID3D12Resource*   m_resource{ nullptr };
+    descriptor_handle m_srv;
+};
+
+class d3d12_render_texture
+{
+public:
+    d3d12_render_texture()  = default;
+    ~d3d12_render_texture()
+    {
+        release();
+    }
+    explicit d3d12_render_texture(d3d12_texture_init_info info);
+    DISABLE_COPY(d3d12_render_texture);
+
+    constexpr d3d12_render_texture(d3d12_render_texture&& o) :
+        m_texture(std::move(o.m_texture)), m_mip_count(o.m_mip_count)
+    {
+        for (u32 i = 0; i < m_mip_count; ++i)
+        {
+            m_rtv[i] = o.m_rtv[i];
+        }
+        o.reset();
+    }
+
+    constexpr d3d12_render_texture& operator=(d3d12_render_texture&& o)
+    {
+        LASSERT(this != &o);
+        if (this != &o)
+        {
+            release();
+            move(o);
+        }
+        return *this;
+    }
+
+    void release();
+
+    constexpr u32 mip_count() const { return m_mip_count; }
+    constexpr D3D12_CPU_DESCRIPTOR_HANDLE rtv(u32 mip_idx) const
+    {
+        LASSERT(mip_idx < m_mip_count);
+        return m_rtv[mip_idx].cpu;
+    }
+
+    constexpr descriptor_handle srv() const { return m_texture.srv(); }
+
+    constexpr ID3D12Resource* const resource() const { return m_texture.resource(); }
+
+private:
+    constexpr void reset()
+    {
+        for (u32 i = 0; i < m_mip_count; ++i)
+        {
+            m_rtv[i] = {};
+        }
+        m_mip_count = 0;
+    }
+
+    constexpr void move(d3d12_render_texture& o)
+    {
+        m_texture = std::move(o.m_texture);
+        m_mip_count = o.m_mip_count;
+        for (u32 i = 0; i < m_mip_count; ++i)
+        {
+            m_rtv[i] = o.m_rtv[i];
+        }
+        o.reset();
+    }
+
+    d3d12_texture     m_texture{};
+    descriptor_handle m_rtv[d3d12_texture::max_mips]{};
+    u32               m_mip_count{ 0 };
+};
+
+class d3d12_depth_buffer
+{
+public:
+    d3d12_depth_buffer()  = default;
+    ~d3d12_depth_buffer()
+    {
+        release();
+    }
+    explicit d3d12_depth_buffer(d3d12_texture_init_info info);
+    DISABLE_COPY(d3d12_depth_buffer);
+
+    constexpr d3d12_depth_buffer(d3d12_depth_buffer&& o) :
+        m_texture(std::move(o.m_texture)), m_dsv(o.m_dsv)
+    {
+        o.m_dsv = {};
+    }
+
+    constexpr d3d12_depth_buffer& operator=(d3d12_depth_buffer&& o)
+    {
+        LASSERT(this != &o);
+        if (this != &o)
+        {
+            m_texture = std::move(o.m_texture);
+            m_dsv = o.m_dsv;
+            o.m_dsv = {};
+        }
+        return *this;
+    }
+
+    void release();
+
+    constexpr D3D12_CPU_DESCRIPTOR_HANDLE dsv() const { return m_dsv.cpu; }
+    constexpr descriptor_handle srv() const { return m_texture.srv(); }
+    constexpr ID3D12Resource*  const resource() const { return m_texture.resource(); }
+
+private:
+    d3d12_texture m_texture{};
+    descriptor_handle m_dsv{};
+};
+
 } // namespace lotus::graphics::d3d12

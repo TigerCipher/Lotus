@@ -23,6 +23,7 @@
 
 #include "D3D12Resources.h"
 #include "D3D12Core.h"
+#include "D3D12Helpers.h"
 
 namespace lotus::graphics::d3d12
 {
@@ -38,7 +39,7 @@ bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
 
     release();
 
-    ID3D12Device* const device = core::device();
+    auto* const device = core::device();
     LASSERT(device);
 
     D3D12_DESCRIPTOR_HEAP_DESC desc{};
@@ -137,4 +138,134 @@ void descriptor_heap::free(descriptor_handle& handle)
 
     handle = {};
 }
+
+
+// TEXTURE //////////////
+
+d3d12_texture::d3d12_texture(d3d12_texture_init_info info)
+{
+    auto* const device = core::device();
+    LASSERT(device);
+
+    const D3D12_CLEAR_VALUE* const clear_value =
+        info.desc && (info.desc->Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET ||
+                      info.desc->Flags & D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL)
+            ? &info.clear_value
+            : nullptr;
+
+    if (info.resource)
+    {
+        LASSERT(!info.heap);
+        m_resource = info.resource;
+    }else if(info.heap && info.desc)
+    {
+        LASSERT(!info.resource);
+        DX_CALL(device->CreatePlacedResource(info.heap, info.allocation_info.Offset, info.desc, info.initial_state, clear_value, L_PTR(&m_resource)));
+    }
+    else if(info.desc)
+    {
+        LASSERT(!info.heap && !info.resource);
+
+
+        DX_CALL(device->CreateCommittedResource(&d3dx::heap_properties.default_heap, D3D12_HEAP_FLAG_NONE, info.desc, info.initial_state,
+                                                clear_value, L_PTR(&m_resource)));
+    }
+
+    LASSERT(m_resource);
+
+    m_srv = core::srv_heap().allocate();
+    device->CreateShaderResourceView(m_resource, info.srv_desc, m_srv.cpu);
+
+}
+
+void d3d12_texture::release()
+{
+    core::srv_heap().free(m_srv);
+    core::deferred_release(m_resource);
+}
+
+
+// RENDER TEXTURE //////////////
+
+
+d3d12_render_texture::d3d12_render_texture(d3d12_texture_init_info info) : m_texture(info)
+{
+    LASSERT(info.desc);
+    m_mip_count = resource()->GetDesc().MipLevels;
+    LASSERT(m_mip_count && m_mip_count <= d3d12_texture::max_mips);
+
+    descriptor_heap& rtvheap = core::rtv_heap();
+    D3D12_RENDER_TARGET_VIEW_DESC desc{};
+    desc.Format = info.desc->Format;
+    desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+    desc.Texture2D.MipSlice = 0;
+
+    auto* const device = core::device();
+    LASSERT(device);
+
+    for (u32 i = 0; i < m_mip_count; ++i)
+    {
+        m_rtv[i] = rtvheap.allocate();
+        device->CreateRenderTargetView(resource(), &desc, m_rtv[i].cpu);
+        ++desc.Texture2D.MipSlice;
+    }
+}
+
+void d3d12_render_texture::release()
+{
+    for (u32 i = 0; i < m_mip_count; ++i)
+    {
+        core::rtv_heap().free(m_rtv[i]);
+    }
+    m_texture.release();
+    m_mip_count = 0;
+}
+
+// DEPTH BUFFER //////////////
+
+
+d3d12_depth_buffer::d3d12_depth_buffer(d3d12_texture_init_info info)
+{
+    LASSERT(info.desc);
+    const DXGI_FORMAT dsv_format = info.desc->Format;
+    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc{};
+    if(info.desc->Format == DXGI_FORMAT_D32_FLOAT)
+    {
+        info.desc->Format = DXGI_FORMAT_R32_TYPELESS;
+        srv_desc.Format = DXGI_FORMAT_R32_FLOAT;
+    }
+
+    srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srv_desc.Texture2D.MipLevels = 1;
+    srv_desc.Texture2D.MostDetailedMip = 0;
+    srv_desc.Texture2D.PlaneSlice = 0;
+    srv_desc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+    LASSERT(!info.srv_desc && !info.resource);
+    info.srv_desc = &srv_desc;
+    m_texture = d3d12_texture(info);
+
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsv_desc{};
+    dsv_desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+    dsv_desc.Flags = D3D12_DSV_FLAG_NONE;
+    dsv_desc.Format = dsv_format;
+    dsv_desc.Texture2D.MipSlice = 0;
+
+    m_dsv = core::dsv_heap().allocate();
+
+    auto* const device = core::device();
+    LASSERT(device);
+
+    device->CreateDepthStencilView(resource(), &dsv_desc, m_dsv.cpu);
+}
+
+void d3d12_depth_buffer::release()
+{
+    core::dsv_heap().free(m_dsv);
+    m_texture.release();
+}
+
+
+
 }

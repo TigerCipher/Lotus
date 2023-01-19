@@ -220,6 +220,7 @@
     <ClInclude Include="src\Lotus\Core\Types.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Common.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Core.h" />
+    <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Helpers.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Interface.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Resources.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Surface.h" />
