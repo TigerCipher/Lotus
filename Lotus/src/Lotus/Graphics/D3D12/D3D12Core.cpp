@@ -23,9 +23,15 @@
 #include "D3D12Core.h"
 #include "D3D12Resources.h"
 #include "D3D12Surface.h"
+#include "D3D12Helpers.h"
 
 namespace lotus::graphics::d3d12::core
 {
+
+// TODO: This was just a testing function
+void create_root_sig();
+void create_a_sig_2();
+
 namespace
 {
 class d3d12_command
@@ -183,7 +189,7 @@ using surface_collection = utl::free_list<d3d12_surface>;
 constexpr D3D_FEATURE_LEVEL min_feature_level    = D3D_FEATURE_LEVEL_11_0;
 constexpr DXGI_FORMAT       render_target_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-ID3D12Device8*     main_device  = nullptr;
+ID3D12Device10*    main_device  = nullptr;
 IDXGIFactory7*     dxgi_factory = nullptr;
 d3d12_command      gfx_command;
 surface_collection surfaces;
@@ -349,6 +355,10 @@ bool initialize()
     NAME_D3D_OBJ(srv_desc_heap.heap(), L"SRV Descriptor Heap");
     NAME_D3D_OBJ(uav_desc_heap.heap(), L"UAV Descriptor Heap");
 
+    // TODO: Just for testing
+    create_root_sig();
+    create_a_sig_2();
+
     return true;
 }
 
@@ -392,7 +402,7 @@ void shutdown()
 }
 
 
-ID3D12Device* const device()
+ID3D12Device10* const device()
 {
     return main_device;
 }
@@ -476,6 +486,176 @@ void render_surface(surface_id id)
     surface.present();
 
     gfx_command.end_frame();
+}
+
+void create_root_sig()
+{
+    D3D12_ROOT_PARAMETER1 params[3];
+
+    {
+        auto& p         = params[0];
+        p.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+        D3D12_ROOT_CONSTANTS consts{};
+        consts.Num32BitValues = 2;
+        consts.ShaderRegister = 0;
+        consts.RegisterSpace  = 0;
+        p.Constants           = consts;
+        p.ShaderVisibility    = D3D12_SHADER_VISIBILITY_PIXEL;
+    }
+
+    {
+        auto& p         = params[1];
+        p.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+
+        D3D12_ROOT_DESCRIPTOR1 root_desc{};
+        root_desc.Flags          = D3D12_ROOT_DESCRIPTOR_FLAG_NONE;
+        root_desc.RegisterSpace  = 0;
+        root_desc.ShaderRegister = 0;
+        p.Descriptor             = root_desc;
+        p.ShaderVisibility       = D3D12_SHADER_VISIBILITY_VERTEX;
+    }
+
+    {
+        auto& p         = params[2];
+        p.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        D3D12_ROOT_DESCRIPTOR_TABLE1 table{};
+        table.NumDescriptorRanges = 1;
+        D3D12_DESCRIPTOR_RANGE1 range{};
+        range.RangeType                         = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+        range.NumDescriptors                    = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+        range.Flags                             = D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE;
+        range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+        range.BaseShaderRegister                = 0;
+        range.RegisterSpace                     = 0;
+        table.pDescriptorRanges                 = &range;
+        p.DescriptorTable                       = table;
+        p.ShaderVisibility                      = D3D12_SHADER_VISIBILITY_PIXEL;
+    }
+
+    D3D12_STATIC_SAMPLER_DESC sampler_desc{};
+    sampler_desc.AddressU         = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    sampler_desc.AddressV         = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    sampler_desc.AddressW         = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    sampler_desc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+    D3D12_ROOT_SIGNATURE_DESC1 desc{};
+
+    desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+                 D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+                 D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+                 D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
+                 D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS;
+    desc.NumParameters     = _countof(params);
+    desc.pParameters       = &params[0];
+    desc.NumStaticSamplers = 1;
+    desc.pStaticSamplers   = &sampler_desc;
+
+    D3D12_VERSIONED_ROOT_SIGNATURE_DESC rs_desc{};
+    rs_desc.Version  = D3D_ROOT_SIGNATURE_VERSION_1_1;
+    rs_desc.Desc_1_1 = desc;
+
+    HRESULT   hr{ S_OK };
+    ID3DBlob* root_sig_blob{ nullptr };
+    ID3DBlob* err_blob{ nullptr };
+
+    if (FAILED(hr = D3D12SerializeVersionedRootSignature(&rs_desc, &root_sig_blob, &err_blob)))
+    {
+        L_DBG(const char* errmsg = err_blob ? (const char*) err_blob->GetBufferPointer() : "");
+        L_DBG(OutputDebugStringA(errmsg));
+        return;
+    }
+
+    LASSERT(root_sig_blob);
+    ID3D12RootSignature* root_sig{ nullptr };
+    DX_CALL(hr = device()->CreateRootSignature(0, root_sig_blob->GetBufferPointer(), root_sig_blob->GetBufferSize(),
+                                               L_PTR(&root_sig)));
+
+    release(root_sig_blob);
+    release(err_blob);
+
+    release(root_sig);
+}
+
+void create_a_sig_2()
+{
+    d3dx::d3d12_descriptor_range range{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND, 0 };
+    d3dx::d3d12_root_parameter   params[3]{};
+    params[0].as_constants(2, D3D12_SHADER_VISIBILITY_PIXEL, 0);
+    params[1].as_cbv(D3D12_SHADER_VISIBILITY_PIXEL, 1);
+    params[2].as_descriptor_table(D3D12_SHADER_VISIBILITY_PIXEL, &range, 1);
+
+    const d3dx::d3d12_root_signature_desc desc{ &params[0], _countof(params) };
+
+    ID3D12RootSignature* root_sig = desc.create();
+
+    release(root_sig);
+}
+
+ID3D12RootSignature*  root_signature;
+D3D12_SHADER_BYTECODE vs{};
+
+template<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type, typename T>
+class alignas(void*) d3d12_pipeline_state_subobject
+{
+public:
+    d3d12_pipeline_state_subobject() = default;
+    constexpr explicit d3d12_pipeline_state_subobject(T subobject) : m_subobject{ subobject } {}
+    d3d12_pipeline_state_subobject& operator=(const T& subobject)
+    {
+        m_subobject = subobject;
+        return *this;
+    }
+
+private:
+    const D3D12_PIPELINE_STATE_SUBOBJECT_TYPE m_type{ Type };
+    T                                         m_subobject{};
+};
+
+using d3d12_pipeline_state_subobject_root_signature =
+    d3d12_pipeline_state_subobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE, ID3D12RootSignature*>;
+using d3d12_pipeline_state_subobject_vs =
+    d3d12_pipeline_state_subobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS, D3D12_SHADER_BYTECODE>;
+
+void create_a_pipeline_state_object()
+{
+    struct
+    {
+        struct alignas(void*)
+        {
+            const D3D12_PIPELINE_STATE_SUBOBJECT_TYPE type{ D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE };
+            ID3D12RootSignature*                      root_signature;
+        } root_sig;
+        struct alignas(void*)
+        {
+            const D3D12_PIPELINE_STATE_SUBOBJECT_TYPE type{ D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS };
+            D3D12_SHADER_BYTECODE                     vs_code{};
+        } vs;
+    } stream;
+
+    stream.root_sig.root_signature = root_signature;
+    stream.vs.vs_code              = vs;
+
+    D3D12_PIPELINE_STATE_STREAM_DESC desc{};
+    desc.pPipelineStateSubobjectStream = &stream;
+    desc.SizeInBytes                   = sizeof(stream);
+
+    ID3D12PipelineState* pso{ nullptr };
+    device()->CreatePipelineState(&desc, L_PTR(&pso));
+
+    release(pso);
+}
+
+void create_a_pipeline_state_object2()
+{
+    struct
+    {
+        d3d12_pipeline_state_subobject_root_signature root_sig{ root_signature };
+        d3d12_pipeline_state_subobject_vs vs_{vs};
+    } stream;
+
+    auto pso = d3dx::create_pipeline_state(&stream, sizeof(stream));
+
+    release(pso);
 }
 
 } // namespace lotus::graphics::d3d12::core

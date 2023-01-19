@@ -59,7 +59,7 @@ constexpr void deferred_release(T*& resource)
     }
 }
 
-ID3D12Device* const device();
+ID3D12Device10* const device();
 
 u32 current_frame_index();
 
