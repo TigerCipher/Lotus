@@ -157,25 +157,24 @@ d3d12_texture::d3d12_texture(d3d12_texture_init_info info)
     {
         LASSERT(!info.heap);
         m_resource = info.resource;
-    }else if(info.heap && info.desc)
+    } else if (info.heap && info.desc)
     {
         LASSERT(!info.resource);
-        DX_CALL(device->CreatePlacedResource(info.heap, info.allocation_info.Offset, info.desc, info.initial_state, clear_value, L_PTR(&m_resource)));
-    }
-    else if(info.desc)
+        DX_CALL(device->CreatePlacedResource(info.heap, info.allocation_info.Offset, info.desc, info.initial_state,
+                                             clear_value, L_PTR(&m_resource)));
+    } else if (info.desc)
     {
         LASSERT(!info.heap && !info.resource);
 
 
-        DX_CALL(device->CreateCommittedResource(&d3dx::heap_properties.default_heap, D3D12_HEAP_FLAG_NONE, info.desc, info.initial_state,
-                                                clear_value, L_PTR(&m_resource)));
+        DX_CALL(device->CreateCommittedResource(&d3dx::heap_properties.default_heap, D3D12_HEAP_FLAG_NONE, info.desc,
+                                                info.initial_state, clear_value, L_PTR(&m_resource)));
     }
 
     LASSERT(m_resource);
 
     m_srv = core::srv_heap().allocate();
     device->CreateShaderResourceView(m_resource, info.srv_desc, m_srv.cpu);
-
 }
 
 void d3d12_texture::release()
@@ -194,10 +193,10 @@ d3d12_render_texture::d3d12_render_texture(d3d12_texture_init_info info) : m_tex
     m_mip_count = resource()->GetDesc().MipLevels;
     LASSERT(m_mip_count && m_mip_count <= d3d12_texture::max_mips);
 
-    descriptor_heap& rtvheap = core::rtv_heap();
+    descriptor_heap&              rtvheap = core::rtv_heap();
     D3D12_RENDER_TARGET_VIEW_DESC desc{};
-    desc.Format = info.desc->Format;
-    desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+    desc.Format             = info.desc->Format;
+    desc.ViewDimension      = D3D12_RTV_DIMENSION_TEXTURE2D;
     desc.Texture2D.MipSlice = 0;
 
     auto* const device = core::device();
@@ -227,29 +226,29 @@ void d3d12_render_texture::release()
 d3d12_depth_buffer::d3d12_depth_buffer(d3d12_texture_init_info info)
 {
     LASSERT(info.desc);
-    const DXGI_FORMAT dsv_format = info.desc->Format;
+    const DXGI_FORMAT               dsv_format = info.desc->Format;
     D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc{};
-    if(info.desc->Format == DXGI_FORMAT_D32_FLOAT)
+    if (info.desc->Format == DXGI_FORMAT_D32_FLOAT)
     {
         info.desc->Format = DXGI_FORMAT_R32_TYPELESS;
-        srv_desc.Format = DXGI_FORMAT_R32_FLOAT;
+        srv_desc.Format   = DXGI_FORMAT_R32_FLOAT;
     }
 
-    srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srv_desc.Texture2D.MipLevels = 1;
-    srv_desc.Texture2D.MostDetailedMip = 0;
-    srv_desc.Texture2D.PlaneSlice = 0;
+    srv_desc.Shader4ComponentMapping       = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srv_desc.ViewDimension                 = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srv_desc.Texture2D.MipLevels           = 1;
+    srv_desc.Texture2D.MostDetailedMip     = 0;
+    srv_desc.Texture2D.PlaneSlice          = 0;
     srv_desc.Texture2D.ResourceMinLODClamp = 0.0f;
 
     LASSERT(!info.srv_desc && !info.resource);
     info.srv_desc = &srv_desc;
-    m_texture = d3d12_texture(info);
+    m_texture     = d3d12_texture(info);
 
     D3D12_DEPTH_STENCIL_VIEW_DESC dsv_desc{};
-    dsv_desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-    dsv_desc.Flags = D3D12_DSV_FLAG_NONE;
-    dsv_desc.Format = dsv_format;
+    dsv_desc.ViewDimension      = D3D12_DSV_DIMENSION_TEXTURE2D;
+    dsv_desc.Flags              = D3D12_DSV_FLAG_NONE;
+    dsv_desc.Format             = dsv_format;
     dsv_desc.Texture2D.MipSlice = 0;
 
     m_dsv = core::dsv_heap().allocate();
@@ -267,5 +266,4 @@ void d3d12_depth_buffer::release()
 }
 
 
-
-}
+} // namespace lotus::graphics::d3d12

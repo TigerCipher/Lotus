@@ -78,7 +78,7 @@ template<class T>
 script_ptr create_script(entity::entity entity)
 {
     LASSERT(entity.is_valid());
-    return CreateScope<T>(entity);
+    return create_scope<T>(entity);
 }
 
 #ifdef L_EDITOR

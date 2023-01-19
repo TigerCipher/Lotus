@@ -22,8 +22,8 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "Lotus/Core/Common.h"
-#include "Lotus/Platform/Window.h"
+#include "../Core/Common.h"
+#include "../Platform/Window.h"
 
 
 namespace lotus::graphics

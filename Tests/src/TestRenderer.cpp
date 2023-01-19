@@ -46,7 +46,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         bool all = true;
         for (auto& s : surfaces)
         {
-            if(s.window.is_valid())
+            if (s.window.is_valid())
             {
                 if (s.window.is_closed())
                 {
@@ -55,7 +55,6 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
                 {
                     all = false;
                 }
-
             }
         }
 
@@ -76,7 +75,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         }
         break;
     case WM_KEYDOWN:
-        if(wparam == VK_ESCAPE)
+        if (wparam == VK_ESCAPE)
         {
             PostMessage(hwnd, WM_CLOSE, 0, 0);
             return 0;
@@ -90,16 +89,18 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 void create_render_surface(graphics::render_surface& surface, platform::window_create_info info)
 {
-    surface.window = platform::create_window(&info);
+    surface.window  = platform::create_window(&info);
     surface.surface = graphics::create_surface(surface.window);
 }
 
 void destroy_render_surface(graphics::render_surface& surface)
 {
-    graphics::render_surface temp{surface};
+    graphics::render_surface temp{ surface };
     surface = {};
-    if(temp.surface.is_valid()) graphics::remove_surface(temp.surface.get_id());
-    if(temp.window.is_valid()) platform::remove_window(temp.window.get_id());
+    if (temp.surface.is_valid())
+        graphics::remove_surface(temp.surface.get_id());
+    if (temp.window.is_valid())
+        platform::remove_window(temp.window.get_id());
 }
 
 bool EngineTest::Init()
@@ -130,7 +131,7 @@ void EngineTest::Run()
     // std::this_thread::sleep_for(std::chrono::milliseconds(10));
     for (u32 i = 0; i < numWindows; ++i)
     {
-        if(surfaces[i].surface.is_valid())
+        if (surfaces[i].surface.is_valid())
         {
             surfaces[i].surface.render();
         }

@@ -22,9 +22,9 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "Lotus/Core/Common.h"
+#include "../Core/Common.h"
 #include "Renderer.h"
-#include "Lotus/Platform/Window.h"
+#include "../Platform/Window.h"
 
 namespace lotus::graphics
 {
