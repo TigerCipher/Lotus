@@ -81,7 +81,7 @@ namespace LotusEditor.GameProject
 
             WriteProjectData();
 
-            return Project.Load(proj).Result;
+            return Project.Load(proj?.FullPath).Result;
         }
 
         public static void AddExistingProject(ProjectData projData)

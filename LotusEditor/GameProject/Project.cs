@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Markup;
 using LotusEditor.Components;
 using LotusEditor.DllWrapper;
 using LotusEditor.GameDev;
@@ -141,10 +142,20 @@ namespace LotusEditor.GameProject
             OnPropertyChanged(nameof(DebugStopCmd));
         }
 
-        public static Project Load(string file)
+        public static async Task<Project> Load(string file)
         {
             Debug.Assert(File.Exists(file));
-            return Serializer.FromFile<Project>(file);
+            var proj = Serializer.FromFile<Project>(file);
+            proj.Location = Path.GetDirectoryName(file) + "\\";
+
+            var configName = VisualStudio.GetConfigName(proj.DllBuildConfig);
+            var dll = $@"{proj.Location}x64\{configName}\{proj.Name}.dll";
+
+            if (!File.Exists(dll)) await proj.BuildGameDll(false);
+            else proj.LoadGameDll();
+            proj.SetCommands();
+
+            return proj;
         }
 
         public static async Task<Project> Load(ProjectData data)
@@ -155,7 +166,7 @@ namespace LotusEditor.GameProject
 
             var configName = VisualStudio.GetConfigName(proj.DllBuildConfig);
             var dll = $@"{proj.Location}x64\{configName}\{proj.Name}.dll";
-
+            
             if (!File.Exists(dll)) await proj.BuildGameDll(false);
             else proj.LoadGameDll();
             proj.SetCommands();
@@ -207,7 +218,7 @@ namespace LotusEditor.GameProject
             ActiveScene = Scenes.FirstOrDefault(x => x.IsActive);
 
             Debug.Assert(ActiveScene != null);
-
+            
             // var configName = VisualStudio.GetConfigName(DllBuildConfig);
             // var dll = $@"{Location}x64\{configName}\{Name}.dll";
             //
