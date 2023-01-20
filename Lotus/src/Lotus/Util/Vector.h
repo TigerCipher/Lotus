@@ -38,20 +38,21 @@ public:
 
     constexpr explicit vector(u64 count, const T& value) { resize(count, value); }
 
-    template<typename it, typename = std::enable_if_t<std::_Is_iterator_v<it>>>
-    constexpr explicit vector(it first, it last)
-    {
-        for (; first != last; ++first)
-        {
-            emplace_back(*first);
-        }
-    }
+    // Just in case I do decide to write a vulcan renderer for non-windows, going to leave this out
+    // template<typename it, typename = std::enable_if_t<std::_Is_iterator_v<it>>>
+    // constexpr explicit vector(it first, it last)
+    // {
+    //     for (; first != last; ++first)
+    //     {
+    //         emplace_back(*first);
+    //     }
+    // }
 
     // copy ctor
     constexpr vector(const vector& o) { *this = o; }
 
     // move ctor
-    constexpr vector(const vector&& o) : m_capacity(o.m_capacity), m_size(o.m_size), m_data(o.m_data) { o.reset(); }
+    constexpr vector(vector&& o) : m_capacity(o.m_capacity), m_size(o.m_size), m_data(o.m_data) { o.reset(); }
 
     ~vector() { destroy(); }
 
@@ -105,7 +106,7 @@ public:
 
     constexpr void resize(u64 new_size)
     {
-        static_assert(std::is_default_constructible_v<T>, "Type must have a default constructor");
+        static_assert(std::is_default_constructible<T>::value, "Type must have a default constructor");
 
         if (new_size > m_size)
         {
@@ -129,7 +130,7 @@ public:
 
     constexpr void resize(u64 new_size, const T& value)
     {
-        static_assert(std::is_copy_constructible_v<T>, "Type must be copyable");
+        static_assert(std::is_copy_constructible<T>::value, "Type must be copyable");
 
         if (new_size > m_size)
         {

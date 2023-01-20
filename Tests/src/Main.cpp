@@ -23,8 +23,10 @@
 
 #pragma comment(lib, "Lotus.lib")
 
-
+#include <Lotus/Core/Common.h>
 #include "Test.h"
+
+#include <filesystem>
 
 #if TEST_ECS
 #include "EntityComponentSystemTest.h"
@@ -39,11 +41,26 @@
 #ifdef _WIN64
     #include <windows.h>
 
+std::filesystem::path set_current_directory_to_exe_path()
+{
+    wchar_t   path[MAX_PATH];
+    const u32 length = GetModuleFileName(nullptr, &path[0], MAX_PATH);
+    if (!length || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+        return {};
+
+    std::filesystem::path p = path;
+    std::filesystem::current_path(p.parent_path());
+    return std::filesystem::current_path();
+}
+
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
     #if L_DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     #endif
+
+    set_current_directory_to_exe_path();
+
     EngineTest engineTest;
     if (engineTest.Init())
     {

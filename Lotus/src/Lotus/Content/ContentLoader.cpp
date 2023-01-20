@@ -107,24 +107,36 @@ comp_reader comp_readers[]{read_transform, read_script};
 
 static_assert(_countof(comp_readers) == component_type::COUNT);
 
+bool read_file(std::filesystem::path path, scope<byte[]>& data, u64& size)
+{
+    if (!std::filesystem::exists(path)) return false;
+    size = std::filesystem::file_size(path);
+    LASSERT(size);
+    if (!size) return false;
+    data = create_scope<byte[]>(size);
+    std::ifstream file(path, std::ios::in | std::ios::binary);
+    if(!file || !file.read((char*)data.get(), size))
+    {
+        file.close();
+        return false;
+    }
+
+    file.close();
+    return true;
+}
 } // namespace
 
 bool load_game()
 {
-    wchar_t   path[MAX_PATH];
-    const u32 length = GetModuleFileName(nullptr, &path[0], MAX_PATH);
-    if (!length || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+
+    scope<byte[]> game_data{};
+    u64 size{ 0 };
+    if(!read_file("game.bin", game_data, size))
+    {
         return false;
-
-    std::filesystem::path p = path;
-    SetCurrentDirectory(p.parent_path().wstring().c_str());
-
-    std::ifstream     game("game.bin", std::ios::in | std::ios::binary);
-    utl::vector<byte> buffer(std::istreambuf_iterator<char>(game), {});
-
-    LASSERT(buffer.size());
-
-    const byte*   at     = buffer.data();
+    }
+    LASSERT(game_data.get());
+    const byte* at = game_data.get();
     constexpr u32 size32 = sizeof(u32);
 
     const u32 num_ents = *at;
@@ -162,7 +174,7 @@ bool load_game()
         entities.emplace_back(ent);
     }
 
-    LASSERT(at == buffer.data() + buffer.size());
+    LASSERT(at == game_data.get() + size);
     return true;
 }
 

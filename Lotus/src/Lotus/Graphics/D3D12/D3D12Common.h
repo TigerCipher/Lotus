@@ -96,4 +96,11 @@ constexpr cptr<T> create_com(Args&&... args)
     return Microsoft::WRL::Make<T>(std::forward<Args>(args)...);
 }
 
+namespace lotus::graphics::d3d12
+{
 constexpr u32 frame_buffer_count = 3;
+
+using id3d12_device                = ID3D12Device10;
+using id3d12_graphics_command_list = ID3D12GraphicsCommandList7;
+
+} // namespace lotus::graphics::d3d12

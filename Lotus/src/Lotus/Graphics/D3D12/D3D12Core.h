@@ -59,7 +59,7 @@ constexpr void deferred_release(T*& resource)
     }
 }
 
-ID3D12Device10* const device();
+id3d12_device* const device();
 
 u32 current_frame_index();
 
@@ -70,7 +70,6 @@ descriptor_heap& dsv_heap();
 descriptor_heap& srv_heap();
 descriptor_heap& uav_heap();
 
-DXGI_FORMAT default_render_target_format();
 
 surface create_surface(platform::window window);
 void remove_surface(surface_id id);

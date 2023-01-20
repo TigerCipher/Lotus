@@ -31,7 +31,8 @@ namespace lotus::graphics::d3d12
 class d3d12_surface
 {
 public:
-    constexpr static u32 buffer_count{3};
+    constexpr static u32         buffer_count{ 3 };
+    constexpr static DXGI_FORMAT default_backbuffer_format{ DXGI_FORMAT_R8G8B8A8_UNORM_SRGB };
 
     explicit d3d12_surface(platform::window window) : m_window(window) { LASSERT(m_window.handle()); }
 
@@ -70,18 +71,13 @@ public:
     DISABLE_COPY_AND_MOVE(d3d12_surface);
 #endif
 
-    void create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue* cmd_queue, DXGI_FORMAT format);
+    void create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue* cmd_queue,
+                           DXGI_FORMAT format = default_backbuffer_format);
     void present() const;
     void resize();
 
-    constexpr u32 width() const
-    {
-        return (u32) m_viewport.Width;
-    }
-    constexpr u32 height() const
-    {
-        return (u32) m_viewport.Height;
-    }
+    constexpr u32                   width() const { return (u32) m_viewport.Width; }
+    constexpr u32                   height() const { return (u32) m_viewport.Height; }
     constexpr ID3D12Resource* const back_buffer() const
     {
         return m_render_target_data[m_current_backbuffer_index].resource;
@@ -90,14 +86,8 @@ public:
     {
         return m_render_target_data[m_current_backbuffer_index].rtv.cpu;
     }
-    constexpr const D3D12_VIEWPORT& viewport() const
-    {
-        return m_viewport;
-    }
-    constexpr const D3D12_RECT& scissor_rect() const
-    {
-        return m_scissor_rect;
-    }
+    constexpr const D3D12_VIEWPORT& viewport() const { return m_viewport; }
+    constexpr const D3D12_RECT&     scissor_rect() const { return m_scissor_rect; }
 
 private:
     void release();
@@ -149,5 +139,6 @@ private:
     u32                m_present_flags{ 0 };
     D3D12_VIEWPORT     m_viewport{};
     D3D12_RECT         m_scissor_rect{};
+    DXGI_FORMAT        m_format{ default_backbuffer_format };
 };
-}
+} // namespace lotus::graphics::d3d12

@@ -147,11 +147,18 @@ namespace LotusEditor.GameProject
             return Serializer.FromFile<Project>(file);
         }
 
-        public static Project Load(ProjectData data)
+        public static async Task<Project> Load(ProjectData data)
         {
             Debug.Assert(data != null && File.Exists(data.FullPath));
             var proj = Serializer.FromFile<Project>(data.FullPath);
             proj.Location = Path.GetDirectoryName(data.ProjectPath) + "\\";
+
+            var configName = VisualStudio.GetConfigName(proj.DllBuildConfig);
+            var dll = $@"{proj.Location}x64\{configName}\{proj.Name}.dll";
+
+            if (!File.Exists(dll)) await proj.BuildGameDll(false);
+            else proj.LoadGameDll();
+            proj.SetCommands();
 
             return proj;
         }
@@ -189,7 +196,7 @@ namespace LotusEditor.GameProject
         }
 
         [OnDeserialized]
-        private async void OnDeserialized(StreamingContext ctx)
+        private /*async*/ void OnDeserialized(StreamingContext ctx)
         {
             if (_scenes != null)
             {
@@ -201,9 +208,12 @@ namespace LotusEditor.GameProject
 
             Debug.Assert(ActiveScene != null);
 
-            await BuildGameDll(false);
-            // LoadGameDll();
-            SetCommands();
+            // var configName = VisualStudio.GetConfigName(DllBuildConfig);
+            // var dll = $@"{Location}x64\{configName}\{Name}.dll";
+            //
+            // if (!File.Exists(dll)) await BuildGameDll(false);
+            // else LoadGameDll();
+            // SetCommands();
         }
 
         private async Task BuildGameExe(bool showWindow = true)
@@ -250,6 +260,7 @@ namespace LotusEditor.GameProject
 
             var configName = VisualStudio.GetConfigName(DllBuildConfig);
             var dll = $@"{Location}x64\{configName}\{Name}.dll";
+            Debug.WriteLine($"Dll: {dll} and Location: {Location}");
             AvailableScripts = null;
             if (File.Exists(dll) && EngineAPI.LoadGameDll(dll) != 0)
             {
