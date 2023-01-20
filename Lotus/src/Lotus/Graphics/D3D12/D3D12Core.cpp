@@ -241,8 +241,8 @@ D3D_FEATURE_LEVEL get_max_feature_level(IDXGIAdapter4* adapter)
     feat_level_info.pFeatureLevelsRequested = feat_levels;
 
     cptr<ID3D12Device> device;
-    DX_CALL(D3D12CreateDevice(adapter, min_feature_level, L_PTR(&device)))
-    DX_CALL(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &feat_level_info, sizeof(feat_level_info)))
+    DX_CALL(D3D12CreateDevice(adapter, min_feature_level, L_PTR(&device)));
+    DX_CALL(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &feat_level_info, sizeof(feat_level_info)));
     return feat_level_info.MaxSupportedFeatureLevel;
 }
 
@@ -320,7 +320,7 @@ bool initialize()
         return false;
 
     // Create d3d12 device (aka our virtual gpu)
-    DX_CALL(hr = D3D12CreateDevice(main_adapter.Get(), max_feature_level, L_PTR(&main_device)))
+    DX_CALL(hr = D3D12CreateDevice(main_adapter.Get(), max_feature_level, L_PTR(&main_device)));
     if (FAILED(hr))
         return failed_init();
 

@@ -246,7 +246,7 @@ namespace LotusEditor.GameDev
             try
             {
 
-                foreach (var pdb in Directory.GetFiles(Path.Combine($"{project.Location}", $@"x64\{configName}"),
+                foreach (var pdb in Directory.GetFiles(Path.Combine($"{project.Path}", $@"x64\{configName}"),
                              "*.pdb"))
                 {
                     File.Delete(pdb);

@@ -38,7 +38,7 @@ namespace LotusEditor.GameProject
         // #TODO: Save last used path in a file so it gets set to that on the next launch. Or have it be a setting/preference the user can set?
         private string _path = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\LotusProjects\";
 
-        private ObservableCollection<ProjectTemplate> _projectTemplates = new ObservableCollection<ProjectTemplate>();
+        private ObservableCollection<ProjectTemplate> _projectTemplates = new();
 
         public ReadOnlyObservableCollection<ProjectTemplate> ProjectTemplates { get; }
 
@@ -198,7 +198,7 @@ namespace LotusEditor.GameProject
                 File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "screenshot.png")));
 
                 var projXml = File.ReadAllText(template.ProjectFilePath);
-                projXml = string.Format(projXml, ProjectName);
+                projXml = string.Format(projXml, ProjectName, path);
                 var projPath = Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
                 File.WriteAllText(projPath, projXml);
 

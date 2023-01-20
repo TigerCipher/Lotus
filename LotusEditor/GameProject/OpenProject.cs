@@ -81,7 +81,7 @@ namespace LotusEditor.GameProject
 
             WriteProjectData();
 
-            return Project.Load(proj?.FullPath).Result;
+            return Project.Load(proj?.FullPath);
         }
 
         public static void AddExistingProject(ProjectData projData)
@@ -99,23 +99,18 @@ namespace LotusEditor.GameProject
 
         private static void ReadProjectData()
         {
-            if (File.Exists(ProjDataPath))
+            if (!File.Exists(ProjDataPath)) return;
+            var projDataList = Serializer.FromFile<ProjectDataList>(ProjDataPath).Projects;
+
+            var projects = projDataList
+                .OrderByDescending(x => x.Date);
+            _projects.Clear();
+            foreach (var proj in projects)
             {
-                var projDataList = Serializer.FromFile<ProjectDataList>(ProjDataPath).Projects;
-
-                var projects = projDataList
-                    .OrderByDescending(x => x.Date);
-                _projects.Clear();
-                foreach (var proj in projects)
-                {
-                    if (File.Exists(proj.FullPath))
-                    {
-                        proj.Icon = File.ReadAllBytes($@"{proj.ProjectPath}\.Lotus\icon.png");
-                        proj.Screenshot = File.ReadAllBytes($@"{proj.ProjectPath}\.Lotus\screenshot.png");
-                        _projects.Add(proj);
-                    }
-                }
-
+                if (!File.Exists(proj.FullPath)) continue;
+                proj.Icon = File.ReadAllBytes($@"{proj.ProjectPath}\.Lotus\icon.png");
+                proj.Screenshot = File.ReadAllBytes($@"{proj.ProjectPath}\.Lotus\screenshot.png");
+                _projects.Add(proj);
             }
         }
     }

@@ -88,9 +88,9 @@ private:
             var name = StringUtil.ReplaceWhitespace(scriptNameTextBox.Text.Trim(), "");
             var path = scriptPathTextBox.Text.Trim();
             var errMsg = string.Empty;
-            var cppName = Path.GetFullPath(Path.Combine(Path.Combine(Project.Current.Location, path),
+            var cppName = Path.GetFullPath(Path.Combine(Path.Combine(Project.Current.Path, path),
                 $"{name}.cpp"));
-            var hName = Path.GetFullPath(Path.Combine(Path.Combine(Project.Current.Location, path),
+            var hName = Path.GetFullPath(Path.Combine(Path.Combine(Project.Current.Path, path),
                 $"{name}.h"));
 
             if (string.IsNullOrEmpty(name)) errMsg = "Give the script a name";
@@ -99,8 +99,8 @@ private:
             else if (string.IsNullOrEmpty(path)) errMsg = "Select a valid folder for your scripts";
             else if (path.IndexOfAny(Path.GetInvalidPathChars()) != -1)
                 errMsg = "Invalid characters in the script path";
-            else if (!Path.GetFullPath(Path.Combine(Project.Current.Location, path))
-                         .Contains(Path.Combine(Project.Current.Location, @"Scripts\")))
+            else if (!Path.GetFullPath(Path.Combine(Project.Current.Path, path))
+                         .Contains(Path.Combine(Project.Current.Path, @"Scripts\")))
                 errMsg = "Script must be added to the projects Scripts folder, or a sub folder";
             else if (File.Exists(cppName) || File.Exists(hName))
                 errMsg = $"Script {name} already exists";
@@ -140,7 +140,7 @@ private:
             try
             {
                 var name = StringUtil.ReplaceWhitespace(scriptNameTextBox.Text.Trim(), "");
-                var path = Path.GetFullPath(Path.Combine(Project.Current.Location, scriptPathTextBox.Text.Trim()));
+                var path = Path.GetFullPath(Path.Combine(Project.Current.Path, scriptPathTextBox.Text.Trim()));
                 var solution = Project.Current.SolutionName;
                 var projName = Project.Current.Name;
                 Logger.Info($"Attemping to create script {name} at {path} for Visual Studio solution {solution} for Project {projName}");

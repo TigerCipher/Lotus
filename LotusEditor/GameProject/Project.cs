@@ -23,10 +23,11 @@ namespace LotusEditor.GameProject
         public static string Extension => ".lproj";
         [DataMember] public string Name { get; private set; } = "New Project";
 
-        public string Location { get; private set; }
-        public string FullPath => $"{Location}{Name}{Extension}";
-        public string SolutionName => $@"{Location}{Name}.sln";
-        public string ContentPath => $@"{Location}Assets\";
+        [DataMember]
+        public string Path { get; private set; }
+        public string FullPath => $"{Path}{Name}{Extension}";
+        public string SolutionName => $@"{Path}{Name}.sln";
+        public string ContentPath => $@"{Path}Assets\";
 
 
 
@@ -82,13 +83,13 @@ namespace LotusEditor.GameProject
         public ICommand DebugStartCmd { get; private set; }
         public ICommand DebugStartWithoutDebuggingCmd { get; private set; }
         public ICommand DebugStopCmd { get; private set; }
-        
+
 
 
         public Project(string name, string path)
         {
             Name = name;
-            Location = path;
+            Path = path;
 
             OnDeserialized(new StreamingContext());
         }
@@ -142,31 +143,33 @@ namespace LotusEditor.GameProject
             OnPropertyChanged(nameof(DebugStopCmd));
         }
 
-        public static async Task<Project> Load(string file)
+        public static Project Load(string file)
         {
             Debug.Assert(File.Exists(file));
-            var proj = Serializer.FromFile<Project>(file);
-            proj.Location = Path.GetDirectoryName(file) + "\\";
-
-            var configName = VisualStudio.GetConfigName(proj.DllBuildConfig);
-            var dll = $@"{proj.Location}x64\{configName}\{proj.Name}.dll";
-
-            if (!File.Exists(dll)) await proj.BuildGameDll(false);
-            else proj.LoadGameDll();
-            proj.SetCommands();
-
-            return proj;
+            return Serializer.FromFile<Project>(file);
+            // var proj = Serializer.FromFile<Project>(file);
+            // var p = proj.Path;
+            // proj.Path = Path.GetDirectoryName(file) + "\\";
+            //
+            // var configName = VisualStudio.GetConfigName(proj.DllBuildConfig);
+            // var dll = $@"{proj.Path}x64\{configName}\{proj.Name}.dll";
+            //
+            // if (!File.Exists(dll)) await proj.BuildGameDll(false);
+            // else proj.LoadGameDll();
+            // proj.SetCommands();
+            //
+            // return proj;
         }
 
         public static async Task<Project> Load(ProjectData data)
         {
             Debug.Assert(data != null && File.Exists(data.FullPath));
             var proj = Serializer.FromFile<Project>(data.FullPath);
-            proj.Location = Path.GetDirectoryName(data.ProjectPath) + "\\";
+            proj.Path = System.IO.Path.GetDirectoryName(data.ProjectPath) + "\\";
 
             var configName = VisualStudio.GetConfigName(proj.DllBuildConfig);
-            var dll = $@"{proj.Location}x64\{configName}\{proj.Name}.dll";
-            
+            var dll = $@"{proj.Path}x64\{configName}\{proj.Name}.dll";
+
             if (!File.Exists(dll)) await proj.BuildGameDll(false);
             else proj.LoadGameDll();
             proj.SetCommands();
@@ -182,7 +185,7 @@ namespace LotusEditor.GameProject
 
         private void SaveToBinary()
         {
-            var bin = $@"{Location}x64\{VisualStudio.GetConfigName(ExeBuildConfig)}\game.bin";
+            var bin = $@"{Path}x64\{VisualStudio.GetConfigName(ExeBuildConfig)}\game.bin";
 
             using var bw = new BinaryWriter(File.Open(bin, FileMode.Create, FileAccess.Write));
             bw.Write(ActiveScene.Entities.Count);
@@ -207,7 +210,7 @@ namespace LotusEditor.GameProject
         }
 
         [OnDeserialized]
-        private /*async*/ void OnDeserialized(StreamingContext ctx)
+        private async void OnDeserialized(StreamingContext ctx)
         {
             if (_scenes != null)
             {
@@ -218,13 +221,14 @@ namespace LotusEditor.GameProject
             ActiveScene = Scenes.FirstOrDefault(x => x.IsActive);
 
             Debug.Assert(ActiveScene != null);
+
+            var configName = VisualStudio.GetConfigName(DllBuildConfig);
+            var dll = $@"{Path}x64\{configName}\{Name}.dll";
             
-            // var configName = VisualStudio.GetConfigName(DllBuildConfig);
-            // var dll = $@"{Location}x64\{configName}\{Name}.dll";
-            //
-            // if (!File.Exists(dll)) await BuildGameDll(false);
-            // else LoadGameDll();
-            // SetCommands();
+            if (!File.Exists(dll)) await BuildGameDll(false);
+            else LoadGameDll();
+            // await BuildGameDll(false);
+            SetCommands();
         }
 
         private async Task BuildGameExe(bool showWindow = true)
@@ -270,8 +274,8 @@ namespace LotusEditor.GameProject
             Logger.Info("Loading game dll");
 
             var configName = VisualStudio.GetConfigName(DllBuildConfig);
-            var dll = $@"{Location}x64\{configName}\{Name}.dll";
-            Debug.WriteLine($"Dll: {dll} and Location: {Location}");
+            var dll = $@"{Path}x64\{configName}\{Name}.dll";
+            Debug.WriteLine($"Dll: {dll} and Path: {Path}");
             AvailableScripts = null;
             if (File.Exists(dll) && EngineAPI.LoadGameDll(dll) != 0)
             {

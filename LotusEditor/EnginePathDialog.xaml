@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:LotusEditor"
         mc:Ignorable="d" Style="{StaticResource LotusDialogStyle}"
         ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen"
-        Title="Locate Lotus Install Location" Height="250" Width="400">
+        Title="Locate Lotus Install Path" Height="250" Width="400">
     <Border CornerRadius="3" Background="{StaticResource Editor.Window.GrayBrush3}" HorizontalAlignment="Stretch" Margin="10">
         <Border.Effect>
             <DropShadowEffect Opacity="0.6" BlurRadius="15" ShadowDepth="2"/>

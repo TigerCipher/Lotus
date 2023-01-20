@@ -274,25 +274,23 @@ public:
 
     constexpr T* begin()
     {
-        LASSERT(m_data);
         return std::addressof(m_data[0]);
     }
 
     constexpr const T* begin() const
     {
-        LASSERT(m_data);
         return std::addressof(m_data[0]);
     }
 
     constexpr T* end()
     {
-        LASSERT(m_data);
+        LASSERT(!(m_data == nullptr && m_size > 0));
         return std::addressof(m_data[m_size]);
     }
 
     constexpr const T* end() const
     {
-        LASSERT(m_data);
+        LASSERT(!(m_data == nullptr && m_size > 0));
         return std::addressof(m_data[m_size]);
     }
 
