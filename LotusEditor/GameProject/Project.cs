@@ -232,6 +232,12 @@ namespace LotusEditor.GameProject
 
         private async Task BuildGameExe(bool showWindow = true)
         {
+            if (Directory.GetFiles($@"{Path}Scripts\", "*.cpp").Length == 0)
+            {
+                Logger.Warn("Failed to build the project - A project must contain scripts to be built");
+                return;
+            }
+
             try
             {
                 await Task.Run(() => VisualStudio.BuildSolution(this, ExeBuildConfig, showWindow));
@@ -242,7 +248,7 @@ namespace LotusEditor.GameProject
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Debug.WriteLine($"========= Failed to build game exe {ex.Message}");
                 Logger.Error($"Failed to build the game exe");
                 throw;
             }
@@ -250,6 +256,12 @@ namespace LotusEditor.GameProject
 
         private async Task BuildGameDll(bool showWindow = true)
         {
+            if (Directory.GetFiles($@"{Path}Scripts\", "*.cpp").Length == 0)
+            {
+                Logger.Warn("Failed to build the project - A project must contain scripts to be built");
+                Debug.WriteLine("======= Cannot build =========");
+                return;
+            }
             try
             {
                 UnloadGameDll();
@@ -261,7 +273,7 @@ namespace LotusEditor.GameProject
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Debug.WriteLine($"========= Failed to build game dll {ex.Message}");
                 Logger.Error($"Failed to build the game dll");
                 throw;
             }
@@ -302,6 +314,11 @@ namespace LotusEditor.GameProject
 
         private async Task RunGame(bool debug)
         {
+            if (Directory.GetFiles($@"{Path}Scripts\").Length == 0)
+            {
+                Logger.Warn("Failed to build & run the project - A project must contain scripts to be built");
+                return;
+            }
             await Task.Run(() => VisualStudio.BuildSolution(this, ExeBuildConfig, debug));
             if (VisualStudio.BuildSucceeded)
             {

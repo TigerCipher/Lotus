@@ -209,7 +209,7 @@ namespace LotusEditor.GameProject
             catch (Exception ex)
             {
                 Logger.Error($"Failed to create project {ProjectName}");
-                Debug.WriteLine(ex.Message);
+                Debug.WriteLine($"========= Failed to create project: {ex.Message}");
                 throw;
             }
 
