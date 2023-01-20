@@ -198,7 +198,7 @@ namespace LotusEditor.GameProject
                 File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "screenshot.png")));
 
                 var projXml = File.ReadAllText(template.ProjectFilePath);
-                projXml = string.Format(projXml, ProjectName, path);
+                projXml = string.Format(projXml, ProjectName);
                 var projPath = Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
                 File.WriteAllText(projPath, projXml);
 
