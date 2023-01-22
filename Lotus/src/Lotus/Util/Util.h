@@ -48,7 +48,7 @@ void erase_unordered(T& vec, size_t index)
 } // namespace lotus::utl
 
 #else
-#include "Vector.h"
+    #include "Vector.h"
 
 namespace lotus::utl
 {
@@ -57,7 +57,7 @@ void erase_unordered(T& v, size_t index)
 {
     v.erase_unordered(index);
 }
-}
+} // namespace lotus::utl
 
 #endif
 
@@ -72,3 +72,12 @@ using deque = std::deque<T>;
 
 
 #include "FreeList.h"
+
+namespace lotus::utl
+{
+inline std::wstring to_wstring(const char* c)
+{
+    std::string s{ c };
+    return { s.begin(), s.end() };
+}
+} // namespace lotus::utl

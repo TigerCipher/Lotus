@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------------
 //
 // Lotus
-//    Copyright 2022 Matthew Rogers
+//    Copyright 2023 Matthew Rogers
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -15,20 +15,12 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: ContentLoader.h
-// Date File Created: 08/26/2022
+// File Name: ShaderCompiler.h
+// Date File Created: 01/21/2023
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "../Core/Common.h"
 
-#ifndef PRODUCTION
-namespace lotus::content
-{
-bool load_game();
-void unload_game();
-bool load_engine_shaders(scope<byte[]>& shaders_blob, u64& size);
-} // namespace lotus::content
-#endif
+bool compile_shaders();

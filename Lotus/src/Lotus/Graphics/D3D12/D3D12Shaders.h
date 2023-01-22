@@ -1,7 +1,7 @@
-// ------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------
 //
 // Lotus
-//    Copyright 2022 Matthew Rogers
+//    Copyright 2023 Matthew Rogers
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -15,34 +15,50 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: GraphicsPlatformInterface.h
-// Date File Created: 10/30/2022
+// File Name: D3D12Shaders.h
+// Date File Created: 01/20/2023
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
+
 #pragma once
 
-#include "../Core/Common.h"
-#include "Renderer.h"
-#include "../Platform/Window.h"
+#include "D3D12Common.h"
 
-namespace lotus::graphics
+namespace lotus::graphics::d3d12::shaders
 {
-struct platform_interface
-{
-    bool (*initialize)(void);
-    void (*shutdown)(void);
 
-    struct
+struct shader_type
+{
+    enum type : u32
     {
-        surface (*create)(platform::window);
-        void (*remove)(surface_id);
-        void (*resize)(surface_id, u32, u32);
-        u32 (*width)(surface_id);
-        u32 (*height)(surface_id);
-        void (*render)(surface_id);
-    } surface;
+        vertex = 0,
+        hull,
+        domain,
+        geometry,
+        pixel,
+        compute,
+        amplification,
+        mesh,
 
-    graphics_platform platform = (graphics_platform)-1;
+        count
+    };
 };
-} // namespace lotus::graphics
+
+struct engine_shader
+{
+    enum id : u32
+    {
+        fullscreen_triangle_vs = 0,
+        fillcolor_ps,
+
+        count
+    };
+};
+
+bool initialize();
+void shutdown();
+
+D3D12_SHADER_BYTECODE get_engine_shader(engine_shader::id id);
+
+} // namespace lotus::graphics::d3d12::shaders

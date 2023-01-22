@@ -2,6 +2,7 @@
 
 A 3D DirectX 12 game engine written in C++ inspired by Primal. The Lotus Editor is written in C# and will always only support windows. But as the game is built from the project, rather than the editor, it is possible games can be made for non-windows platform in the future if I ever implement a graphics API other than DirectX.
 
+
 ### Roadmap
 ___
 This is a rough idea of what to expect. No ETA is given for anything. As of January 16th, 2023 I am still currently working on getting DirectX 12 supported and ready to use.

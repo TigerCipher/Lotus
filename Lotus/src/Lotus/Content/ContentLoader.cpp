@@ -25,6 +25,7 @@
 #include "../Components/Entity.h"
 #include "../Components/Transform.h"
 #include "../Components/Script.h"
+#include "../Graphics/Renderer.h"
 
 #include <fstream>
 #include <filesystem>
@@ -185,4 +186,11 @@ void unload_game()
         entity::remove(ent.get_id());
     }
 }
+
+bool load_engine_shaders(scope<byte[]>& shaders_blob, u64& size)
+{
+    auto path = graphics::get_engine_shaders_path();
+    return read_file(path, shaders_blob, size);
+}
+
 } // namespace lotus::content

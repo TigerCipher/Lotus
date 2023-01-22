@@ -40,5 +40,7 @@ void get_platform_interface(platform_interface& pinterface)
     pinterface.surface.width  = core::surface_width;
     pinterface.surface.height = core::surface_height;
     pinterface.surface.render = core::render_surface;
+
+    pinterface.platform = graphics_platform::d3d12;
 }
 }

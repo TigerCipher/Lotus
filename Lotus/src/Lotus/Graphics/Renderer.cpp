@@ -32,6 +32,11 @@ namespace
 {
 platform_interface gfx{};
 
+constexpr const char* engine_shader_paths[] {
+    R"(.\shaders\d3d12\shaders.bin)",
+    // ".\\shaders\\vulkan\\shaders.bin",
+};
+
 bool set_platform_interface(graphics_platform platform)
 {
     switch(platform)
@@ -43,6 +48,7 @@ bool set_platform_interface(graphics_platform platform)
         return false;
     }
 
+    LASSERT(gfx.platform == platform);
     return true;
 }
 } // namespace
@@ -93,4 +99,13 @@ void remove_surface(surface_id id)
     gfx.surface.remove(id);
 }
 
+const char* get_engine_shaders_path()
+{
+    return engine_shader_paths[(u32)gfx.platform];
+}
+
+const char* get_engine_shaders_path(graphics_platform platform)
+{
+    return engine_shader_paths[(u32)platform];
+}
 } // namespace lotus::graphics

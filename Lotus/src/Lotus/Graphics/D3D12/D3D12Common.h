@@ -78,6 +78,7 @@
     #define NAME_D3D_OBJ_INDEXED(obj, i, name)
 #endif
 
+
 /**
  * \brief Obtains the interface pointer. Short hand for IID_PPV_ARGS
  * \param x Address of the pointer to retrieve
@@ -104,3 +105,7 @@ using id3d12_device                = ID3D12Device10;
 using id3d12_graphics_command_list = ID3D12GraphicsCommandList7;
 
 } // namespace lotus::graphics::d3d12
+
+
+#include "D3D12Helpers.h"
+#include "D3D12Resources.h"

@@ -22,6 +22,7 @@
 // ------------------------------------------------------------------------------
 
 #include "TestRenderer.h"
+#include "ShaderCompiler.h"
 
 #include "Lotus/Platform/Platform.h"
 #include "Lotus/Graphics/Renderer.h"
@@ -105,9 +106,13 @@ void destroy_render_surface(graphics::render_surface& surface)
 
 bool EngineTest::Init()
 {
-    bool result = graphics::initialize(graphics::graphics_platform::d3d12);
-    if (!result)
-        return result;
+    while(!compile_shaders())
+    {
+        if (MessageBox(nullptr, L"Failed to compile engine shaders", L"Shader Compilation Error", MB_RETRYCANCEL) != IDRETRY)
+            return false;
+    }
+
+    if (!graphics::initialize(graphics::graphics_platform::d3d12)) return false;
 
     platform::window_create_info info[numWindows]{
         { &winproc, nullptr, L"Test Window 1", 100, 100, 400, 800 },
@@ -123,7 +128,7 @@ bool EngineTest::Init()
         create_render_surface(surfaces[i], info[i]);
     }
 
-    return result;
+    return true;
 }
 void EngineTest::Run()
 {

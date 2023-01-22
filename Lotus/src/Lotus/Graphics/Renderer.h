@@ -71,4 +71,7 @@ void shutdown();
 surface create_surface(platform::window window);
 void remove_surface(surface_id id);
 
+const char* get_engine_shaders_path();
+const char* get_engine_shaders_path(graphics_platform platform);
+
 } // namespace lotus::graphics

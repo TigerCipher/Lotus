@@ -24,7 +24,6 @@
 #pragma once
 
 #include "D3D12Common.h"
-#include "D3D12Resources.h"
 
 namespace lotus::graphics::d3d12
 {
