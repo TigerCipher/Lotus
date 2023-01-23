@@ -192,7 +192,7 @@ void render(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info
         f32 width;
         f32 height;
         u32 frame;
-    } constants{(f32)info.surface_width, (f32)info.surface_width, ++frame };
+    } constants{(f32)info.surface_width, (f32)info.surface_height, ++frame };
 
     using idx = gpass_root_param_indices;
     cmd_list->SetGraphicsRoot32BitConstants(idx::root_constants, 3, &constants, 0);

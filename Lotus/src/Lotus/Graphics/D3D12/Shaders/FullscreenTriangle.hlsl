@@ -9,6 +9,7 @@ VSOutput FullscreenTriangleVS(in uint VertexIdx : SV_VertexID)
 {
     VSOutput output;
 
+    /*
     float2 tex;
     float2 pos;
 
@@ -25,8 +26,10 @@ VSOutput FullscreenTriangleVS(in uint VertexIdx : SV_VertexID)
         tex = float2(2, 0);
         pos = float2(3, 1);
     }
+    */
 
-    output.Position = float4(pos, 0, 1);
+    const float2 tex = float2(uint2(VertexIdx, VertexIdx << 1) & 2);
+    output.Position = float4(lerp(float2(-1, 1), float2(1, -1), tex), 0, 1);
     output.UV = tex;
 
     return output;
