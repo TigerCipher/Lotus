@@ -31,6 +31,15 @@ namespace lotus::graphics::d3d12::gpass
 namespace
 {
 
+struct gpass_root_param_indices {
+    enum : u32 {
+        root_constants,
+
+
+        count
+    };
+};
+
 constexpr DXGI_FORMAT main_buffer_format{ DXGI_FORMAT_R16G16B16A16_FLOAT };
 constexpr DXGI_FORMAT depth_buffer_format{ DXGI_FORMAT_D32_FLOAT };
 
@@ -104,9 +113,10 @@ bool create_gpass_pso_and_rootsig()
 {
     LASSERT(!gpass_root_sig && !gpass_pso);
 
+    using idx = gpass_root_param_indices;
     // root sig
-    d3dx::d3d12_root_parameter params[1]{};
-    params[0].as_constants(1, D3D12_SHADER_VISIBILITY_PIXEL, 1);
+    d3dx::d3d12_root_parameter params[idx::count]{};
+    params[idx::root_constants].as_constants(3, D3D12_SHADER_VISIBILITY_PIXEL, 1);
     const d3dx::d3d12_root_signature_desc root_sig{ &params[0], _countof(params) };
     gpass_root_sig = root_sig.create();
     LASSERT(gpass_root_sig);
@@ -176,9 +186,16 @@ void render(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info
     cmd_list->SetGraphicsRootSignature(gpass_root_sig);
     cmd_list->SetPipelineState(gpass_pso);
 
+
     static u32 frame = 0;
-    ++frame;
-    cmd_list->SetGraphicsRoot32BitConstant(0, frame, 0);
+    struct {
+        f32 width;
+        f32 height;
+        u32 frame;
+    } constants{(f32)info.surface_width, (f32)info.surface_width, ++frame };
+
+    using idx = gpass_root_param_indices;
+    cmd_list->SetGraphicsRoot32BitConstants(idx::root_constants, 3, &constants, 0);
 
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->DrawInstanced(3, 1, 0, 0);

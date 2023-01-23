@@ -32,20 +32,17 @@ namespace
 {
 platform_interface gfx{};
 
-constexpr const char* engine_shader_paths[] {
+constexpr const char* engine_shader_paths[]{
     R"(.\shaders\d3d12\shaders.bin)",
     // ".\\shaders\\vulkan\\shaders.bin",
 };
 
 bool set_platform_interface(graphics_platform platform)
 {
-    switch(platform)
+    switch (platform)
     {
-    case graphics_platform::d3d12:
-        d3d12::get_platform_interface(gfx);
-        break;
-    default:
-        return false;
+    case graphics_platform::d3d12: d3d12::get_platform_interface(gfx); break;
+    default: return false;
     }
 
     LASSERT(gfx.platform == platform);
@@ -53,7 +50,7 @@ bool set_platform_interface(graphics_platform platform)
 }
 } // namespace
 
-void   surface::resize(u32 width, u32 height) const
+void surface::resize(u32 width, u32 height) const
 {
     LASSERT(is_valid());
     gfx.surface.resize(m_id, width, height);
@@ -84,7 +81,8 @@ bool initialize(graphics_platform platform)
 
 void shutdown()
 {
-    gfx.shutdown();
+    if(gfx.platform != (graphics_platform) -1)
+        gfx.shutdown();
 }
 
 
@@ -101,11 +99,11 @@ void remove_surface(surface_id id)
 
 const char* get_engine_shaders_path()
 {
-    return engine_shader_paths[(u32)gfx.platform];
+    return engine_shader_paths[(u32) gfx.platform];
 }
 
 const char* get_engine_shaders_path(graphics_platform platform)
 {
-    return engine_shader_paths[(u32)platform];
+    return engine_shader_paths[(u32) platform];
 }
 } // namespace lotus::graphics

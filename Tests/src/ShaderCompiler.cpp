@@ -110,12 +110,14 @@ public:
         std::wstring file = utl::to_wstring(info.file);
         std::wstring func = utl::to_wstring(info.function);
         std::wstring prof = utl::to_wstring(m_profiles[info.type]);
+        std::wstring inc  = utl::to_wstring(shaders_src_path);
 
         LPCWSTR args[]
         {
             file.c_str(),            // shader file name used for error reporting
                 L"-E", func.c_str(), // Entrypoint function
                 L"-T", prof.c_str(), // hlsl profile (i.e, vs_6_5)
+                L"-I", inc.c_str(),  // include path
                 DXC_ARG_ALL_RESOURCES_BOUND,
 #if L_DEBUG
                 DXC_ARG_DEBUG, DXC_ARG_SKIP_OPTIMIZATIONS,
