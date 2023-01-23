@@ -31,7 +31,7 @@ namespace
 {
     utl::vector<id::gen_type>         generations;
     utl::deque<entity_id>             free_ids;
-    utl::vector<transform::Component> transforms;
+    utl::vector<transform::component> transforms;
     utl::vector<script::component>    scripts;
 } // namespace
 
@@ -106,7 +106,7 @@ bool is_alive(const entity_id id)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-transform::Component entity::transform() const
+transform::component entity::transform() const
 {
     LASSERT(is_alive(m_id));
     const id::id_type index = id::index(m_id);

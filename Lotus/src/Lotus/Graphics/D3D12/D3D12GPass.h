@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------------
 //
 // Lotus
-//    Copyright 2022 Matthew Rogers
+//    Copyright 2023 Matthew Rogers
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -15,34 +15,30 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-// File Name: TransformComponent.h
-// Date File Created: 8/20/2022
+// File Name: D3D12GPass
+// Date File Created: 1/22/2023 12:56:14 PM
 // Author: Matt
 //
 // ------------------------------------------------------------------------------
+
 #pragma once
-#include "../Components/Components.h"
 
-namespace lotus::transform
+
+#include "D3D12Common.h"
+
+namespace lotus::graphics::d3d12
 {
-L_TYPED_ID(transform_id)
+struct d3d12_frame_info;
+}
 
-
-class component final
+namespace lotus::graphics::d3d12::gpass
 {
-public:
-    constexpr explicit component(const transform_id id) : m_id(id) {}
-    constexpr component() : m_id(id::invalid_id) {}
 
-    constexpr transform_id get_id() const { return m_id; }
+bool initialize();
+void shutdown();
 
-    constexpr bool is_valid() const { return id::is_valid(m_id); }
+void set_size(vec2u size);
+void depth_prepass(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info);
+void render(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info);
 
-    vec3 position() const;
-    vec4 rotation() const;
-    vec3 scale() const;
-
-private:
-    transform_id m_id;
-};
-} // namespace lotus::transform
+}

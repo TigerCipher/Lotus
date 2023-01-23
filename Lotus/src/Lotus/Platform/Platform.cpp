@@ -43,7 +43,6 @@ namespace
 
     window_info& get_from_id(window_id id)
     {
-        LASSERT(id < windows.size());
         LASSERT(windows [ id ].hwnd);
         return windows [ id ];
     }

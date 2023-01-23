@@ -118,10 +118,18 @@ inline vec load_float2(const vec2* src) { return DirectX::XMLoadFloat2(src); }
 inline vec load_float3(const vec3* src) { return DirectX::XMLoadFloat3(src); }
 inline vec load_float4(const vec4* src) { return DirectX::XMLoadFloat4(src); }
 
+inline vec load_float2a(const vec2a* src) { return DirectX::XMLoadFloat2A(src); }
+inline vec load_float3a(const vec3a* src) { return DirectX::XMLoadFloat3A(src); }
+inline vec load_float4a(const vec4a* src) { return DirectX::XMLoadFloat4A(src); }
+
 inline void store_float(f32* dest, vec v) { DirectX::XMStoreFloat(dest, v); }
 inline void store_float2(vec2* dest, vec v) { DirectX::XMStoreFloat2(dest, v); }
 inline void store_float3(vec3* dest, vec v) { DirectX::XMStoreFloat3(dest, v); }
 inline void store_float4(vec4* dest, vec v) { DirectX::XMStoreFloat4(dest, v); }
+
+inline void store_float2a(vec2a* dest, vec v) { DirectX::XMStoreFloat2A(dest, v); }
+inline void store_float3a(vec3a* dest, vec v) { DirectX::XMStoreFloat3A(dest, v); }
+inline void store_float4a(vec4a* dest, vec v) { DirectX::XMStoreFloat4A(dest, v); }
 
 inline vec normalize_vec3(const vec v) { return DirectX::XMVector3Normalize(v); }
 inline vec dot_vec3(const vec v1, const vec v2) { return DirectX::XMVector3Dot(v1, v2); }
@@ -131,6 +139,8 @@ inline vec reciprocal_length_vec3(const vec v1) { return DirectX::XMVector3Recip
 inline f32  scalar_cos(f32 value) { return DirectX::XMScalarCos(value); }
 inline f32 scalar_sin(f32 value) { return DirectX::XMScalarSin(value); }
 inline bool scalar_near_equal(f32 s1, f32 s2) { return DirectX::XMScalarNearEqual(s1, s2, epsilon); }
+
+inline vec quat_rotation_roll_pitch_yaw_from_vec(vec v) {return DirectX::XMQuaternionRotationRollPitchYawFromVector(v); }
 
 // clang-format on
 

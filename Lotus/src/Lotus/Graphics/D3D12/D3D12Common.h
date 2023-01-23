@@ -26,6 +26,10 @@
 #include "../../Graphics/Renderer.h"
 #include "../../Platform/Window.h"
 
+#ifndef NOMINMAX
+    #define NOMINMAX
+#endif
+
 #include <dxgi1_6.h>
 #include <d3d12.h>
 #include <wrl.h>
@@ -54,7 +58,7 @@
 
     #define NAME_D3D_OBJ(obj, name)                                                                                    \
         obj->SetName(name);                                                                                            \
-        OutputDebugString(L"::D3D12 Object Created: ");                                                                \
+        OutputDebugString(L"================= D3D12 Object Created: ");                                                \
         OutputDebugString(name);                                                                                       \
         OutputDebugString(L"\n")
 

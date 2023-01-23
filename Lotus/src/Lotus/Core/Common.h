@@ -101,6 +101,9 @@
 
 #ifdef _WIN64
     #define WIN32_LEAN_AND_MEAN
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
     #include <Windows.h>
 #else
     #error Currently only Windows x64 is supported. No current plans to change this

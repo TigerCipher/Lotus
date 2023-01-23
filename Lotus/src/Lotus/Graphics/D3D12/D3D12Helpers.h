@@ -19,6 +19,9 @@
 // Date File Created: 01/18/2023
 // Author: Matt
 //
+//
+// Please note this helper file is largely based on d3dx by Microsoft and a helper file by Arash Khatami
+//
 // ------------------------------------------------------------------------------
 #pragma once
 
@@ -42,6 +45,81 @@ constexpr struct
     const D3D12_HEAP_PROPERTIES default_heap{ D3D12_HEAP_TYPE_DEFAULT, D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
                                               D3D12_MEMORY_POOL_UNKNOWN, 0, 0 };
 } heap_properties;
+
+
+constexpr struct
+{
+    const D3D12_RASTERIZER_DESC no_cull{
+        D3D12_FILL_MODE_SOLID,                     // FillMode
+        D3D12_CULL_MODE_NONE,                      // CullMode
+        0,                                         // FrontCounterClockwise
+        0,                                         // DepthBias
+        0,                                         // DepthBiasClamp
+        0,                                         // SlopeScaledDepthBias
+        1,                                         // DepthClipEnable
+        1,                                         // MultisampleEnable
+        0,                                         // AntialiasedLineEnable
+        0,                                         // ForcedSampleCount
+        D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF, // ConservativeRaster
+    };
+
+    const D3D12_RASTERIZER_DESC backface_cull{
+        D3D12_FILL_MODE_SOLID,                     // FillMode
+        D3D12_CULL_MODE_BACK,                      // CullMode
+        0,                                         // FrontCounterClockwise
+        0,                                         // DepthBias
+        0,                                         // DepthBiasClamp
+        0,                                         // SlopeScaledDepthBias
+        1,                                         // DepthClipEnable
+        1,                                         // MultisampleEnable
+        0,                                         // AntialiasedLineEnable
+        0,                                         // ForcedSampleCount
+        D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF, // ConservativeRaster
+    };
+
+    const D3D12_RASTERIZER_DESC frontface_cull{
+        D3D12_FILL_MODE_SOLID,                     // FillMode
+        D3D12_CULL_MODE_FRONT,                     // CullMode
+        0,                                         // FrontCounterClockwise
+        0,                                         // DepthBias
+        0,                                         // DepthBiasClamp
+        0,                                         // SlopeScaledDepthBias
+        1,                                         // DepthClipEnable
+        1,                                         // MultisampleEnable
+        0,                                         // AntialiasedLineEnable
+        0,                                         // ForcedSampleCount
+        D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF, // ConservativeRaster
+    };
+
+    const D3D12_RASTERIZER_DESC wireframe{
+        D3D12_FILL_MODE_WIREFRAME,                 // FillMode
+        D3D12_CULL_MODE_NONE,                      // CullMode
+        0,                                         // FrontCounterClockwise
+        0,                                         // DepthBias
+        0,                                         // DepthBiasClamp
+        0,                                         // SlopeScaledDepthBias
+        1,                                         // DepthClipEnable
+        1,                                         // MultisampleEnable
+        0,                                         // AntialiasedLineEnable
+        0,                                         // ForcedSampleCount
+        D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF, // ConservativeRaster
+    };
+} rasterizer_state;
+
+constexpr struct
+{
+    const D3D12_DEPTH_STENCIL_DESC1 disabled{
+        0,                                //DepthEnable
+        D3D12_DEPTH_WRITE_MASK_ZERO,      //DepthWriteMask
+        D3D12_COMPARISON_FUNC_LESS_EQUAL, //DepthFunc
+        0,                                //StencilEnable
+        0,                                //StencilReadMask
+        0,                                //StencilWriteMask
+        {},                               //FrontFace
+        {},                               //BackFace
+        0                                 //DepthBoundsTestEnable
+    };
+} depth_state;
 
 struct d3d12_descriptor_range : D3D12_DESCRIPTOR_RANGE1
 {
@@ -120,6 +198,8 @@ struct d3d12_root_signature_desc : D3D12_ROOT_SIGNATURE_DESC1
     ID3D12RootSignature* create() const { return create_root_signature(*this); }
 };
 
+#pragma warning(push)
+#pragma warning(disable : 4324)
 template<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type, typename T>
 class alignas(void*) d3d12_pipeline_state_subobject
 {
@@ -136,6 +216,8 @@ private:
     const D3D12_PIPELINE_STATE_SUBOBJECT_TYPE m_type{ Type };
     T                                         m_subobject{};
 };
+
+#pragma warning(pop)
 
 // Pipeline State Subobject
 #define PSS(name, ...) using d3d12_pipeline_state_subobject_##name = d3d12_pipeline_state_subobject<__VA_ARGS__>

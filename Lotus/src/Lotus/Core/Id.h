@@ -56,8 +56,7 @@ constexpr bool is_valid(const id_type id)
 
 constexpr id_type index(const id_type id)
 {
-    id_type i = id & detail::index_mask;
-    LASSERT(i != detail::index_mask);
+    LASSERT((id & detail::index_mask) != detail::index_mask);
     return id & detail::index_mask;
 }
 

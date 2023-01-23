@@ -42,9 +42,9 @@ namespace
 {
 enum component_type
 {
-    TRANSFORM,
-    SCRIPT,
-    COUNT
+    transform = 0,
+    script,
+    count
 };
 
 using comp_type = bool (*)(const byte*&, entity::create_info&);
@@ -56,7 +56,6 @@ script::create_info         script_info;
 bool read_transform(const byte*& data, entity::create_info& info)
 {
     LASSERT(!info.transform);
-    using namespace DirectX;
 
     f32 rotation[3];
 
@@ -70,10 +69,9 @@ bool read_transform(const byte*& data, entity::create_info& info)
     data += sizeof(transform_info.scale);
 
     vec3a rot{&rotation[0]};
-    // TODO: Move XM functions to math util
-    vec   quat{XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3A(&rot))};
+    vec   quat{math::quat_rotation_roll_pitch_yaw_from_vec(math::load_float3a(&rot))};
     vec4a rotQuad{};
-    XMStoreFloat4A(&rotQuad, quat);
+    math::store_float4a(&rotQuad, quat);
     memcpy(&transform_info.rotation[0], &rotQuad.x, sizeof(transform_info.rotation));
 
     info.transform = &transform_info;
@@ -106,7 +104,7 @@ using comp_reader = bool (*)(const byte*&, entity::create_info&);
 
 comp_reader comp_readers[]{read_transform, read_script};
 
-static_assert(_countof(comp_readers) == component_type::COUNT);
+static_assert(_countof(comp_readers) == component_type::count);
 
 bool read_file(std::filesystem::path path, scope<byte[]>& data, u64& size)
 {
@@ -149,7 +147,7 @@ bool load_game()
     for (u32 i = 0; i < num_ents; ++i)
     {
         entity::create_info info;
-        const u32           entity_type = *at; // TODO
+//         const u32           entity_type = *at; // TODO
         at += size32;
         const u32 comp_count = *at;
         at += size32;
@@ -162,7 +160,7 @@ bool load_game()
             const u32 comp_type = *at;
             at += size32;
             LASSERT(comp_index == 0 || comp_index == 1);
-            LASSERT(comp_type < component_type::COUNT);
+            LASSERT(comp_type < component_type::count);
 
             if (!comp_readers[comp_type](at, info))
                 return false;

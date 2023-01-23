@@ -42,7 +42,7 @@ public:
 
     constexpr bool is_valid() const { return id::is_valid(m_id); }
 
-    transform::Component transform() const;
+    transform::component transform() const;
     script::component    script() const;
 
 private:
@@ -58,7 +58,7 @@ public:
     virtual ~scriptable_entity() = default;
 
     virtual void on_start() {}
-    virtual void update(timestep ts) {}
+    virtual void update([[maybe_unused]] timestep ts) {}
 
 protected:
     constexpr explicit scriptable_entity(const entity entity) : entity(entity.get_id()) {}

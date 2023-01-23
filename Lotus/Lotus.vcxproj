@@ -220,6 +220,10 @@
     <ClInclude Include="src\Lotus\Core\Types.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Common.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Core.h" />
+    <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12GPass.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Helpers.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Interface.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Resources.h" />
@@ -245,6 +249,7 @@
     <ClCompile Include="src\Lotus\Core\Engine.cpp" />
     <ClCompile Include="src\Lotus\Core\EntryPoint.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Core.cpp" />
+    <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12GPass.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Helpers.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Interface.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Resources.cpp" />

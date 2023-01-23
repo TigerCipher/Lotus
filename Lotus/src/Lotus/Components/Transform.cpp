@@ -32,7 +32,7 @@ utl::vector<vec4> rotations;
 utl::vector<vec3> scales;
 } // namespace
 
-Component create(const create_info& info, entity::entity entity)
+component create(const create_info& info, entity::entity entity)
 {
     LASSERT(entity.is_valid());
     const id::id_type ent_index = id::index(entity.get_id());
@@ -50,10 +50,10 @@ Component create(const create_info& info, entity::entity entity)
         scales.emplace_back(info.scale);
     }
 
-    return Component(transform_id{(id::id_type) positions.size() - 1});
+    return component(transform_id{ entity.get_id() });
 }
 
-void remove(const Component comp)
+void remove([[maybe_unused]] const component comp)
 {
     LASSERT(comp.is_valid());
 }
@@ -66,17 +66,17 @@ void remove(const Component comp)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-vec3 Component::position() const
+vec3 component::position() const
 {
     LASSERT(is_valid());
     return positions[id::index(m_id)];
 }
-vec4 Component::rotation() const
+vec4 component::rotation() const
 {
     LASSERT(is_valid());
     return rotations[id::index(m_id)];
 }
-vec3 Component::scale() const
+vec3 component::scale() const
 {
     LASSERT(is_valid());
     return scales[id::index(m_id)];

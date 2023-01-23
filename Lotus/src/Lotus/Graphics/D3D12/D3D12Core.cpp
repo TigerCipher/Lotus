@@ -24,6 +24,8 @@
 
 #include "D3D12Surface.h"
 #include "D3D12Shaders.h"
+#include "D3D12GPass.h"
+
 
 namespace lotus::graphics::d3d12::core
 {
@@ -183,7 +185,7 @@ private:
 
 using surface_collection = utl::free_list<d3d12_surface>;
 
-constexpr D3D_FEATURE_LEVEL min_feature_level    = D3D_FEATURE_LEVEL_11_0;
+constexpr D3D_FEATURE_LEVEL min_feature_level = D3D_FEATURE_LEVEL_11_0;
 
 id3d12_device*     main_device  = nullptr;
 IDXGIFactory7*     dxgi_factory = nullptr;
@@ -345,7 +347,8 @@ bool initialize()
     if (!gfx_command.command_queue())
         return failed_init();
 
-    if (!shaders::initialize())
+    // Initialize various graphics api sub modules
+    if (!(shaders::initialize() && gpass::initialize()))
         return failed_init();
 
     NAME_D3D_OBJ(main_device, L"MAIN_DEVICE");
@@ -367,6 +370,8 @@ void shutdown()
         process_deferred_releases(i);
     }
 
+    // Shutdown the render submodules
+    gpass::shutdown();
     shaders::shutdown();
 
     release(dxgi_factory);
@@ -454,7 +459,7 @@ void remove_surface(surface_id id)
     surfaces.remove(id);
 }
 
-void resize_surface(surface_id id, u32 width, u32 height)
+void resize_surface(surface_id id, [[maybe_unused]] u32 width, [[maybe_unused]] u32 height)
 {
     gfx_command.flush();
     surfaces[id].resize();
