@@ -41,4 +41,11 @@ void set_size(vec2u size);
 void depth_prepass(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info);
 void render(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info);
 
+void add_transitions_depth_prepass(d3dx::d3d12_resource_barrier& barriers);
+void add_transitions_gpass(d3dx::d3d12_resource_barrier& barriers);
+void add_transitions_post_process(d3dx::d3d12_resource_barrier& barriers);
+
+void set_render_targets_depth_prepass(id3d12_graphics_command_list* cmd_list);
+void set_render_targets_gpass(id3d12_graphics_command_list* cmd_list);
+
 }

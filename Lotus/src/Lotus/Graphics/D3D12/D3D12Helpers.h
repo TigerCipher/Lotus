@@ -121,6 +121,73 @@ constexpr struct
     };
 } depth_state;
 
+class d3d12_resource_barrier
+{
+public:
+    constexpr static u32 max_resource_barriers{ 32 };
+
+    // Adds a transition barrier
+    constexpr void add(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after,
+                       D3D12_RESOURCE_BARRIER_FLAGS flags       = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+                       u32                          subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
+    {
+        LASSERT(resource);
+        LASSERT(m_offset < max_resource_barriers);
+        D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
+        barrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags                  = flags;
+        barrier.Transition.pResource   = resource;
+        barrier.Transition.StateBefore = before;
+        barrier.Transition.StateAfter  = after;
+        barrier.Transition.Subresource = subresource;
+
+        ++m_offset;
+    }
+
+    // Adds a UAV barrier
+    constexpr void add(ID3D12Resource* resource, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE)
+    {
+        LASSERT(resource);
+        LASSERT(m_offset < max_resource_barriers);
+        D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
+        barrier.Type  = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+        barrier.Flags = flags;
+        barrier.UAV.pResource = resource;
+
+        ++m_offset;
+    }
+
+    // Adds an aliasing barrier
+    constexpr void add(ID3D12Resource* resource_before, ID3D12Resource* resource_after, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE)
+    {
+        LASSERT(resource_before && resource_after);
+        LASSERT(m_offset < max_resource_barriers);
+        D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
+        barrier.Type          = D3D12_RESOURCE_BARRIER_TYPE_ALIASING;
+        barrier.Flags         = flags;
+        barrier.Aliasing.pResourceBefore = resource_before;
+        barrier.Aliasing.pResourceAfter = resource_after;
+
+        ++m_offset;
+    }
+
+    void apply(id3d12_graphics_command_list* cmd_list)
+    {
+        LASSERT(m_offset);
+        cmd_list->ResourceBarrier(m_offset, m_barriers);
+        m_offset = 0;
+    }
+
+private:
+    D3D12_RESOURCE_BARRIER m_barriers[max_resource_barriers]{};
+    u32                    m_offset{ 0 };
+};
+
+void transition_resource(id3d12_graphics_command_list* cmd_list, ID3D12Resource* resource, D3D12_RESOURCE_STATES before,
+                         D3D12_RESOURCE_STATES        after,
+                         D3D12_RESOURCE_BARRIER_FLAGS flags       = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+                         u32                          subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
+
 struct d3d12_descriptor_range : D3D12_DESCRIPTOR_RANGE1
 {
     constexpr explicit d3d12_descriptor_range(D3D12_DESCRIPTOR_RANGE_TYPE type, u32 descriptor_count,

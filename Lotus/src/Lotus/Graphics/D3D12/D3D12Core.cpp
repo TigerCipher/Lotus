@@ -137,11 +137,15 @@ public:
         DX_CALL(m_cmd_list->Reset(frame.cmd_allocator, nullptr));
     }
 
-    void end_frame()
+    void end_frame(const d3d12_surface& surface)
     {
         DX_CALL(m_cmd_list->Close());
         ID3D12CommandList* const cmd_lists[]{ m_cmd_list };
         m_cmd_queue->ExecuteCommandLists(_countof(cmd_lists), &cmd_lists[0]);
+
+        // Present swap chain buffers
+        surface.present();
+
         u64& fence_value = m_fence_value;
         ++fence_value;
         command_frame& frame = m_cmd_frames[m_frame_index];
@@ -187,10 +191,11 @@ using surface_collection = utl::free_list<d3d12_surface>;
 
 constexpr D3D_FEATURE_LEVEL min_feature_level = D3D_FEATURE_LEVEL_11_0;
 
-id3d12_device*     main_device  = nullptr;
-IDXGIFactory7*     dxgi_factory = nullptr;
-d3d12_command      gfx_command;
-surface_collection surfaces;
+id3d12_device*               main_device  = nullptr;
+IDXGIFactory7*               dxgi_factory = nullptr;
+d3d12_command                gfx_command;
+surface_collection           surfaces;
+d3dx::d3d12_resource_barrier resource_barriers{};
 
 descriptor_heap rtv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);         // render targets
 descriptor_heap dsv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);         // depth stencils
@@ -487,9 +492,46 @@ void render_surface(surface_id id)
     }
 
     const d3d12_surface& surface{ surfaces[id] };
-    surface.present();
 
-    gfx_command.end_frame();
+    ID3D12Resource* const current_back_buffer = surface.back_buffer();
+
+    d3d12_frame_info frame_info{ surface.width(), surface.height() };
+    gpass::set_size({ frame_info.surface_width, frame_info.surface_height });
+    d3dx::d3d12_resource_barrier& barriers{ resource_barriers };
+
+    // Commands
+
+    cmd_list->RSSetViewports(1, &surface.viewport());
+    cmd_list->RSSetScissorRects(1, &surface.scissor_rect());
+
+    // Depth prepass
+    gpass::add_transitions_depth_prepass(barriers);
+    barriers.apply(cmd_list);
+
+    gpass::set_render_targets_depth_prepass(cmd_list);
+    gpass::depth_prepass(cmd_list, frame_info);
+
+    // Geometry and lighting pass
+    gpass::add_transitions_gpass(barriers);
+    barriers.apply(cmd_list);
+    gpass::set_render_targets_gpass(cmd_list);
+    gpass::render(cmd_list, frame_info);
+
+    d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_PRESENT,
+                              D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+    // Post processing
+    gpass::add_transitions_post_process(barriers);
+    barriers.apply(cmd_list);
+
+
+    // After post processing
+    d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_RENDER_TARGET,
+                              D3D12_RESOURCE_STATE_PRESENT);
+
+    // End of commands
+
+    gfx_command.end_frame(surface);
 }
 
 } // namespace lotus::graphics::d3d12::core
