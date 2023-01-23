@@ -36,7 +36,11 @@ timer timer;
 
 graphics::render_surface surfaces[numWindows];
 
+bool is_restarting = false;
+
 void destroy_render_surface(graphics::render_surface& surface);
+bool test_initialize();
+void test_shutdown();
 
 LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -59,7 +63,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
             }
         }
 
-        if (all)
+        if (all && !is_restarting)
         {
             PostQuitMessage(0);
             return 0;
@@ -80,6 +84,11 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         {
             PostMessage(hwnd, WM_CLOSE, 0, 0);
             return 0;
+        } else if (wparam == VK_F11)
+        {
+            is_restarting = true;
+            test_shutdown();
+            test_initialize();
         }
 
     default: break;
@@ -104,15 +113,17 @@ void destroy_render_surface(graphics::render_surface& surface)
         platform::remove_window(temp.window.get_id());
 }
 
-bool EngineTest::Init()
+bool test_initialize()
 {
-    while(!compile_shaders())
+    while (!compile_shaders())
     {
-        if (MessageBox(nullptr, L"Failed to compile engine shaders", L"Shader Compilation Error", MB_RETRYCANCEL) != IDRETRY)
+        if (MessageBox(nullptr, L"Failed to compile engine shaders", L"Shader Compilation Error", MB_RETRYCANCEL) !=
+            IDRETRY)
             return false;
     }
 
-    if (!graphics::initialize(graphics::graphics_platform::d3d12)) return false;
+    if (!graphics::initialize(graphics::graphics_platform::d3d12))
+        return false;
 
     platform::window_create_info info[numWindows]{
         { &winproc, nullptr, L"Test Window 1", 100, 100, 400, 800 },
@@ -128,7 +139,23 @@ bool EngineTest::Init()
         create_render_surface(surfaces[i], info[i]);
     }
 
+    is_restarting = false;
     return true;
+}
+
+void test_shutdown()
+{
+    for (auto& s : surfaces)
+    {
+        destroy_render_surface(s);
+    }
+
+    graphics::shutdown();
+}
+
+bool EngineTest::Init()
+{
+    return test_initialize();
 }
 void EngineTest::Run()
 {
@@ -146,12 +173,7 @@ void EngineTest::Run()
 
 void EngineTest::Shutdown()
 {
-    for (auto& s : surfaces)
-    {
-        destroy_render_surface(s);
-    }
-
-    graphics::shutdown();
+    test_shutdown();
 }
 
 #endif

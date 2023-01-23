@@ -51,6 +51,7 @@ struct engine_shader
     {
         fullscreen_triangle_vs = 0,
         fillcolor_ps,
+        post_process_ps,
 
         count
     };

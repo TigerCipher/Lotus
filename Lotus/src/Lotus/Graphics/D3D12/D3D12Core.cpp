@@ -25,6 +25,7 @@
 #include "D3D12Surface.h"
 #include "D3D12Shaders.h"
 #include "D3D12GPass.h"
+#include "D3D12PostProcess.h"
 
 
 namespace lotus::graphics::d3d12::core
@@ -353,7 +354,7 @@ bool initialize()
         return failed_init();
 
     // Initialize various graphics api sub modules
-    if (!(shaders::initialize() && gpass::initialize()))
+    if (!(shaders::initialize() && gpass::initialize() && fx::initialize()))
         return failed_init();
 
     NAME_D3D_OBJ(main_device, L"MAIN_DEVICE");
@@ -376,6 +377,7 @@ void shutdown()
     }
 
     // Shutdown the render submodules
+    fx::shutdown();
     gpass::shutdown();
     shaders::shutdown();
 
@@ -500,11 +502,15 @@ void render_surface(surface_id id)
     d3dx::d3d12_resource_barrier& barriers{ resource_barriers };
 
     // Commands
+    ID3D12DescriptorHeap* const heaps[]{ srv_desc_heap.heap() };
+    cmd_list->SetDescriptorHeaps(1, &heaps[0]);
 
     cmd_list->RSSetViewports(1, &surface.viewport());
     cmd_list->RSSetScissorRects(1, &surface.scissor_rect());
 
     // Depth prepass
+//     barriers.add(current_back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET,
+//                  D3D12_RESOURCE_BARRIER_FLAG_BEGIN_ONLY);
     gpass::add_transitions_depth_prepass(barriers);
     barriers.apply(cmd_list);
 
@@ -521,9 +527,12 @@ void render_surface(surface_id id)
                               D3D12_RESOURCE_STATE_RENDER_TARGET);
 
     // Post processing
+//     barriers.add(current_back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET,
+//                  D3D12_RESOURCE_BARRIER_FLAG_END_ONLY);
     gpass::add_transitions_post_process(barriers);
     barriers.apply(cmd_list);
 
+    fx::post_process(cmd_list, surface.rtv());
 
     // After post processing
     d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_RENDER_TARGET,

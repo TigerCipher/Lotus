@@ -63,6 +63,13 @@ constexpr shader_file_info shader_files[]{
         engine_shader::fillcolor_ps,
         shader_type::pixel,
     },
+
+    {
+        "PostProcess.hlsl",
+        "PostProcessPS",
+        engine_shader::post_process_ps,
+        shader_type::pixel,
+    },
 };
 
 static_assert(_countof(shader_files) == engine_shader::count);

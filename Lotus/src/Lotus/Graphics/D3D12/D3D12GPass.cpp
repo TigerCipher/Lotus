@@ -225,4 +225,14 @@ void add_transitions_post_process(d3dx::d3d12_resource_barrier& barriers)
                  D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
+const d3d12_render_texture& main_buffer()
+{
+    return gpass_main_buffer;
+}
+
+const d3d12_depth_buffer& depth_buffer()
+{
+    return gpass_depth_buffer;
+}
+
 } // namespace lotus::graphics::d3d12::gpass

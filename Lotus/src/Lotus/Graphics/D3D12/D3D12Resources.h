@@ -36,10 +36,10 @@ struct descriptor_handle
     constexpr bool is_valid() const { return cpu.ptr != 0; }
     constexpr bool is_shader_visible() const { return gpu.ptr != 0; }
 
+    u32 index{ invalid_id_u32 };
 #ifdef L_DEBUG
     friend class descriptor_heap;
     descriptor_heap* container{ nullptr };
-    u32              index{ invalid_id_u32 };
 #endif
 };
 
@@ -95,11 +95,8 @@ class d3d12_texture
 {
 public:
     constexpr static u32 max_mips{ 14 }; // supports 16k resolution
-    d3d12_texture()  = default;
-    ~d3d12_texture()
-    {
-        release();
-    }
+    d3d12_texture() = default;
+    ~d3d12_texture() { release(); }
     explicit d3d12_texture(d3d12_texture_init_info info);
     DISABLE_COPY(d3d12_texture);
 
@@ -143,11 +140,8 @@ private:
 class d3d12_render_texture
 {
 public:
-    d3d12_render_texture()  = default;
-    ~d3d12_render_texture()
-    {
-        release();
-    }
+    d3d12_render_texture() = default;
+    ~d3d12_render_texture() { release(); }
     explicit d3d12_render_texture(d3d12_texture_init_info info);
     DISABLE_COPY(d3d12_render_texture);
 
@@ -174,7 +168,7 @@ public:
 
     void release();
 
-    constexpr u32 mip_count() const { return m_mip_count; }
+    constexpr u32                         mip_count() const { return m_mip_count; }
     constexpr D3D12_CPU_DESCRIPTOR_HANDLE rtv(u32 mip_idx) const
     {
         LASSERT(mip_idx < m_mip_count);
@@ -197,7 +191,7 @@ private:
 
     constexpr void move(d3d12_render_texture& o)
     {
-        m_texture = std::move(o.m_texture);
+        m_texture   = std::move(o.m_texture);
         m_mip_count = o.m_mip_count;
         for (u32 i = 0; i < m_mip_count; ++i)
         {
@@ -214,16 +208,12 @@ private:
 class d3d12_depth_buffer
 {
 public:
-    d3d12_depth_buffer()  = default;
-    ~d3d12_depth_buffer()
-    {
-        release();
-    }
+    d3d12_depth_buffer() = default;
+    ~d3d12_depth_buffer() { release(); }
     explicit d3d12_depth_buffer(d3d12_texture_init_info info);
     DISABLE_COPY(d3d12_depth_buffer);
 
-    constexpr d3d12_depth_buffer(d3d12_depth_buffer&& o) :
-        m_texture(std::move(o.m_texture)), m_dsv(o.m_dsv)
+    constexpr d3d12_depth_buffer(d3d12_depth_buffer&& o) : m_texture(std::move(o.m_texture)), m_dsv(o.m_dsv)
     {
         o.m_dsv = {};
     }
@@ -234,8 +224,8 @@ public:
         if (this != &o)
         {
             m_texture = std::move(o.m_texture);
-            m_dsv = o.m_dsv;
-            o.m_dsv = {};
+            m_dsv     = o.m_dsv;
+            o.m_dsv   = {};
         }
         return *this;
     }
@@ -243,11 +233,11 @@ public:
     void release();
 
     constexpr D3D12_CPU_DESCRIPTOR_HANDLE dsv() const { return m_dsv.cpu; }
-    constexpr descriptor_handle srv() const { return m_texture.srv(); }
-    constexpr ID3D12Resource*  const resource() const { return m_texture.resource(); }
+    constexpr descriptor_handle           srv() const { return m_texture.srv(); }
+    constexpr ID3D12Resource* const       resource() const { return m_texture.resource(); }
 
 private:
-    d3d12_texture m_texture{};
+    d3d12_texture     m_texture{};
     descriptor_handle m_dsv{};
 };
 

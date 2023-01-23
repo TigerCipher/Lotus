@@ -113,8 +113,8 @@ descriptor_handle descriptor_heap::allocate()
     {
         handle.gpu.ptr = m_gpu_start.ptr + offset;
     }
+    handle.index = index;
     L_DBG(handle.container = this);
-    L_DBG(handle.index = index);
     return handle;
 }
 
