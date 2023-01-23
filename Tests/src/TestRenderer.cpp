@@ -37,6 +37,7 @@ timer timer;
 graphics::render_surface surfaces[numWindows];
 
 bool is_restarting = false;
+bool resized       = false;
 
 void destroy_render_surface(graphics::render_surface& surface);
 bool test_initialize();
@@ -44,6 +45,8 @@ void test_shutdown();
 
 LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+    bool toggle_fullscreen = false;
+
     switch (msg)
     {
     case WM_DESTROY:
@@ -70,15 +73,11 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         }
     }
     break;
-
+    case WM_SIZE: resized = (wparam != SIZE_MINIMIZED); break;
     case WM_SYSCHAR:
+        toggle_fullscreen = (wparam == VK_RETURN && (HIWORD(lparam) & KF_ALTDOWN));
         if (wparam == VK_RETURN && (HIWORD(lparam) & KF_ALTDOWN))
-        {
-            platform::window win(platform::window_id{ (id::id_type) GetWindowLongPtr(hwnd, GWLP_USERDATA) });
-            win.set_fullscreen(!win.is_fullscreen());
-            return 0;
-        }
-        break;
+            break;
     case WM_KEYDOWN:
         if (wparam == VK_ESCAPE)
         {
@@ -92,6 +91,28 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         }
 
     default: break;
+    }
+
+    if ((resized && GetAsyncKeyState(VK_LBUTTON) >= 0) || toggle_fullscreen)
+    {
+        platform::window win{ platform::window_id{ (id::id_type) GetWindowLongPtr(hwnd, GWLP_USERDATA) } };
+        for (u32 i = 0; i < _countof(surfaces); ++i)
+        {
+            if (win.get_id() == surfaces[i].window.get_id())
+            {
+                if (toggle_fullscreen)
+                {
+                    win.set_fullscreen(!win.is_fullscreen());
+                    return 0;
+                } else
+                {
+                    surfaces[i].surface.resize(win.width(), win.height());
+
+                    resized = false;
+                }
+                break;
+            }
+        }
     }
 
     return DefWindowProc(hwnd, msg, wparam, lparam);

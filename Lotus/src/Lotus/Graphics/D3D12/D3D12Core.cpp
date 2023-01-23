@@ -509,8 +509,8 @@ void render_surface(surface_id id)
     cmd_list->RSSetScissorRects(1, &surface.scissor_rect());
 
     // Depth prepass
-//     barriers.add(current_back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET,
-//                  D3D12_RESOURCE_BARRIER_FLAG_BEGIN_ONLY);
+    barriers.add(current_back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET,
+                 D3D12_RESOURCE_BARRIER_FLAG_BEGIN_ONLY);
     gpass::add_transitions_depth_prepass(barriers);
     barriers.apply(cmd_list);
 
@@ -523,12 +523,9 @@ void render_surface(surface_id id)
     gpass::set_render_targets_gpass(cmd_list);
     gpass::render(cmd_list, frame_info);
 
-    d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_PRESENT,
-                              D3D12_RESOURCE_STATE_RENDER_TARGET);
-
     // Post processing
-//     barriers.add(current_back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET,
-//                  D3D12_RESOURCE_BARRIER_FLAG_END_ONLY);
+    barriers.add(current_back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET,
+                 D3D12_RESOURCE_BARRIER_FLAG_END_ONLY);
     gpass::add_transitions_post_process(barriers);
     barriers.apply(cmd_list);
 

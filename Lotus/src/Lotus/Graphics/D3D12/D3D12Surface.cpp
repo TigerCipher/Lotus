@@ -43,7 +43,8 @@ void d3d12_surface::create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue
     LASSERT(factory && cmd_queue);
     release();
 
-    if(SUCCEEDED(factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &m_allow_tearing, sizeof(u32))) && m_allow_tearing)
+    if (SUCCEEDED(factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &m_allow_tearing, sizeof(u32))) &&
+        m_allow_tearing)
     {
         m_present_flags = DXGI_PRESENT_ALLOW_TEARING;
     }
@@ -52,7 +53,7 @@ void d3d12_surface::create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue
 
     DXGI_SWAP_CHAIN_DESC1 desc{};
     desc.AlphaMode          = DXGI_ALPHA_MODE_UNSPECIFIED;
-    desc.BufferCount        = frame_buffer_count;
+    desc.BufferCount        = buffer_count;
     desc.BufferUsage        = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     desc.Flags              = m_allow_tearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
     desc.Format             = to_non_srgb(format);
@@ -88,7 +89,22 @@ void d3d12_surface::present() const
     m_current_backbuffer_index = m_swap_chan->GetCurrentBackBufferIndex();
 }
 
-void d3d12_surface::resize() {}
+void d3d12_surface::resize()
+{
+    LASSERT(m_swap_chan);
+    for (u32 i = 0; i < buffer_count; ++i)
+    {
+        core::release(m_render_target_data[i].resource);
+    }
+
+    const u32 flags = m_allow_tearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0ul;
+    DX_CALL(m_swap_chan->ResizeBuffers(buffer_count, 0, 0, DXGI_FORMAT_UNKNOWN, flags));
+    m_current_backbuffer_index = m_swap_chan->GetCurrentBackBufferIndex();
+
+    finalize();
+
+    L_DBG(OutputDebugStringA("===== D3D12 Surface Resized\n"));
+}
 
 void d3d12_surface::release()
 {
@@ -109,7 +125,7 @@ void d3d12_surface::finalize()
         LASSERT(!data.resource);
         DX_CALL(m_swap_chan->GetBuffer(i, IID_PPV_ARGS(&data.resource)));
         D3D12_RENDER_TARGET_VIEW_DESC desc{};
-        desc.Format = m_format;
+        desc.Format        = m_format;
         desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
         core::device()->CreateRenderTargetView(data.resource, &desc, data.rtv.cpu);
     }
@@ -129,4 +145,4 @@ void d3d12_surface::finalize()
 
     m_scissor_rect = { 0, 0, (s32) width, (s32) height };
 }
-}
+} // namespace lotus::graphics::d3d12
