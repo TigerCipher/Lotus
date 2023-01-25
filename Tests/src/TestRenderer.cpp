@@ -32,7 +32,7 @@ using namespace lotus;
 
 constexpr u32 numWindows = 4;
 
-timer timer;
+timer_lt timer;
 
 graphics::render_surface surfaces[numWindows];
 
@@ -181,7 +181,7 @@ bool EngineTest::Init()
 void EngineTest::Run()
 {
     timer.begin();
-    // std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     for (u32 i = 0; i < numWindows; ++i)
     {
         if (surfaces[i].surface.is_valid())

@@ -15,6 +15,7 @@ namespace LotusEditor.GameProject
 
         private readonly CubicEase _easing = new CubicEase() { EasingMode = EasingMode.EaseInOut };
 
+        public static bool GotoNewProjectTab { get; set; }
 
         public ProjectBrowserDialog()
         {
@@ -25,12 +26,17 @@ namespace LotusEditor.GameProject
         private void OnProjectBrowserDialogLoaded(object sender, RoutedEventArgs e)
         {
             Loaded -= OnProjectBrowserDialogLoaded;
-            if (!OpenProject.Projects.Any())
+            if (!OpenProject.Projects.Any() || GotoNewProjectTab)
             {
-                openProjectButton.IsEnabled = false;
-                openProjectView.Visibility = Visibility.Hidden;
+                if (!GotoNewProjectTab)
+                {
+                    openProjectButton.IsEnabled = false;
+                    openProjectView.Visibility = Visibility.Hidden;
+                }
                 OnToggleButton_Click(createProjectButton, new RoutedEventArgs());
             }
+
+            GotoNewProjectTab = false;
         }
 
         private void OnToggleButton_Click(object sender, RoutedEventArgs e)
@@ -66,9 +72,9 @@ namespace LotusEditor.GameProject
             highlightAnim.Completed += (s, e) =>
             {
                 var anim = new ThicknessAnimation(new Thickness(0), new Thickness(-1600, 0, 0, 0), new Duration(TimeSpan.FromSeconds(0.5)))
-                    {
-                        EasingFunction = _easing
-                    };
+                {
+                    EasingFunction = _easing
+                };
                 browserContent.BeginAnimation(MarginProperty, anim);
             };
             highlightRect.BeginAnimation(Canvas.LeftProperty, highlightAnim);
@@ -81,9 +87,9 @@ namespace LotusEditor.GameProject
             highlightAnim.Completed += (s, e) =>
             {
                 var anim = new ThicknessAnimation(new Thickness(-1600, 0, 0, 0), new Thickness(0), new Duration(TimeSpan.FromSeconds(0.5)))
-                    {
-                        EasingFunction = _easing
-                    };
+                {
+                    EasingFunction = _easing
+                };
                 browserContent.BeginAnimation(MarginProperty, anim);
             };
             highlightRect.BeginAnimation(Canvas.LeftProperty, highlightAnim);

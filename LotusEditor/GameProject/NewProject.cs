@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using LotusEditor.Utility;
 
@@ -38,7 +39,7 @@ namespace LotusEditor.GameProject
         // #TODO: Save last used path in a file so it gets set to that on the next launch. Or have it be a setting/preference the user can set?
         private string _path = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\LotusProjects\";
 
-        private ObservableCollection<ProjectTemplate> _projectTemplates = new();
+        private readonly ObservableCollection<ProjectTemplate> _projectTemplates = new();
 
         public ReadOnlyObservableCollection<ProjectTemplate> ProjectTemplates { get; }
 
@@ -138,40 +139,39 @@ namespace LotusEditor.GameProject
             var path = ProjectPath;
             if (!Path.EndsInDirectorySeparator(path)) path += @"\";
             path += $@"{ProjectName}\";
+            var nameRegex = new Regex(@"^[A-Za-z_][A-za-z0-9_]*$");
 
-            IsValid = true;
+            IsValid = false;
 
             if (string.IsNullOrWhiteSpace(ProjectName.Trim()))
             {
                 ErrorMessage = "You must supply a project name";
-                IsValid = false;
             }
 
-            if (ProjectName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+            else if (!nameRegex.IsMatch(ProjectName))
             {
                 ErrorMessage = "Invalid character(s) in project name!";
-                IsValid = false;
             }
 
-            if (string.IsNullOrWhiteSpace(ProjectPath.Trim()))
+            else if (string.IsNullOrWhiteSpace(ProjectPath.Trim()))
             {
                 ErrorMessage = "Select a valid project path";
-                IsValid = false;
             }
 
-            if (ProjectPath.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            else if (ProjectPath.IndexOfAny(Path.GetInvalidPathChars()) != -1)
             {
                 ErrorMessage = "Invalid character(s) in project path!";
-                IsValid = false;
             }
 
-            if (Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any())
+            else if (Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any())
             {
                 ErrorMessage = "The provided path already exists and is not empty";
-                IsValid = false;
             }
-
-            if (IsValid) ErrorMessage = string.Empty;
+            else
+            {
+                ErrorMessage = string.Empty;
+                IsValid = true;
+            }
 
             return IsValid;
         }
@@ -186,7 +186,7 @@ namespace LotusEditor.GameProject
 
             try
             {
-                if(!Directory.Exists(path)) Directory.CreateDirectory(path);
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 foreach (var folder in template.Folders!)
                 {
                     Directory.CreateDirectory(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path)!, folder)));
@@ -220,8 +220,10 @@ namespace LotusEditor.GameProject
             Debug.Assert(File.Exists(Path.Combine(template.TemplatePath, "MSVCSolution")));
             Debug.Assert(File.Exists(Path.Combine(template.TemplatePath, "MSVCProject")));
 
-            var engineApiPath = Path.Combine(MainWindow.LotusEngineSrcPath, @"Lotus\EngineApi\");
-            Debug.Assert(Directory.Exists(engineApiPath), engineApiPath);
+            // TODO Production build path will likely be $(LOTUS_ENGINE)includes\Lotus\EngineApi\
+            // Maybe a good idea to set up a pre/post build script that copies the current headers to includes folder?
+            var engineApiPath = @"$(LOTUS_ENGINE)Lotus\src\Lotus\EngineApi\";
+            //Debug.Assert(Directory.Exists(engineApiPath), engineApiPath);
 
             var _0 = ProjectName;
             var _1 = $"{{{Guid.NewGuid().ToString().ToUpper()}}}"; // proj guid
@@ -234,7 +236,7 @@ namespace LotusEditor.GameProject
 
             _2 = engineApiPath;
 
-            var _3 = MainWindow.LotusPath;
+            var _3 = @"$(LOTUS_ENGINE)";
 
             var proj = File.ReadAllText(Path.Combine(template.TemplatePath, "MSVCProject"));
             proj = string.Format(proj, _0, _1, _2, _3);

@@ -45,7 +45,7 @@ public:
     virtual void Shutdown() = 0;
 };
 
-class timer
+class timer_lt
 {
 public:
     using clock = std::chrono::high_resolution_clock;

@@ -15,6 +15,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using LotusEditor.Utility;
 using LotusEditor.GameProject;
+using System.Text.RegularExpressions;
 
 namespace LotusEditor.GameDev
 {
@@ -67,8 +68,9 @@ private:
 
         private static string GetNamespaceFromProject()
         {
-            var projName = Project.Current.Name;
+            var projName = Project.Current.Name.Trim();
             if (string.IsNullOrEmpty(projName)) return string.Empty;
+            projName = Regex.Replace(projName, @"[^A-Za-z0-9_]", "");
             projName = StringUtil.ReplaceWhitespace(projName, "_");
             return projName;
         }
@@ -88,13 +90,15 @@ private:
             var name = StringUtil.ReplaceWhitespace(scriptNameTextBox.Text.Trim(), "");
             var path = scriptPathTextBox.Text.Trim();
             var errMsg = string.Empty;
+            var nameRegex = new Regex(@"^[A-Za-z_][A-za-z0-9_]*$");
+
             var cppName = Path.GetFullPath(Path.Combine(Path.Combine(Project.Current.Path, path),
                 $"{name}.cpp"));
             var hName = Path.GetFullPath(Path.Combine(Path.Combine(Project.Current.Path, path),
                 $"{name}.h"));
 
             if (string.IsNullOrEmpty(name)) errMsg = "Give the script a name";
-            else if (name.IndexOfAny(Path.GetInvalidFileNameChars()) != -1 || name.Any(char.IsWhiteSpace))
+            else if (!nameRegex.IsMatch(name))
                 errMsg = "Invalid characters in the script name";
             else if (string.IsNullOrEmpty(path)) errMsg = "Select a valid folder for your scripts";
             else if (path.IndexOfAny(Path.GetInvalidPathChars()) != -1)

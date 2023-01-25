@@ -44,7 +44,7 @@
                   Margin="0,5,0,0">
                 <TextBlock Text="Path" Width="50" Style="{StaticResource LightTextBlockStyle}"/>
                 <TextBox Width="500" Text="{Binding ProjectPath, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Content="Browse" Width="60" Margin="-10,0,0,0"
+                <Button Content="Browse" Width="70" Margin="-20,0,0,0"
                 Click="Browse_Button_Click"/>
             </StackPanel>
 
