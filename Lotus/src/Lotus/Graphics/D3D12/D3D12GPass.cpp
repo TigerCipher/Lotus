@@ -106,6 +106,7 @@ bool create_buffers(vec2u size)
     NAME_D3D_OBJ(gpass_main_buffer.resource(), L"GPass Main Buffer");
     NAME_D3D_OBJ(gpass_depth_buffer.resource(), L"GPass Depth Buffer");
 
+
     return gpass_main_buffer.resource() && gpass_depth_buffer.resource();
 }
 
@@ -220,16 +221,20 @@ void set_render_targets_gpass(id3d12_graphics_command_list* cmd_list)
 
 void add_transitions_depth_prepass(d3dx::d3d12_resource_barrier& barriers)
 {
+    barriers.add(gpass_main_buffer.resource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+                 D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_BARRIER_FLAG_BEGIN_ONLY);
+
     barriers.add(gpass_depth_buffer.resource(),
                  D3D12_RESOURCE_STATE_DEPTH_READ | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
                      D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
                  D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
 }
 
 void add_transitions_gpass(d3dx::d3d12_resource_barrier& barriers)
 {
     barriers.add(gpass_main_buffer.resource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-                 D3D12_RESOURCE_STATE_RENDER_TARGET);
+                 D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_BARRIER_FLAG_END_ONLY);
 
     barriers.add(gpass_depth_buffer.resource(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
                  D3D12_RESOURCE_STATE_DEPTH_READ | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |

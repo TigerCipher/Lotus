@@ -307,6 +307,11 @@ bool initialize()
         dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
     }
 
+    #if 0
+        #pragma message("WARNING: GPU_based validation is enabled. This will considerably slow down the renderer!")
+    debug_interface->SetEnableGPUBasedValidation(1);
+    #endif
+
 #endif
 
     HRESULT hr = S_OK;
