@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 
+    <Color x:Key="Editor.Window.GrayColor0">#ff181818</Color>
+    <Color x:Key="Editor.Window.GrayColor01">#ff202020</Color>
     <Color x:Key="Editor.Window.GrayColor1">#ff282828</Color>
     <Color x:Key="Editor.Window.GrayColor2">#ff303030</Color>
     <Color x:Key="Editor.Window.GrayColor3">#ff393939</Color>
@@ -18,6 +20,8 @@
     <Color x:Key="Editor.Selected.BackgroundColor">#ff6565dd</Color>
 
 
+    <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor0}"        x:Key="Editor.Window.GrayBrush0"/>
+    <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor01}"        x:Key="Editor.Window.GrayBrush01"/>
     <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor1}"        x:Key="Editor.Window.GrayBrush1"/>
     <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor2}"        x:Key="Editor.Window.GrayBrush2"/>
     <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor3}"        x:Key="Editor.Window.GrayBrush3"/>
