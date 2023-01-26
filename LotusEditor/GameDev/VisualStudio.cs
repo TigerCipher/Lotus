@@ -231,13 +231,13 @@ namespace LotusEditor.GameDev
 
             CallOnSTAThread(() =>
             {
-                _vsInstance.MainWindow.Visible = showWindow;
                 if (!_vsInstance.Solution.IsOpen)
                 {
                     Logger.Info($"Opening Visual Studio solution {project.SolutionName}");
                     _vsInstance.Solution.Open(project.SolutionName);
                 }
 
+                _vsInstance.MainWindow.Visible = showWindow;
                 _vsInstance.Events.BuildEvents.OnBuildProjConfigBegin += OnBuildBegin;
                 _vsInstance.Events.BuildEvents.OnBuildProjConfigDone += OnBuildDone;
             });

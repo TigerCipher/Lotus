@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
@@ -57,7 +58,7 @@ namespace LotusEditor.Utility
         {
             FilteredMessages.Filter += (sender, args) =>
             {
-                var level = (int)(args.Item as LogMessage).MsgLevel;
+                var level = (int)((LogMessage)args.Item).MsgLevel;
                 args.Accepted = (level & _messageFilter) != 0;
             };
 
@@ -93,6 +94,10 @@ namespace LotusEditor.Utility
         {
             await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
+                Debug.WriteLine("=============== INFO LOG =========================");
+                Debug.WriteLine($"====== File: {file} at line {line}");
+                Debug.WriteLine($"====== Caller: {caller}");
+                Debug.WriteLine($"====== Msg: {msg}");
                 _messages.Add(new LogMessage(Level.Info, msg, file, caller, line));
             }));
         }
@@ -102,6 +107,10 @@ namespace LotusEditor.Utility
         {
             await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
+                Debug.WriteLine("=============== WARN LOG =========================");
+                Debug.WriteLine($"====== File: {file} at line {line}");
+                Debug.WriteLine($"====== Caller: {caller}");
+                Debug.WriteLine($"====== Msg: {msg}");
                 _messages.Add(new LogMessage(Level.Warning, msg, file, caller, line));
             }));
         }
@@ -111,6 +120,10 @@ namespace LotusEditor.Utility
         {
             await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
+                Debug.WriteLine("=============== ERROR LOG =========================");
+                Debug.WriteLine($"====== File: {file} at line {line}");
+                Debug.WriteLine($"====== Caller: {caller}");
+                Debug.WriteLine($"====== Msg: {msg}");
                 _messages.Add(new LogMessage(Level.Error, msg, file, caller, line));
             }));
         }
