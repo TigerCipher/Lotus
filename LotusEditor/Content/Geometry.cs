@@ -220,7 +220,7 @@ namespace LotusEditor.Content
                 {
                     Debug.Assert(lodGroup.LODS.Any());
                     // use name of highest detail mesh
-                    var meshName = path + fileName + "_" + lodGroup.LODS[0].Name + AssetFileExtension;
+                    var meshName = ContentUtil.FixFilename(path + fileName + "_" + lodGroup.LODS[0].Name + AssetFileExtension);
                     Guid = Guid.NewGuid(); // need dif id for each asset file
                     Logger.Info($"Saving mesh with highest lod with name {lodGroup.LODS[0].Name} and guid {Guid.ToString()}");
                     byte[] data = null;
@@ -255,22 +255,22 @@ namespace LotusEditor.Content
                     }
 
                     savedFiles.Add(meshName);
+                    Logger.Info($"Geometry asset [{meshName}] successfully saved!");
                 }
             }
             catch (Exception e)
             {
                 Debug.Write(e.Message);
-                Logger.Error($"Failed to save geometry asset to {file}");
+                Logger.Error($"Failed to save geometry asset to {fileName}");
             }
 
-            Logger.Info($"{fileName} successfully saved!");
             return savedFiles;
         }
 
         private byte[] GenerateIcon(MeshLOD lod)
         {
             Logger.Info("Generating asset icon");
-            var width = 90 * 4; // 90 pixels * 4, so 4x sampling
+            const int width = 90 * 4; // 90 pixels * 4, so 4x sampling
             BitmapSource bmp = null;
 
             Application.Current.Dispatcher.Invoke(() =>

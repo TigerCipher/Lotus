@@ -4,10 +4,90 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LotusEditor.Content"
-             Background="Red"
+             d:DataContext="{d:DesignInstance Type=local:AssetBrowser}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+
+    <UserControl.Resources>
+        <Style x:Key="SmallIconStyle" TargetType="{x:Type Image}">
+            <Setter Property="Source" Value="{Binding IconSmall}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsDirectory}" Value="True">
+                    <Setter Property="Source" Value="pack://application:,,,/Resources/AssetBrowser/FolderSmall.png"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="LargeIconStyle" TargetType="{x:Type Image}">
+            <Setter Property="Source" Value="{Binding Icon}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsDirectory}" Value="True">
+                    <Setter Property="Source" Value="pack://application:,,,/Resources/AssetBrowser/FolderLarge.png"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <GridView x:Key="gridView">
+
+            <!-- Icon/File Name-->
+            <GridViewColumn>
+                <GridViewColumn.Header>
+                    <GridViewColumnHeader Tag="FileName" Content="Name"/>
+                </GridViewColumn.Header>
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <Image Style="{StaticResource SmallIconStyle}" Width="18" Margin="5, 0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding FileName}" Margin="5,2,0,2" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
+            <!-- Date Modified -->
+            <GridViewColumn>
+                <GridViewColumn.Header>
+                    <GridViewColumnHeader Tag="DateModified" Content="Date Modified"/>
+                </GridViewColumn.Header>
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <TextBlock Text="{Binding DateModified, StringFormat=MM/dd/yy HH:mm:ss}" Margin="5,2,0,2" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
+            <!-- File Size -->
+            <GridViewColumn>
+                <GridViewColumn.Header>
+                    <GridViewColumnHeader Tag="FileSize" Content="Size"/>
+                </GridViewColumn.Header>
+            </GridViewColumn>
+
+        </GridView>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource Editor.Window.GrayBrush2}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <ListView ItemsSource="{Binding FolderAssets}" Grid.Row="1" x:Name="folderListView" IsTextSearchEnabled="True" TextSearch.TextPath="FileName">
+            <ListView.Style>
+                <Style TargetType="{x:Type ListView}">
+                    <Setter Property="Background" Value="{StaticResource Editor.Window.GrayBrush2}"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="View" Value="{StaticResource gridView}"/>
+                </Style>
+            </ListView.Style>
+        </ListView>
+
+        <Border Background="{StaticResource Editor.Window.GrayBrush3}" VerticalAlignment="Top">
+            <Border.Effect>
+                <DropShadowEffect Opacity="0.3" BlurRadius="10" ShadowDepth="0"/>
+            </Border.Effect>
+            <TextBlock Text="LOTUS ASSET BROWSER (TODO: File Explorer-esc bar up here)" Margin="5" Height="32" Foreground="{StaticResource Editor.FontColorBrush}"/>
+        </Border>
+
     </Grid>
 </UserControl>

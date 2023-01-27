@@ -62,10 +62,12 @@ namespace LotusEditor.Content
                 using var reader = new BinaryReader(res.Stream);
                 var data = reader.ReadBytes((int)res.Stream.Length);
                 var imageRes = (BitmapSource)new ImageSourceConverter().ConvertFrom(data);
-                imageRes.Freeze();
-                var brush = new ImageBrush(imageRes);
-                brush.Transform = new ScaleTransform(1, -1, 0.5, 0.5);
-                brush.ViewportUnits = BrushMappingMode.Absolute;
+                imageRes?.Freeze();
+                var brush = new ImageBrush(imageRes)
+                {
+                    Transform = new ScaleTransform(1, -1, 0.5, 0.5),
+                    ViewportUnits = BrushMappingMode.Absolute
+                };
                 brush.Freeze();
                 _textures.Add(brush);
             }
@@ -156,8 +158,9 @@ namespace LotusEditor.Content
             if (dlg.ShowDialog() == true)
             {
                 Debug.Assert(!string.IsNullOrEmpty(dlg.FileName));
-                Logger.Info($"Saving asset file to {dlg.FileName}");
+                // Logger.Info($"Saving asset file to {dlg.FileName}");
                 var asset = (DataContext as IAssetEditor).Asset;
+                Debug.Assert(asset != null);
                 asset.Save(dlg.FileName);
             }
         }

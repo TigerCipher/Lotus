@@ -4,9 +4,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using LotusEditor.Utility;
 
@@ -16,6 +13,8 @@ namespace LotusEditor.Content
     {
         private static readonly Dictionary<string, AssetInfo> _assetDictionary = new();
         private static readonly ObservableCollection<AssetInfo> _assets = new();
+
+        public static ReadOnlyObservableCollection<AssetInfo> Assets { get; } = new(_assets);
 
         private static readonly FileSystemWatcher _assetsWatcher = new()
         {
@@ -27,7 +26,6 @@ namespace LotusEditor.Content
                            NotifyFilters.LastWrite
         };
 
-        public static ReadOnlyObservableCollection<AssetInfo> Assets { get; } = new(_assets);
 
         private static readonly DelayEventTimer _refreshTimer = new(TimeSpan.FromMilliseconds(250));
 
@@ -57,7 +55,7 @@ namespace LotusEditor.Content
                     RegisterAsset(eventArgs.FullPath);
                     if (eventArgs.ChangeType == WatcherChangeTypes.Renamed)
                     {
-                        _assetDictionary.Keys.Where(key => !File.Exists(key)).ToList().ForEach(file => UnregisterAsset(file));
+                        _assetDictionary.Keys.Where(key => !File.Exists(key)).ToList().ForEach(UnregisterAsset);
                     }
                 }
             }
@@ -74,6 +72,10 @@ namespace LotusEditor.Content
 
         private static async void OnAssetModified(object sender, FileSystemEventArgs e)
         {
+            Debug.WriteLine("File system event occurred:");
+            Debug.WriteLine($"========= File modified: {e.FullPath}");
+            WatcherChangeTypes wct = e.ChangeType;
+            Debug.WriteLine($"Change type: {wct.ToString()}");
             if (Path.GetExtension(e.FullPath) != Asset.AssetFileExtension) return;
 
             await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
@@ -113,27 +115,30 @@ namespace LotusEditor.Content
                     RegisterAsset(entry);
                 }
             }
-            throw new NotImplementedException();
         }
 
 
         private static void RegisterAsset(string file)
         {
+            Debug.Assert(File.Exists(file), $"Asset File: {file}");
             try
             {
                 var fileInfo = new FileInfo(file);
-                if (_assetDictionary.ContainsKey(file) &&
-                    !_assetDictionary[file].RegisterTime.IsOlder(fileInfo.LastWriteTime)) return;
+                if (!_assetDictionary.ContainsKey(file) ||
+                    _assetDictionary[file].RegisterTime.IsOlder(fileInfo.LastWriteTime))
+                {
+                    var info = Asset.GetAssetInfo(file);
+                    Debug.Assert(info != null);
 
-                var info = Asset.GetAssetInfo(file);
-                Debug.Assert(info != null);
+                    info.RegisterTime = DateTime.Now;
 
-                info.RegisterTime = DateTime.Now;
+                    _assetDictionary[file] = info;
+                    Debug.Assert(_assetDictionary.ContainsKey(file));
+                    _assets.Add(_assetDictionary[file]);
+                    Logger.Info($"Registered asset: [{file}]");
+                }
 
-                _assetDictionary[file] = info;
-                Debug.Assert(_assetDictionary.ContainsKey(file));
-                _assets.Add(_assetDictionary[file]);
-                Logger.Info($"Registered asset: [{file}]");
+
             }
             catch (Exception ex)
             {

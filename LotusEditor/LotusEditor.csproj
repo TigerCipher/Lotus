@@ -29,11 +29,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\AssetBrowser\FolderLarge.png" />
+    <None Remove="Resources\AssetBrowser\FolderSmall.png" />
+    <None Remove="Resources\AssetBrowser\ListView.png" />
+    <None Remove="Resources\AssetBrowser\TileView.png" />
     <None Remove="Resources\PrimitiveMeshView\Checkermap.png" />
     <None Remove="Resources\PrimitiveMeshView\PlaneTexture.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\AssetBrowser\FolderLarge.png" />
+    <Resource Include="Resources\AssetBrowser\FolderSmall.png" />
+    <Resource Include="Resources\AssetBrowser\ListView.png" />
+    <Resource Include="Resources\AssetBrowser\TileView.png" />
     <Resource Include="Resources\PrimitiveMeshView\Checkermap.png" />
     <Resource Include="Resources\PrimitiveMeshView\PlaneTexture.png" />
   </ItemGroup>
