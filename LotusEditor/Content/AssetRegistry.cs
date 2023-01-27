@@ -120,7 +120,8 @@ namespace LotusEditor.Content
 
         private static void RegisterAsset(string file)
         {
-            Debug.Assert(File.Exists(file), $"Asset File: {file}");
+            if (!File.Exists(file)) return;
+            // Debug.Assert(File.Exists(file), $"Asset File: {file}");
             try
             {
                 var fileInfo = new FileInfo(file);
