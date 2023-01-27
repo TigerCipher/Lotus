@@ -1,17 +1,100 @@
 ﻿
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-
+using System.Windows.Data;
 using System.Windows.Input;
 
 using LotusEditor.GameProject;
 
 namespace LotusEditor.Content
 {
+
+    // Much of this due to JLRishe from a StackOverflow post back in 2013
+    class DataSizeToStringConverter : IValueConverter
+    {
+        static readonly string[] _sizeSuffixes =
+                   { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+
+        static string SizeSuffix(long value, int decimalPlaces = 1)
+        {
+            if (value <= 0 || decimalPlaces < 0) return string.Empty;
+
+            // mag is 0 for bytes, 1 for KB, 2, for MB, etc.
+            var mag = (int)Math.Log(value, 1024);
+
+            // 1L << (mag * 10) == 2 ^ (10 * mag) 
+            // [i.e. the number of bytes in the unit corresponding to mag]
+            var adjustedSize = (decimal)value / (1L << (mag * 10));
+
+            // make adjustment when the value is large enough that
+            // it would round up to 1000 or more
+            if (Math.Round(adjustedSize, decimalPlaces) >= 1000)
+            {
+                mag += 1;
+                adjustedSize /= 1024;
+            }
+
+            return string.Format("{0:n" + decimalPlaces + "} {1}", adjustedSize, _sizeSuffixes[mag]);
+        }
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is long size ? SizeSuffix(size, 0) : null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    // Taken from MS Docs
+    class PlainView : ViewBase
+    {
+        public static readonly DependencyProperty ItemContainerStyleProperty =
+          ItemsControl.ItemContainerStyleProperty.AddOwner(typeof(PlainView));
+
+        public Style ItemContainerStyle
+        {
+            get => (Style)GetValue(ItemContainerStyleProperty);
+            set => SetValue(ItemContainerStyleProperty, value);
+        }
+
+        public static readonly DependencyProperty ItemTemplateProperty =
+            ItemsControl.ItemTemplateProperty.AddOwner(typeof(PlainView));
+
+        public DataTemplate ItemTemplate
+        {
+            get => (DataTemplate)GetValue(ItemTemplateProperty);
+            set => SetValue(ItemTemplateProperty, value);
+        }
+
+        public static readonly DependencyProperty ItemWidthProperty =
+            WrapPanel.ItemWidthProperty.AddOwner(typeof(PlainView));
+
+        public double ItemWidth
+        {
+            get => (double)GetValue(ItemWidthProperty);
+            set => SetValue(ItemWidthProperty, value);
+        }
+
+        public static readonly DependencyProperty ItemHeightProperty =
+            WrapPanel.ItemHeightProperty.AddOwner(typeof(PlainView));
+
+        public double ItemHeight
+        {
+            get => (double)GetValue(ItemHeightProperty);
+            set => SetValue(ItemHeightProperty, value);
+        }
+
+        protected override object DefaultStyleKey => new ComponentResourceKey(GetType(), "PlainViewResourceId");
+    }
+
     /// <summary>
     /// Interaction logic for AssetBrowserView.xaml
     /// </summary>
@@ -40,7 +123,7 @@ namespace LotusEditor.Content
             folderListView.AddHandler(Thumb.DragDeltaEvent, new DragDeltaEventHandler(Thumb_DragDelta), true);
 
             folderListView.Items.SortDescriptions.Add(new SortDescription(_sortedProperty, _sortDirection));
-            
+
         }
 
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -50,7 +133,8 @@ namespace LotusEditor.Content
                 if (header.Column.ActualWidth < 50)
                 {
                     header.Column.Width = 50;
-                }else if (header.Column.ActualWidth > 250)
+                }
+                else if (header.Column.ActualWidth > 250)
                 {
                     header.Column.Width = 250;
                 }
@@ -115,7 +199,8 @@ namespace LotusEditor.Content
 
         private void OnGridViewColumnHeader_Click(object sender, RoutedEventArgs e)
         {
-            var column = sender as GridViewColumnHeader;
+            if (sender is not GridViewColumnHeader column) return;
+            if(column.Tag == null) return;
             var sortBy = column.Tag.ToString();
 
             folderListView.Items.SortDescriptions.Clear();
@@ -130,7 +215,6 @@ namespace LotusEditor.Content
             _sortedProperty = sortBy;
 
             folderListView.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
-            
         }
 
         private void OnContent_Item_MouseDoubleClick(object sender, MouseButtonEventArgs e)

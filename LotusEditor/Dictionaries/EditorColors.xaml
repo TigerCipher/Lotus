@@ -18,10 +18,12 @@
     <Color x:Key="Editor.YellowColor">#fff2c754</Color>
     <!-- <Color x:Key="Editor.Selected.BackgroundColor">#ffc52525</Color> -->
     <Color x:Key="Editor.Selected.BackgroundColor">#ff6565dd</Color>
+    <Color x:Key="Editor.MouseOver.BorderColor">#ff7eb4ea</Color>
+
 
 
     <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor0}"        x:Key="Editor.Window.GrayBrush0"/>
-    <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor01}"        x:Key="Editor.Window.GrayBrush01"/>
+    <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor01}"       x:Key="Editor.Window.GrayBrush01"/>
     <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor1}"        x:Key="Editor.Window.GrayBrush1"/>
     <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor2}"        x:Key="Editor.Window.GrayBrush2"/>
     <SolidColorBrush Color="{StaticResource Editor.Window.GrayColor3}"        x:Key="Editor.Window.GrayBrush3"/>
@@ -36,5 +38,6 @@
     <SolidColorBrush Color="{StaticResource Editor.BlueColor}"                x:Key="Editor.BlueBrush"                    />
     <SolidColorBrush Color="{StaticResource Editor.YellowColor}"              x:Key="Editor.YellowBrush"                  />
     <SolidColorBrush Color="{StaticResource Editor.Selected.BackgroundColor}" x:Key="Editor.Selected.BackgroundColorBrush"/>
+    <SolidColorBrush Color="{StaticResource Editor.MouseOver.BorderColor}"    x:Key="Editor.MouseOver.BorderBrush"        />
 
 </ResourceDictionary>
