@@ -303,7 +303,7 @@
             <DockPanel>
                 <DockPanel Margin="5" DockPanel.Dock="Top">
                     <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ListViewToggleButtonStyle}" x:Name="listViewToggle"/>
-                    <TextBlock/>
+                    <TextBox/>
                 <!-- <TextBlock DockPanel.Dock="Top" Text="ASSET BROWSER" Margin="5" Height="32" Foreground="{StaticResource Editor.FontColorBrush}"/> -->
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" x:Name="pathStack" Margin="0,0,0,5">
