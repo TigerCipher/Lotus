@@ -16,50 +16,7 @@ namespace LotusEditor.Content
 
         public static ReadOnlyObservableCollection<AssetInfo> Assets { get; } = new(_assets);
 
-        private static readonly FileSystemWatcher _assetsWatcher = new()
-        {
-            IncludeSubdirectories = true,
-            Filter = "",
-            NotifyFilter = NotifyFilters.CreationTime |
-                           NotifyFilters.DirectoryName |
-                           NotifyFilters.FileName |
-                           NotifyFilters.LastWrite
-        };
 
-
-        private static readonly DelayEventTimer _refreshTimer = new(TimeSpan.FromMilliseconds(250));
-
-
-        static AssetRegistry()
-        {
-            _assetsWatcher.Changed += OnAssetModified;
-            _assetsWatcher.Created += OnAssetModified;
-            _assetsWatcher.Deleted += OnAssetModified;
-            _assetsWatcher.Renamed += OnAssetModified;
-
-            _refreshTimer.Triggered += Refresh;
-        }
-
-        private static void Refresh(object sender, DelayEventTimerArgs e)
-        {
-            foreach (var item in e.Data)
-            {
-                if (item is not FileSystemEventArgs eventArgs) continue;
-
-                if (eventArgs.ChangeType == WatcherChangeTypes.Deleted)
-                {
-                    UnregisterAsset(eventArgs.FullPath);
-                }
-                else
-                {
-                    RegisterAsset(eventArgs.FullPath);
-                    if (eventArgs.ChangeType == WatcherChangeTypes.Renamed)
-                    {
-                        _assetDictionary.Keys.Where(key => !File.Exists(key)).ToList().ForEach(UnregisterAsset);
-                    }
-                }
-            }
-        }
 
         private static void UnregisterAsset(string file)
         {
@@ -70,35 +27,30 @@ namespace LotusEditor.Content
             Logger.Info($"Unregistered asset: [{file}]");
         }
 
-        private static async void OnAssetModified(object sender, FileSystemEventArgs e)
+        private static async void OnAssetModified(object sender, ContentModifiedEventArgs e)
         {
-            Debug.WriteLine("File system event occurred:");
-            Debug.WriteLine($"========= File modified: {e.FullPath}");
-            WatcherChangeTypes wct = e.ChangeType;
-            Debug.WriteLine($"Change type: {wct.ToString()}");
-            if (Path.GetExtension(e.FullPath) != Asset.AssetFileExtension) return;
-
-            await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            if (ContentUtil.IsDirectory(e.FullPath))
             {
-                _refreshTimer.Trigger(e);
-            }));
-        }
+                RegisterAllAssets(e.FullPath);
+            }
+            else if (File.Exists(e.FullPath))
+            {
+                RegisterAsset(e.FullPath);
+            }
 
-
-        public static void Clear()
-        {
-            _assetsWatcher.EnableRaisingEvents = false;
-            _assetDictionary.Clear();
-            _assets.Clear();
+            _assets.Where(x => !File.Exists(x.FullPath)).ToList().ForEach(x => UnregisterAsset(x.FullPath));
         }
 
         public static void Reset(string assetsFolder)
         {
-            Clear();
+            ContentWatcher.ContentModified -= OnAssetModified;
+
+            _assetDictionary.Clear();
+            _assets.Clear();
             Debug.Assert(Directory.Exists(assetsFolder));
             RegisterAllAssets(assetsFolder);
-            _assetsWatcher.Path = assetsFolder;
-            _assetsWatcher.EnableRaisingEvents = true;
+
+            ContentWatcher.ContentModified += OnAssetModified;
         }
 
         private static void RegisterAllAssets(string assetsFolder)
@@ -120,8 +72,8 @@ namespace LotusEditor.Content
 
         private static void RegisterAsset(string file)
         {
-            if (!File.Exists(file)) return;
-            // Debug.Assert(File.Exists(file), $"Asset File: {file}");
+            // if (!File.Exists(file)) return;
+            Debug.Assert(File.Exists(file), $"Asset File: {file}");
             try
             {
                 var fileInfo = new FileInfo(file);

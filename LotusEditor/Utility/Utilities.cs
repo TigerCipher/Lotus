@@ -181,5 +181,7 @@ namespace LotusEditor.Utility
                 return false;
             }
         }
+
+        public static bool IsDirectory(this FileInfo info) => info.Attributes.HasFlag(FileAttributes.Directory);
     }
 }

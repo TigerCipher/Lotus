@@ -55,7 +55,7 @@
                 <MenuItem Header="Undo Selection" Command="{Binding UndoSelectionCmd}"/>
                 <MenuItem Header="Redo Selection" Command="{Binding RedoSelectionCmd}"/>
             </MenuItem>
-            <MenuItem Header="View"/>
+            <MenuItem Header="View" Template="{DynamicResource FinalSubMenuItemTemplate}"/>
             <MenuItem Header="Window"/>
             <MenuItem Header="Create" IsEnabled="False">
             </MenuItem>

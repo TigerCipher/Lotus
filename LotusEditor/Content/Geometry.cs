@@ -121,7 +121,7 @@ namespace LotusEditor.Content
             // lods
             var numLodGroups = reader.ReadInt32();
             Debug.Assert(numLodGroups > 0);
-            for (int i = 0; i < numLodGroups; ++i)
+            for (var i = 0; i < numLodGroups; ++i)
             {
                 s = reader.ReadInt32();
                 string lodGroupName;
@@ -149,7 +149,7 @@ namespace LotusEditor.Content
         {
             var lodIds = new List<int>();
             var lodList = new List<MeshLOD>();
-            for (int i = 0; i < numMeshes; i++)
+            for (var i = 0; i < numMeshes; i++)
             {
                 ReadMeshes(reader, lodIds, lodList);
             }
@@ -238,7 +238,7 @@ namespace LotusEditor.Content
 
                         Logger.Info("Computing hash");
                         Hash = ContentUtil.ComputeHash(hashes.ToArray());
-                        data = (writer.BaseStream as MemoryStream).ToArray();
+                        data = (writer.BaseStream as MemoryStream)?.ToArray();
                         Icon = GenerateIcon(lodGroup.LODS[0]);
                     }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,11 +43,6 @@ namespace LotusEditor.Editors
             new NewScriptDialog().ShowDialog();
         }
 
-        private void Build_OnButtonClick(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
         private void OnCreatePrimitiveMesh_Button_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new PrimitiveMeshDialog();
@@ -57,6 +53,7 @@ namespace LotusEditor.Editors
         {
             ProjectBrowserDialog.GotoNewProjectTab = true;
             Project.Current?.Unload();
+            Debug.Assert(Application.Current.MainWindow != null, "Application.Current.MainWindow != null");
             Application.Current.MainWindow.DataContext = null;
             Application.Current.MainWindow.Close();
         }
@@ -64,6 +61,7 @@ namespace LotusEditor.Editors
         private void OnOpenProject(object sender, ExecutedRoutedEventArgs e)
         {
             Project.Current?.Unload();
+            Debug.Assert(Application.Current.MainWindow != null, "Application.Current.MainWindow != null");
             Application.Current.MainWindow.DataContext = null;
             Application.Current.MainWindow.Close();
         }
@@ -71,7 +69,7 @@ namespace LotusEditor.Editors
         private void OnCloseEditor(object sender, ExecutedRoutedEventArgs e)
         {
             // TODO: If unsaved project, prompt to save
-            Application.Current.MainWindow.Close();
+            Application.Current.MainWindow?.Close();
         }
     }
 }

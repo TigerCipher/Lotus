@@ -924,18 +924,18 @@
                                     <ContentPresenter x:Name="Icon" ContentSource="Icon" 
                                                           SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" VerticalAlignment="Center"
                                                           HorizontalAlignment="Center" Width="16" Height="16" Margin="3"/>
-                                    <Path x:Name="GlyphPanel" Data="F1 M 10.0,1.2 L 4.7,9.1 L 4.5,9.1 L 0,5.2 L 1.3,3.5 L 4.3,6.1L 8.3,0 L 10.0,1.2 Z" FlowDirection="LeftToRight" Margin="3"
-                                              Visibility="Collapsed" VerticalAlignment="Center" Fill="{TemplateBinding Control.Foreground}"/>
+                                    <Path Grid.Column="0" x:Name="GlyphPanel" Data="F1 M 10.0,1.2 L 4.7,9.1 L 4.5,9.1 L 0,5.2 L 1.3,3.5 L 4.3,6.1L 8.3,0 L 10.0,1.2 Z" FlowDirection="LeftToRight" Margin="3"
+                                          Visibility="Collapsed" VerticalAlignment="Center" Fill="{TemplateBinding Control.Foreground}"/>
                                     <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="true"
                                                           Margin="{TemplateBinding Control.Padding}"
                                                           SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"/>
 
                                     <!-- The popup menu bit. This is where the good stuff is :)))) idk where the header goes but eh -->
-                                    <Popup x:Name="PART_Popup" AllowsTransparency="true" Focusable="false" 
-                                                   PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" 
-                                                   Placement="Bottom"
-                                                   IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" 
-                                                   PlacementTarget="{Binding ElementName=templateRoot}">
+                                    <Popup Grid.Column="0" x:Name="PART_Popup" AllowsTransparency="true" Focusable="false" 
+                                           PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" 
+                                           Placement="Bottom"
+                                           IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" 
+                                           PlacementTarget="{Binding ElementName=templateRoot}">
 
                                         <Border x:Name="SubMenuBorder" Background="#1b1b1c" BorderBrush="#333337"
                                                     BorderThickness="1" Padding="2">
@@ -1007,7 +1007,7 @@
                     <ColumnDefinition Width="20"/>
                 </Grid.ColumnDefinitions>
                 <ContentPresenter x:Name="Icon" Content="{TemplateBinding Icon}" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center" Width="16"/>
-                <Border x:Name="GlyphPanel" Background="#1b1b1c" BorderBrush="#333337" BorderThickness="1" Height="22" Margin="-1,0,0,0" Visibility="Hidden" VerticalAlignment="Center" Width="22">
+                <Border Grid.Column="0" x:Name="GlyphPanel" Background="#1b1b1c" BorderBrush="#333337" BorderThickness="1" Height="22" Margin="-1,0,0,0" Visibility="Hidden" VerticalAlignment="Center" Width="22">
                     <Path x:Name="Glyph" Data="F1M10,1.2L4.7,9.1 4.5,9.1 0,5.2 1.3,3.5 4.3,6.1 8.3,0 10,1.2z" Fill="#FF212121" FlowDirection="LeftToRight" Height="11" Width="9"/>
                 </Border>
                 <ContentPresenter ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" Grid.Column="2" ContentStringFormat="{TemplateBinding HeaderStringFormat}" ContentSource="Header" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
