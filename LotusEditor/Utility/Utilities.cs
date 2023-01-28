@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Microsoft.VisualBasic;
 
 namespace LotusEditor.Utility
 {
@@ -48,9 +50,9 @@ namespace LotusEditor.Utility
     internal class DelayEventTimerArgs : EventArgs
     {
         public bool RepeatEvent { get; set; }
-        public object Data { get; set; }
+        public IEnumerable<object> Data { get; set; }
 
-        public DelayEventTimerArgs(object data)
+        public DelayEventTimerArgs(IEnumerable<object> data)
         {
             Data = data;
         }
@@ -60,8 +62,8 @@ namespace LotusEditor.Utility
     {
         private readonly DispatcherTimer _timer;
         private readonly TimeSpan _delay;
+        private readonly List<object> _data = new();
         private DateTime _lastTime = DateTime.Now;
-        private object _data;
 
         public event EventHandler<DelayEventTimerArgs> Triggered;
 
@@ -80,12 +82,21 @@ namespace LotusEditor.Utility
             if ((DateTime.Now - _lastTime) < _delay) return;
             var evtArgs = new DelayEventTimerArgs(_data);
             Triggered?.Invoke(this, evtArgs);
+
+            if (!evtArgs.RepeatEvent)
+            {
+                _data.Clear();
+            }
+
             _timer.IsEnabled = evtArgs.RepeatEvent;
         }
 
         public void Trigger(object data = null)
         {
-            _data = data;
+            if (data != null)
+            {
+                _data.Add(data);
+            }
             _lastTime = DateTime.Now;
             _timer.IsEnabled = true;
         }
@@ -116,6 +127,7 @@ namespace LotusEditor.Utility
             return null;
         }
     }
+
 
     public static class ContentUtil
     {
@@ -148,6 +160,8 @@ namespace LotusEditor.Utility
             return path.Append(file).ToString();
         }
 
+        public static bool IsOlder(this DateTime date, DateTime other) => date < other;
+
         public static byte[] ComputeHash(byte[] data, int offset = 0, int count = 0)
         {
             if (!(data?.Length > 0)) return null;
@@ -155,5 +169,19 @@ namespace LotusEditor.Utility
             return sha.ComputeHash(data, offset, count > 0 ? count : data.Length);
 
         }
+
+        public static bool IsDirectory(string path)
+        {
+            try
+            {
+                return File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+            }catch(Exception ex)
+            {
+                Debug.WriteLine($"Error occurred while checking file attributes: {ex.Message}");
+                return false;
+            }
+        }
+
+        public static bool IsDirectory(this FileInfo info) => info.Attributes.HasFlag(FileAttributes.Directory);
     }
 }

@@ -70,8 +70,6 @@ private:
         {
             var projName = Project.Current.Name.Trim();
             if (string.IsNullOrEmpty(projName)) return string.Empty;
-            projName = Regex.Replace(projName, @"[^A-Za-z0-9_]", "");
-            projName = StringUtil.ReplaceWhitespace(projName, "_");
             return projName;
         }
 
@@ -185,12 +183,7 @@ private:
 
             var files = new[] { cppName, hName };
 
-            for (int i = 0; i < 3; ++i)
-            {
-                if (!VisualStudio.AddFilesToSolution(solution, projName, files))
-                    System.Threading.Thread.Sleep(1000);
-                else break;
-            }
+            VisualStudio.AddFilesToSolution(solution, projName, files);
         }
     }
 }

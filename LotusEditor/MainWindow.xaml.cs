@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using LotusEditor.Content;
 using LotusEditor.GameProject;
 
 namespace LotusEditor
@@ -97,7 +99,11 @@ namespace LotusEditor
             }
 
             Project.Current?.Unload();
-            DataContext = projBrowser.DataContext;
+            var project = projBrowser.DataContext as Project;
+            Debug.Assert(project != null);
+            ContentWatcher.Reset(project.ContentPath, project.Path);
+
+            DataContext = project;
         }
 
     }

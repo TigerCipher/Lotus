@@ -59,22 +59,22 @@ namespace LotusEditor.Content
     class GeometryImportSettings : ViewModelBase
     {
         private float _smoothingAngle;
-        public float SmoothingAngle { get => _smoothingAngle; set { if(_smoothingAngle == value) return; _smoothingAngle = value; OnPropertyChanged(nameof(SmoothingAngle)); } }
+        public float SmoothingAngle { get => _smoothingAngle; set { if (_smoothingAngle == value) return; _smoothingAngle = value; OnPropertyChanged(nameof(SmoothingAngle)); } }
 
         private bool _calculateNormals;
-        public bool CalculateNormals { get => _calculateNormals; set { if(_calculateNormals == value) return; _calculateNormals = value; OnPropertyChanged(nameof(CalculateNormals)); } }
+        public bool CalculateNormals { get => _calculateNormals; set { if (_calculateNormals == value) return; _calculateNormals = value; OnPropertyChanged(nameof(CalculateNormals)); } }
 
         private bool _calculateTangents;
-        public bool CalculateTangents { get => _calculateTangents; set { if(_calculateTangents == value) return; _calculateTangents = value; OnPropertyChanged(nameof(CalculateTangents)); } }
+        public bool CalculateTangents { get => _calculateTangents; set { if (_calculateTangents == value) return; _calculateTangents = value; OnPropertyChanged(nameof(CalculateTangents)); } }
 
         private bool _reverseHandedness;
-        public bool ReverseHandedness { get => _reverseHandedness; set { if(_reverseHandedness == value) return; _reverseHandedness = value; OnPropertyChanged(nameof(ReverseHandedness)); } }
+        public bool ReverseHandedness { get => _reverseHandedness; set { if (_reverseHandedness == value) return; _reverseHandedness = value; OnPropertyChanged(nameof(ReverseHandedness)); } }
 
         private bool _importEmbededTextures;
-        public bool ImportEmbededTextures { get => _importEmbededTextures; set { if(_importEmbededTextures == value) return; _importEmbededTextures = value; OnPropertyChanged(nameof(ImportEmbededTextures)); } }
+        public bool ImportEmbededTextures { get => _importEmbededTextures; set { if (_importEmbededTextures == value) return; _importEmbededTextures = value; OnPropertyChanged(nameof(ImportEmbededTextures)); } }
 
         private bool _importAnimations;
-        public bool ImportAnimations { get => _importAnimations; set { if(_importAnimations == value) return; _importAnimations = value; OnPropertyChanged(nameof(ImportAnimations)); } }
+        public bool ImportAnimations { get => _importAnimations; set { if (_importAnimations == value) return; _importAnimations = value; OnPropertyChanged(nameof(ImportAnimations)); } }
 
         public GeometryImportSettings()
         {
@@ -121,7 +121,7 @@ namespace LotusEditor.Content
             // lods
             var numLodGroups = reader.ReadInt32();
             Debug.Assert(numLodGroups > 0);
-            for (int i = 0; i < numLodGroups; ++i)
+            for (var i = 0; i < numLodGroups; ++i)
             {
                 s = reader.ReadInt32();
                 string lodGroupName;
@@ -149,7 +149,7 @@ namespace LotusEditor.Content
         {
             var lodIds = new List<int>();
             var lodList = new List<MeshLOD>();
-            for (int i = 0; i < numMeshes; i++)
+            for (var i = 0; i < numMeshes; i++)
             {
                 ReadMeshes(reader, lodIds, lodList);
             }
@@ -220,7 +220,9 @@ namespace LotusEditor.Content
                 {
                     Debug.Assert(lodGroup.LODS.Any());
                     // use name of highest detail mesh
-                    var meshName = path + fileName + "_" + lodGroup.LODS[0].Name + AssetFileExtension;
+                    var meshName = ContentUtil.FixFilename(_lodGroups.Count > 1 ?
+                        path + fileName + "_" + lodGroup.LODS[0].Name + AssetFileExtension :
+                        path + fileName + AssetFileExtension);
                     Guid = Guid.NewGuid(); // need dif id for each asset file
                     Logger.Info($"Saving mesh with highest lod with name {lodGroup.LODS[0].Name} and guid {Guid.ToString()}");
                     byte[] data = null;
@@ -238,7 +240,7 @@ namespace LotusEditor.Content
 
                         Logger.Info("Computing hash");
                         Hash = ContentUtil.ComputeHash(hashes.ToArray());
-                        data = (writer.BaseStream as MemoryStream).ToArray();
+                        data = (writer.BaseStream as MemoryStream)?.ToArray();
                         Icon = GenerateIcon(lodGroup.LODS[0]);
                     }
 
@@ -255,22 +257,22 @@ namespace LotusEditor.Content
                     }
 
                     savedFiles.Add(meshName);
+                    Logger.Info($"Geometry asset [{meshName}] successfully saved!");
                 }
             }
             catch (Exception e)
             {
                 Debug.Write(e.Message);
-                Logger.Error($"Failed to save geometry asset to {file}");
+                Logger.Error($"Failed to save geometry asset to {fileName}");
             }
 
-            Logger.Info($"{fileName} successfully saved!");
             return savedFiles;
         }
 
         private byte[] GenerateIcon(MeshLOD lod)
         {
             Logger.Info("Generating asset icon");
-            var width = 90 * 4; // 90 pixels * 4, so 4x sampling
+            const int width = 90 * 4; // 90 pixels * 4, so 4x sampling
             BitmapSource bmp = null;
 
             Application.Current.Dispatcher.Invoke(() =>
