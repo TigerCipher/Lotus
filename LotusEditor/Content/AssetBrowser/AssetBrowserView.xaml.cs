@@ -254,22 +254,16 @@ namespace LotusEditor.Content
 
         private void ExecuteSelection(AssetFileInfo info)
         {
-            if (info == null) return;
+            if (info is not { IsDirectory: true }) return;
 
-            if (info.IsDirectory)
-            {
-                var vm = DataContext as AssetBrowser;
-                vm.SelectedFolder = info.FullPath;
-            }
+            if (DataContext is AssetBrowser vm) vm.SelectedFolder = info.FullPath;
         }
 
         private void OnContent_Item_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-            {
-                var info = (sender as FrameworkElement)?.DataContext as AssetFileInfo;
-                ExecuteSelection(info);
-            }
+            if (e.Key != Key.Enter) return;
+            var info = (sender as FrameworkElement)?.DataContext as AssetFileInfo;
+            ExecuteSelection(info);
         }
 
         private void OnPathStack_Button_Click(object sender, RoutedEventArgs e)
