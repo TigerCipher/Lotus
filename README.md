@@ -2,6 +2,11 @@
 
 A 3D DirectX 12 game engine written in C++ inspired by Primal. The Lotus Editor is written in C# and will always only support windows. But as the game is built from the project, rather than the editor, it is possible games can be made for non-windows platform in the future if I ever implement a graphics API other than DirectX.
 
+## Working with the code
+At this time, the engine and the editor both require Windows 10 or 11 and a GPU that supports DirectX 12. In addition, in order to build ContentTools, Autodesk FBX SDK `2020.2` must be installed on the device.
+In order to not have to modify project settings, ensure the include and library folders can be found at `C:\Program Files\Autodesk\FBX\FBX SDK\2020.2`
+
+Suggested to add command line option `/ignore:4099` to linker options to supress warnings about missing FBX PDBs.
 
 ### Roadmap
 ___

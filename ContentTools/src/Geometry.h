@@ -55,7 +55,11 @@ struct mesh
     utl::vector<vec3>              normals;
     utl::vector<vec4>              tangents;
     utl::vector<utl::vector<vec2>> uv_sets;
-    utl::vector<u32>               raw_indices;
+
+    utl::vector<u32> material_indices;
+    utl::vector<u32> material_used;
+
+    utl::vector<u32> raw_indices;
 
     utl::vector<vertex> vertices;
     utl::vector<u32>    indices;
@@ -65,7 +69,7 @@ struct mesh
     std::string                               name;
     utl::vector<packed_vertex::vertex_static> packed_vertices_static;
     f32                                       lod_threshold = -1.0f;
-    u32                                       lod_id{invalid_id_u32};
+    u32                                       lod_id{ invalid_id_u32 };
 };
 
 struct lod_group
