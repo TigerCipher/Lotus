@@ -127,7 +127,7 @@ namespace LotusEditor.Content
             var geometry = new Geometry();
             geometry.ImportSettings.SmoothingAngle = smoothingAngle;
             ContentToolsAPI.CreatePrimitiveMesh(geometry, info);
-            (DataContext as GeometryEditor).SetAsset(geometry);
+            (DataContext as GeometryEditor)?.SetAsset(geometry);
             TexturesCheckBox_OnClick(texturesCheckBox, null);
         }
 
@@ -135,7 +135,7 @@ namespace LotusEditor.Content
         private void TexturesCheckBox_OnClick(object sender, RoutedEventArgs e)
         {
             Brush brush = Brushes.White;
-            if ((sender as CheckBox).IsChecked == true)
+            if ((sender as CheckBox)?.IsChecked == true)
             {
                 brush = _textures[(int)primitiveTypeComboBox.SelectedItem];
             }
@@ -149,19 +149,15 @@ namespace LotusEditor.Content
 
         private void SaveButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var dlg = new SaveFileDialog()
-            {
-                InitialDirectory = Project.Current.ContentPath,
-                Filter = "Asset File (*.asset)|*.asset"
-            };
-
+            var dlg = new SaveDialog();
             if (dlg.ShowDialog() == true)
             {
-                Debug.Assert(!string.IsNullOrEmpty(dlg.FileName));
-                // Logger.Info($"Saving asset file to {dlg.FileName}");
-                var asset = (DataContext as IAssetEditor).Asset;
+                Debug.Assert(!string.IsNullOrEmpty(dlg.SaveFilePath));
+                var asset = (DataContext as IAssetEditor)?.Asset;
                 Debug.Assert(asset != null);
-                asset.Save(dlg.FileName);
+                asset.Save(dlg.SaveFilePath);
+
+                dlg.Close();
             }
         }
     }

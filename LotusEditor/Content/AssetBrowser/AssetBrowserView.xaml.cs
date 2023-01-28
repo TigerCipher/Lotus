@@ -100,6 +100,35 @@ namespace LotusEditor.Content
     /// </summary>
     public partial class AssetBrowserView : UserControl
     {
+
+        public SelectionMode SelectionMode
+        {
+            get => (SelectionMode)GetValue(SelectionModeProperty);
+            set => SetValue(SelectionModeProperty, value);
+        }
+
+        public static readonly DependencyProperty SelectionModeProperty =
+            DependencyProperty.Register(nameof(SelectionMode), typeof(SelectionMode), typeof(AssetBrowserView), new PropertyMetadata(SelectionMode.Extended));
+
+        public FileAccess FileAccess
+        {
+            get => (FileAccess)GetValue(FileAccessProperty);
+            set => SetValue(FileAccessProperty, value);
+        }
+
+        public static readonly DependencyProperty FileAccessProperty =
+            DependencyProperty.Register(nameof(FileAccess), typeof(FileAccess), typeof(AssetBrowserView), new PropertyMetadata(FileAccess.ReadWrite));
+
+        internal AssetFileInfo SelectedItem
+        {
+            get => (AssetFileInfo)GetValue(SelectedItemProperty);
+            set => SetValue(SelectedItemProperty, value);
+        }
+
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register(nameof(SelectedItem), typeof(AssetFileInfo), typeof(AssetBrowserView), new PropertyMetadata(null));
+
+
         private string _sortedProperty = nameof(AssetFileInfo.FileName);
         private ListSortDirection _sortDirection;
 
@@ -247,6 +276,12 @@ namespace LotusEditor.Content
         {
             var vm = DataContext as AssetBrowser;
             vm.SelectedFolder = (sender as Button)?.DataContext as string;
+        }
+
+        private void OnFolderViewSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var item = folderListView.SelectedItem as AssetFileInfo;
+            SelectedItem = item?.IsDirectory == true ? null : item;
         }
     }
 }

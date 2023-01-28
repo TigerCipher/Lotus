@@ -59,22 +59,22 @@ namespace LotusEditor.Content
     class GeometryImportSettings : ViewModelBase
     {
         private float _smoothingAngle;
-        public float SmoothingAngle { get => _smoothingAngle; set { if(_smoothingAngle == value) return; _smoothingAngle = value; OnPropertyChanged(nameof(SmoothingAngle)); } }
+        public float SmoothingAngle { get => _smoothingAngle; set { if (_smoothingAngle == value) return; _smoothingAngle = value; OnPropertyChanged(nameof(SmoothingAngle)); } }
 
         private bool _calculateNormals;
-        public bool CalculateNormals { get => _calculateNormals; set { if(_calculateNormals == value) return; _calculateNormals = value; OnPropertyChanged(nameof(CalculateNormals)); } }
+        public bool CalculateNormals { get => _calculateNormals; set { if (_calculateNormals == value) return; _calculateNormals = value; OnPropertyChanged(nameof(CalculateNormals)); } }
 
         private bool _calculateTangents;
-        public bool CalculateTangents { get => _calculateTangents; set { if(_calculateTangents == value) return; _calculateTangents = value; OnPropertyChanged(nameof(CalculateTangents)); } }
+        public bool CalculateTangents { get => _calculateTangents; set { if (_calculateTangents == value) return; _calculateTangents = value; OnPropertyChanged(nameof(CalculateTangents)); } }
 
         private bool _reverseHandedness;
-        public bool ReverseHandedness { get => _reverseHandedness; set { if(_reverseHandedness == value) return; _reverseHandedness = value; OnPropertyChanged(nameof(ReverseHandedness)); } }
+        public bool ReverseHandedness { get => _reverseHandedness; set { if (_reverseHandedness == value) return; _reverseHandedness = value; OnPropertyChanged(nameof(ReverseHandedness)); } }
 
         private bool _importEmbededTextures;
-        public bool ImportEmbededTextures { get => _importEmbededTextures; set { if(_importEmbededTextures == value) return; _importEmbededTextures = value; OnPropertyChanged(nameof(ImportEmbededTextures)); } }
+        public bool ImportEmbededTextures { get => _importEmbededTextures; set { if (_importEmbededTextures == value) return; _importEmbededTextures = value; OnPropertyChanged(nameof(ImportEmbededTextures)); } }
 
         private bool _importAnimations;
-        public bool ImportAnimations { get => _importAnimations; set { if(_importAnimations == value) return; _importAnimations = value; OnPropertyChanged(nameof(ImportAnimations)); } }
+        public bool ImportAnimations { get => _importAnimations; set { if (_importAnimations == value) return; _importAnimations = value; OnPropertyChanged(nameof(ImportAnimations)); } }
 
         public GeometryImportSettings()
         {
@@ -220,7 +220,9 @@ namespace LotusEditor.Content
                 {
                     Debug.Assert(lodGroup.LODS.Any());
                     // use name of highest detail mesh
-                    var meshName = ContentUtil.FixFilename(path + fileName + "_" + lodGroup.LODS[0].Name + AssetFileExtension);
+                    var meshName = ContentUtil.FixFilename(_lodGroups.Count > 1 ?
+                        path + fileName + "_" + lodGroup.LODS[0].Name + AssetFileExtension :
+                        path + fileName + AssetFileExtension);
                     Guid = Guid.NewGuid(); // need dif id for each asset file
                     Logger.Info($"Saving mesh with highest lod with name {lodGroup.LODS[0].Name} and guid {Guid.ToString()}");
                     byte[] data = null;

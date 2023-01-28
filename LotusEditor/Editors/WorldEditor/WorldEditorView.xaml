@@ -42,20 +42,20 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Margin="0, 10, 0, 0">
             <MenuItem Header="File">
-                <MenuItem Header="New Project..." Command="ApplicationCommands.New"/>
-                <MenuItem Header="Open Project..." Command="ApplicationCommands.Open"/>
+                <MenuItem Header="New Project..." Command="ApplicationCommands.New" Template="{DynamicResource FinalSubMenuItemTemplate}"/>
+                <MenuItem Header="Open Project..." Command="ApplicationCommands.Open" Template="{DynamicResource FinalSubMenuItemTemplate}"/>
                 <Separator/>
-                <MenuItem Header="Save Project" Command="{Binding SaveCmd}"/>
+                <MenuItem Header="Save Project" Command="{Binding SaveCmd}" Template="{DynamicResource FinalSubMenuItemTemplate}"/>
                 <Separator/>
-                <MenuItem Header="Exit" Command="ApplicationCommands.Close"/>
+                <MenuItem Header="Exit" Command="ApplicationCommands.Close" Template="{DynamicResource FinalSubMenuItemTemplate}"/>
             </MenuItem>
             <MenuItem Header="Edit">
-                <MenuItem Header="Undo" Command="{Binding UndoCmd}"/>
+                <MenuItem Header="Undo" Command="{Binding UndoCmd}" Template="{DynamicResource FinalSubMenuItemTemplate}"/>
                 <MenuItem Header="Redo" Command="{Binding RedoCmd}"/>
-                <MenuItem Header="Undo Selection" Command="{Binding UndoSelectionCmd}"/>
-                <MenuItem Header="Redo Selection" Command="{Binding RedoSelectionCmd}"/>
+                <MenuItem Header="Undo Selection" Command="{Binding UndoSelectionCmd}" Template="{DynamicResource FinalSubMenuItemTemplate}"/>
+                <MenuItem Header="Redo Selection" Command="{Binding RedoSelectionCmd}" Template="{DynamicResource FinalSubMenuItemTemplate}"/>
             </MenuItem>
-            <MenuItem Header="View" Template="{DynamicResource FinalSubMenuItemTemplate}"/>
+            <MenuItem Header="View"/>
             <MenuItem Header="Window"/>
             <MenuItem Header="Create" IsEnabled="False">
             </MenuItem>
