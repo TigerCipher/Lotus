@@ -43,17 +43,17 @@ public:
 
     vec4u rect() const;
     vec2u size() const;
-    void  resize(uint32 width, uint32 height) const;
+    void  resize(u32 width, u32 height) const;
 
-    uint32 width() const;
-    uint32 height() const;
+    u32 width() const;
+    u32 height() const;
 
     bool is_closed() const;
 
     void* handle() const;
 
 private:
-    window_id m_id{id::invalid_id};
+    window_id m_id{ id::invalid_id };
 };
 
 

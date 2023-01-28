@@ -35,12 +35,12 @@ struct window_create_info
     window_proc    callback = nullptr;
     window_handle  parent   = nullptr;
     const wchar_t* caption  = nullptr;
-    int32          left     = 0;
-    int32          top      = 0;
-    int32          width    = 1920;
-    int32          height   = 1080;
+    i32            left     = 0;
+    i32            top      = 0;
+    i32            width    = 1920;
+    i32            height   = 1080;
 };
 
-window create_window(const window_create_info* const info = nullptr);
+window create_window(const window_create_info* info = nullptr);
 void   remove_window(window_id id);
 } // namespace lotus::platform

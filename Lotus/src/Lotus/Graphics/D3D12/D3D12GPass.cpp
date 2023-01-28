@@ -180,7 +180,10 @@ void set_size(vec2u size)
     }
 }
 
-void depth_prepass(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info) {}
+void depth_prepass([[maybe_unused]] id3d12_graphics_command_list* cmd_list, [[maybe_unused]] const d3d12_frame_info& info)
+{
+    return;
+}
 
 void render(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info)
 {
@@ -189,11 +192,12 @@ void render(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info
 
 
     static u32 frame = 0;
-    struct {
+    const struct
+    {
         f32 width;
         f32 height;
         u32 frame;
-    } constants{(f32)info.surface_width, (f32)info.surface_height, ++frame };
+    } constants{ (f32) info.surface_width, (f32) info.surface_height, ++frame };
 
     using idx = gpass_root_param_indices;
     cmd_list->SetGraphicsRoot32BitConstants(idx::root_constants, 3, &constants, 0);

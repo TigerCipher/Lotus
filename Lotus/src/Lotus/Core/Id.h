@@ -29,19 +29,19 @@
 namespace lotus::id
 {
 
-using id_type = uint32;
+using id_type = u32;
 
 namespace detail
 {
-constexpr uint32  generation_bits = 10;
-constexpr uint32  index_bits      = sizeof(id_type) * 8 - generation_bits;
-constexpr id_type index_mask      = (id_type{1} << index_bits) - 1;
-constexpr id_type generation_mask = (id_type{1} << generation_bits) - 1;
+constexpr u32     generation_bits = 10;
+constexpr u32     index_bits      = sizeof(id_type) * 8 - generation_bits;
+constexpr id_type index_mask      = (id_type{ 1 } << index_bits) - 1;
+constexpr id_type generation_mask = (id_type{ 1 } << generation_bits) - 1;
 } // namespace detail
 
 #pragma warning(disable : 4245)
 constexpr id_type invalid_id           = -1;
-constexpr uint32  min_deleted_elements = 1024;
+constexpr u32     min_deleted_elements = 1024;
 
 using gen_type =
     std::conditional_t<detail::generation_bits <= 16, std::conditional_t<detail::generation_bits <= 8, u8, u16>, u32>;
@@ -86,11 +86,13 @@ private:
 };
 } // namespace detail
 
-    #define L_TYPED_ID(name)                                                                                           \
-        struct name final : id::detail::id_base                                                                        \
-        {                                                                                                              \
-            constexpr explicit name(const id::id_type id) : id_base(id) {}                                             \
-            constexpr name() : id_base(0) {}                                                                           \
+    #define L_TYPED_ID(name)                                                                                                \
+        struct name final : id::detail::id_base                                                                             \
+        {                                                                                                                   \
+            constexpr explicit name(const id::id_type id) : id_base(id)                                                     \
+            {}                                                                                                              \
+            constexpr name() : id_base(0)                                                                                   \
+            {}                                                                                                              \
         };
 
 #else

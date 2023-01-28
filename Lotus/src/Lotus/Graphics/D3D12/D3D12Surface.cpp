@@ -143,6 +143,6 @@ void d3d12_surface::finalize()
     m_viewport.MinDepth = 0.0f;
     m_viewport.MaxDepth = 1.0f;
 
-    m_scissor_rect = { 0, 0, (s32) width, (s32) height };
+    m_scissor_rect = { 0, 0, (i32) width, (i32) height };
 }
 } // namespace lotus::graphics::d3d12

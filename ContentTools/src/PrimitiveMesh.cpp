@@ -31,11 +31,14 @@ namespace
 using primitive_mesh_creator = void (*)(scene&, const primitive_create_info& info);
 
 
-enum axis : u32
+struct axis
 {
-    AXIS_X = 0,
-    AXIS_Y = 1,
-    AXIS_Z = 2
+    enum : u32
+    {
+        x = 0,
+        y = 1,
+        z = 2
+    };
 };
 
 void create_plane(scene& scene, const primitive_create_info& info);
@@ -45,15 +48,15 @@ void create_ico_sphere(scene& scene, const primitive_create_info& info);
 void create_cylinder(scene& scene, const primitive_create_info& info);
 void create_capsule(scene& scene, const primitive_create_info& info);
 
-primitive_mesh_creator creators[]{create_plane,      create_cube,     create_uv_sphere,
-                                  create_ico_sphere, create_cylinder, create_capsule};
+primitive_mesh_creator creators[]{ create_plane,      create_cube,     create_uv_sphere,
+                                   create_ico_sphere, create_cylinder, create_capsule };
 
 static_assert(_countof(creators) == primitive_mesh_type::MESH_COUNT);
 
-mesh create_plane(const primitive_create_info& info, const u32 horizontal_index = AXIS_X,
-                  const u32 vertical_index = AXIS_Z, const bool flip_winding = false,
-                  const vec3 offset = {-0.5f, 0.0f, -0.5f}, const vec2 u_range = {0.0f, 1.0f},
-                  const vec2 v_range = {0.0f, 1.0f})
+mesh create_plane(const primitive_create_info& info, const u32 horizontal_index = axis::x,
+                  const u32 vertical_index = axis::z, const bool flip_winding = false,
+                  const vec3 offset = { -0.5f, 0.0f, -0.5f }, const vec2 u_range = { 0.0f, 1.0f },
+                  const vec2 v_range = { 0.0f, 1.0f })
 {
     LASSERT(horizontal_index < 3 && vertical_index < 3 && horizontal_index != vertical_index);
     const u32 horiz_count = math::clamp(info.segments[horizontal_index], 1u, 10u);
@@ -76,7 +79,7 @@ mesh create_plane(const primitive_create_info& info, const u32 horizontal_index 
             arr[vertical_index] += j * vert_step;
             m.positions.emplace_back(pos.x * info.size.x, pos.y * info.size.y, pos.z * info.size.z);
 
-            vec2 uv = {u_range.x, 1.0f - v_range.x};
+            vec2 uv = { u_range.x, 1.0f - v_range.x };
             uv.x += i * u_step;
             uv.y -= j * v_step;
             // vec2 uv{ 0, 1.0f };
@@ -126,8 +129,8 @@ mesh create_plane(const primitive_create_info& info, const u32 horizontal_index 
 
 mesh create_uv_sphere(const primitive_create_info& info)
 {
-    const u32 phi_count   = math::clamp(info.segments[AXIS_X], 3u, 64u);
-    const u32 theta_count = math::clamp(info.segments[AXIS_Y], 2u, 64u);
+    const u32 phi_count   = math::clamp(info.segments[axis::x], 3u, 64u);
+    const u32 theta_count = math::clamp(info.segments[axis::y], 2u, 64u);
     const f32 theta_step  = pi / theta_count;
     const f32 phi_step    = two_pi / phi_count;
     const u32 num_verts   = 2 + phi_count * (theta_count - 1);
@@ -140,7 +143,7 @@ mesh create_uv_sphere(const primitive_create_info& info)
 
     // Top vertex
     u32 c            = 0;
-    m.positions[c++] = {0.0f, info.size.y, 0.0f};
+    m.positions[c++] = { 0.0f, info.size.y, 0.0f };
 
     for (u32 j = 1; j <= theta_count - 1; ++j)
     {
@@ -148,14 +151,14 @@ mesh create_uv_sphere(const primitive_create_info& info)
         for (u32 i = 0; i < phi_count; ++i)
         {
             const f32 phi    = (f32) i * phi_step;
-            m.positions[c++] = {info.size.x * math::scalar_sin(theta) * math::scalar_cos(phi),
-                                info.size.y * math::scalar_cos(theta),
-                                -info.size.z * math::scalar_sin(theta) * math::scalar_sin(phi)};
+            m.positions[c++] = { info.size.x * math::scalar_sin(theta) * math::scalar_cos(phi),
+                                 info.size.y * math::scalar_cos(theta),
+                                 -info.size.z * math::scalar_sin(theta) * math::scalar_sin(phi) };
         }
     }
 
     // Bottom vertex
-    m.positions[c++] = {0.0f, -info.size.y, 0.0f};
+    m.positions[c++] = { 0.0f, -info.size.y, 0.0f };
 
     LASSERT(c == num_verts);
 
@@ -168,19 +171,19 @@ mesh create_uv_sphere(const primitive_create_info& info)
     // top cap indices
     for (u32 i = 0; i < phi_count - 1; ++i)
     {
-        uvs[c]             = {(2 * i + 1) * 0.5f * inv_phi_count, 1.0f};
+        uvs[c]             = { (2 * i + 1) * 0.5f * inv_phi_count, 1.0f };
         m.raw_indices[c++] = 0;
-        uvs[c]             = {i * inv_phi_count, 1.0f - inv_theta_count};
+        uvs[c]             = { i * inv_phi_count, 1.0f - inv_theta_count };
         m.raw_indices[c++] = i + 1;
-        uvs[c]             = {(i + 1) * inv_phi_count, 1.0f - inv_theta_count};
+        uvs[c]             = { (i + 1) * inv_phi_count, 1.0f - inv_theta_count };
         m.raw_indices[c++] = i + 2;
     }
 
-    uvs[c]             = {1.0f - 0.5f * inv_phi_count, 1.0f};
+    uvs[c]             = { 1.0f - 0.5f * inv_phi_count, 1.0f };
     m.raw_indices[c++] = 0;
-    uvs[c]             = {1.0f - inv_phi_count, 1.0f - inv_theta_count};
+    uvs[c]             = { 1.0f - inv_phi_count, 1.0f - inv_theta_count };
     m.raw_indices[c++] = phi_count;
-    uvs[c]             = {1.0f, 1.0f - inv_theta_count};
+    uvs[c]             = { 1.0f, 1.0f - inv_theta_count };
     m.raw_indices[c++] = 1;
 
     // Mid section
@@ -195,18 +198,18 @@ mesh create_uv_sphere(const primitive_create_info& info)
                 1 + (i + 1) + j * phi_count        //
             };
 
-            uvs[c]             = {i * inv_phi_count, 1.0f - (j + 1) * inv_theta_count};
+            uvs[c]             = { i * inv_phi_count, 1.0f - (j + 1) * inv_theta_count };
             m.raw_indices[c++] = index[0];
-            uvs[c]             = {i * inv_phi_count, 1.0f - (j + 2) * inv_theta_count};
+            uvs[c]             = { i * inv_phi_count, 1.0f - (j + 2) * inv_theta_count };
             m.raw_indices[c++] = index[1];
-            uvs[c]             = {(i + 1) * inv_phi_count, 1.0f - (j + 2) * inv_theta_count};
+            uvs[c]             = { (i + 1) * inv_phi_count, 1.0f - (j + 2) * inv_theta_count };
             m.raw_indices[c++] = index[2];
 
-            uvs[c]             = {i * inv_phi_count, 1.0f - (j + 1) * inv_theta_count};
+            uvs[c]             = { i * inv_phi_count, 1.0f - (j + 1) * inv_theta_count };
             m.raw_indices[c++] = index[0];
-            uvs[c]             = {(i + 1) * inv_phi_count, 1.0f - (j + 2) * inv_theta_count};
+            uvs[c]             = { (i + 1) * inv_phi_count, 1.0f - (j + 2) * inv_theta_count };
             m.raw_indices[c++] = index[2];
-            uvs[c]             = {(i + 1) * inv_phi_count, 1.0f - (j + 1) * inv_theta_count};
+            uvs[c]             = { (i + 1) * inv_phi_count, 1.0f - (j + 1) * inv_theta_count };
             m.raw_indices[c++] = index[3];
         }
 
@@ -217,18 +220,18 @@ mesh create_uv_sphere(const primitive_create_info& info)
             1 + j * phi_count                //
         };
 
-        uvs[c]             = {1.0f - inv_phi_count, 1.0f - (j + 1) * inv_theta_count};
+        uvs[c]             = { 1.0f - inv_phi_count, 1.0f - (j + 1) * inv_theta_count };
         m.raw_indices[c++] = index[0];
-        uvs[c]             = {1.0f - inv_phi_count, 1.0f - (j + 2) * inv_theta_count};
+        uvs[c]             = { 1.0f - inv_phi_count, 1.0f - (j + 2) * inv_theta_count };
         m.raw_indices[c++] = index[1];
-        uvs[c]             = {1.0f, 1.0f - (j + 2) * inv_theta_count};
+        uvs[c]             = { 1.0f, 1.0f - (j + 2) * inv_theta_count };
         m.raw_indices[c++] = index[2];
 
-        uvs[c]             = {1.0f - inv_phi_count, 1.0f - (j + 1) * inv_theta_count};
+        uvs[c]             = { 1.0f - inv_phi_count, 1.0f - (j + 1) * inv_theta_count };
         m.raw_indices[c++] = index[0];
-        uvs[c]             = {1.0f, 1.0f - (j + 2) * inv_theta_count};
+        uvs[c]             = { 1.0f, 1.0f - (j + 2) * inv_theta_count };
         m.raw_indices[c++] = index[2];
-        uvs[c]             = {1.0f, 1.0f - (j + 1) * inv_theta_count};
+        uvs[c]             = { 1.0f, 1.0f - (j + 1) * inv_theta_count };
         m.raw_indices[c++] = index[3];
     }
 
@@ -236,19 +239,19 @@ mesh create_uv_sphere(const primitive_create_info& info)
     const u32 south_index = (u32) m.positions.size() - 1;
     for (u32 i = 0; i < phi_count - 1; ++i)
     {
-        uvs[c]             = {(2 * i + 1) * 0.5f * inv_phi_count, 0.0f};
+        uvs[c]             = { (2 * i + 1) * 0.5f * inv_phi_count, 0.0f };
         m.raw_indices[c++] = south_index;
-        uvs[c]             = {(i + 1) * inv_phi_count, inv_theta_count};
+        uvs[c]             = { (i + 1) * inv_phi_count, inv_theta_count };
         m.raw_indices[c++] = south_index - phi_count + i + 1;
-        uvs[c]             = {i * inv_phi_count, inv_theta_count};
+        uvs[c]             = { i * inv_phi_count, inv_theta_count };
         m.raw_indices[c++] = south_index - phi_count + i;
     }
 
-    uvs[c]             = {1.0f - 0.5f * inv_phi_count, 0.0f};
+    uvs[c]             = { 1.0f - 0.5f * inv_phi_count, 0.0f };
     m.raw_indices[c++] = south_index;
-    uvs[c]             = {1.0f, inv_theta_count};
+    uvs[c]             = { 1.0f, inv_theta_count };
     m.raw_indices[c++] = south_index - phi_count;
-    uvs[c]             = {1.0f - inv_phi_count, inv_theta_count};
+    uvs[c]             = { 1.0f - inv_phi_count, inv_theta_count };
     m.raw_indices[c++] = south_index - 1;
 
     LASSERT(c == num_indices);
@@ -260,22 +263,22 @@ mesh create_uv_sphere(const primitive_create_info& info)
 
 void create_plane(scene& scene, const primitive_create_info& info)
 {
-    lod_group lod{"plane"};
+    lod_group lod{ "plane" };
     lod.meshes.emplace_back(create_plane(info));
     scene.lod_groups.emplace_back(lod);
 }
-void create_cube(scene& scene, const primitive_create_info& info) {}
+void create_cube([[maybe_unused]] scene& scene, [[maybe_unused]] const primitive_create_info& info) {}
 
 void create_uv_sphere(scene& scene, const primitive_create_info& info)
 {
-    lod_group lod{"uv_sphere"};
+    lod_group lod{ "uv_sphere" };
     lod.meshes.emplace_back(create_uv_sphere(info));
     scene.lod_groups.emplace_back(lod);
 }
 
-void create_ico_sphere(scene& scene, const primitive_create_info& info) {}
-void create_cylinder(scene& scene, const primitive_create_info& info) {}
-void create_capsule(scene& scene, const primitive_create_info& info) {}
+void create_ico_sphere([[maybe_unused]] scene& scene, [[maybe_unused]] const primitive_create_info& info) {}
+void create_cylinder([[maybe_unused]] scene& scene, [[maybe_unused]] const primitive_create_info& info) {}
+void create_capsule([[maybe_unused]] scene& scene, [[maybe_unused]] const primitive_create_info& info) {}
 
 } // namespace
 

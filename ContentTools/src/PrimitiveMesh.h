@@ -27,7 +27,8 @@
 namespace lotus::tools
 {
 
-enum primitive_mesh_type : uint32
+
+enum primitive_mesh_type : u32
 {
     MESH_PLANE,
     MESH_CUBE,
@@ -42,9 +43,9 @@ enum primitive_mesh_type : uint32
 struct primitive_create_info
 {
     primitive_mesh_type type;
-    uint32              segments[3]{1, 1, 1};
-    vec3                size{1, 1, 1};
-    uint32              lod = 0;
+    u32                 segments[3]{ 1, 1, 1 };
+    vec3                size{ 1, 1, 1 };
+    u32                 lod = 0;
 };
 
 } // namespace lotus::tools

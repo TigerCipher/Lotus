@@ -38,18 +38,6 @@ using ulong = unsigned long;
 // ensure x bit, but I hate using _t, it looks ugly
 
 
-// TODO Remove and stick to u# and i#
-using uint8  = uint8_t;
-using uint16 = uint16_t;
-using uint32 = uint32_t;
-using uint64 = uint64_t;
-
-using int8  = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
-
-
 // Even shorter because why not? (above ones are preferred for explicitness)
 using u8  = uint8_t;
 using u16 = uint16_t;
@@ -61,16 +49,11 @@ using i16 = int16_t;
 using i32 = int32_t;
 using i64 = int64_t;
 
-using s8  = int8_t;
-using s16 = int16_t;
-using s32 = int32_t;
-using s64 = int64_t;
 
-
-constexpr uint8  invalid_id_u8  = 0xffui8;
-constexpr uint16 invalid_id_u16 = 0xffffui16;
-constexpr uint32 invalid_id_u32 = 0xffff'ffffui32;
-constexpr uint64 invalid_id_u64 = 0xffff'ffff'ffff'ffffui64;
+constexpr u8  invalid_id_u8  = 0xffui8;
+constexpr u16 invalid_id_u16 = 0xffffui16;
+constexpr u32 invalid_id_u32 = 0xffff'ffffui32;
+constexpr u64 invalid_id_u64 = 0xffff'ffff'ffff'ffffui64;
 
 
 using f32 = float;
@@ -81,14 +64,14 @@ using string_hash = std::hash<std::string>;
 
 
 template<typename T>
-using UniquePtr = std::unique_ptr<T>;
+using uptr = std::unique_ptr<T>;
 
 // Scope as well as above in case I decide to make my own version of unique ptr
 template<typename T>
 using scope = std::unique_ptr<T>;
 
 template<typename T>
-using SharedPtr = std::shared_ptr<T>;
+using sptr = std::shared_ptr<T>;
 
 // Ref as well as above in case I decide to make my own version of shared ptr
 template<typename T>

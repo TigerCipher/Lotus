@@ -64,7 +64,7 @@ LRESULT CALLBACK internal_window_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         L_DBG(SetLastError(0));
         const window_id id{ windows.add() };
         windows[id].hwnd = hwnd;
-        SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) id);
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, id);
         LASSERT(GetLastError() == 0);
         break;
     }
@@ -90,12 +90,12 @@ void resize_window(const window_info& info, const RECT& area)
 {
     RECT winrect = area;
     AdjustWindowRect(&winrect, info.style, FALSE);
-    const s32 width  = winrect.right - winrect.left;
-    const s32 height = winrect.bottom - winrect.top;
+    const i32 width  = winrect.right - winrect.left;
+    const i32 height = winrect.bottom - winrect.top;
     MoveWindow(info.hwnd, info.topLeft.x, info.topLeft.y, width, height, TRUE);
 }
 
-void resize_window(const window_id id, const uint32 width, const uint32 height)
+void resize_window(const window_id id, const u32 width, const u32 height)
 {
     window_info& info = get_from_id(id);
 
@@ -209,10 +209,10 @@ window create_window(const window_create_info* const info)
     AdjustWindowRect(&rect, winInfo.style, FALSE);
 
     const wchar_t* caption = info && info->caption ? info->caption : L"Lotus Game";
-    const s32      left    = info ? info->left : winInfo.topLeft.x;
-    const s32      top     = info ? info->top : winInfo.topLeft.y;
-    const s32      width   = rect.right - rect.left;
-    const s32      height  = rect.bottom - rect.top;
+    const i32      left    = info ? info->left : winInfo.topLeft.x;
+    const i32      top     = info ? info->top : winInfo.topLeft.y;
+    const i32      width   = rect.right - rect.left;
+    const i32      height  = rect.bottom - rect.top;
 
 
     // extended style, window class name, instance title, window style, x pos, y pos, width, height, menu, hinstance, extra params
@@ -283,18 +283,18 @@ vec4u window::rect() const
     return get_window_rect(m_id);
 }
 
-void window::resize(const uint32 width, const uint32 height) const
+void window::resize(const u32 width, const u32 height) const
 {
     LASSERT(is_valid());
     resize_window(m_id, width, height);
 }
 
-uint32 window::width() const
+u32 window::width() const
 {
     return size().x;
 }
 
-uint32 window::height() const
+u32 window::height() const
 {
     return size().y;
 }
