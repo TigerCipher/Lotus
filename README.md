@@ -49,7 +49,7 @@ ___
   + Partially implemented
 + [X] Project open/create dialog
 + [X] Win32 window hosting
-+ [ ] Content/asset browser
++ [X] Content/asset browser
 + [ ] Model importer
 + [ ] Texture editor
 + [ ] Material editor
