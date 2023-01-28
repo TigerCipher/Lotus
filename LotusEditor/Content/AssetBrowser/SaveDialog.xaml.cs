@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,12 @@ namespace LotusEditor.Content
         public SaveDialog()
         {
             InitializeComponent();
+            Closing += OnSaveDialogClosing;
+        }
+
+        private void OnSaveDialogClosing(object sender, CancelEventArgs e)
+        {
+            assetBrowserView.Dispose();
         }
 
         private void Save_OnButtonClick(object sender, RoutedEventArgs e)

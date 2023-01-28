@@ -98,7 +98,7 @@ namespace LotusEditor.Content
     /// <summary>
     /// Interaction logic for AssetBrowserView.xaml
     /// </summary>
-    public partial class AssetBrowserView : UserControl
+    public partial class AssetBrowserView : UserControl, IDisposable
     {
 
         public SelectionMode SelectionMode
@@ -282,6 +282,17 @@ namespace LotusEditor.Content
         {
             var item = folderListView.SelectedItem as AssetFileInfo;
             SelectedItem = item?.IsDirectory == true ? null : item;
+        }
+
+        public void Dispose()
+        {
+            if (Application.Current?.MainWindow != null)
+            {
+                Application.Current.MainWindow.DataContextChanged -= OnProjectChanged;
+            }
+
+            (DataContext as AssetBrowser)?.Dispose();
+            DataContext = null;
         }
     }
 }

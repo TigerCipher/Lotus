@@ -45,7 +45,7 @@ namespace LotusEditor.Content
         private readonly ObservableCollection<AssetFileInfo> _folderAssets = new();
         public ReadOnlyObservableCollection<AssetFileInfo> FolderAssets { get; }
 
-        private static readonly DelayEventTimer _refreshTimer = new(TimeSpan.FromMilliseconds(250));
+        private readonly DelayEventTimer _refreshTimer = new(TimeSpan.FromMilliseconds(250));
 
         private string _selectedFolder;
 
@@ -64,7 +64,7 @@ namespace LotusEditor.Content
             }
         }
 
-        
+
 
         public AssetBrowser(Project project)
         {
@@ -111,10 +111,7 @@ namespace LotusEditor.Content
                 folderAssets.AddRange(Directory.GetDirectories(path).Select(dir => new AssetFileInfo(dir)));
 
                 // Files
-                    foreach (var file in Directory.GetFiles(path, $"*{Asset.AssetFileExtension}"))
-                    {
-                        folderAssets.Add(AssetInfoCache.Add(file));
-                    }
+                folderAssets.AddRange(Directory.GetFiles(path, $"*{Asset.AssetFileExtension}").Select(AssetInfoCache.Add));
             }
             catch (Exception e)
             {
