@@ -24,10 +24,10 @@
 
 #include "../Components/Components.h"
 
-#define COMPONENT_INFO(name)                                                                                           \
-    namespace name                                                                                                     \
-    {                                                                                                                  \
-    struct create_info;                                                                                                \
+#define COMPONENT_INFO(name)                                                                                                \
+    namespace name                                                                                                          \
+    {                                                                                                                       \
+    struct create_info;                                                                                                     \
     }
 
 namespace lotus
@@ -39,14 +39,14 @@ COMPONENT_INFO(script)
 #undef COMPONENT_INFO
 namespace entity
 {
-    struct create_info
-    {
-        transform::create_info* transform = nullptr;
-        script::create_info*    script    = nullptr;
-    };
+struct create_info
+{
+    transform::create_info* transform = nullptr;
+    script::create_info*    script    = nullptr;
+};
 
-    entity create(const create_info& info);
-    void   remove(entity_id id);
-    bool   is_alive(entity_id id);
+entity create(const create_info& info);
+void   remove(entity_id id);
+bool   is_alive(entity_id id);
 } // namespace entity
 } // namespace lotus

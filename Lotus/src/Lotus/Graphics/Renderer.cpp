@@ -34,7 +34,6 @@ platform_interface gfx{};
 
 constexpr const char* engine_shader_paths[]{
     R"(.\shaders\d3d12\shaders.bin)",
-    // ".\\shaders\\vulkan\\shaders.bin",
 };
 
 bool set_platform_interface(graphics_platform platform)
@@ -48,7 +47,8 @@ bool set_platform_interface(graphics_platform platform)
     LASSERT(gfx.platform == platform);
     return true;
 }
-} // namespace
+
+} // anonymous namespace
 
 void surface::resize(u32 width, u32 height) const
 {
@@ -81,7 +81,7 @@ bool initialize(graphics_platform platform)
 
 void shutdown()
 {
-    if(gfx.platform != (graphics_platform) -1)
+    if (gfx.platform != (graphics_platform) -1)
         gfx.shutdown();
 }
 

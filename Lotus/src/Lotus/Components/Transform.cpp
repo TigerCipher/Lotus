@@ -30,7 +30,7 @@ namespace
 utl::vector<vec3> positions;
 utl::vector<vec4> rotations;
 utl::vector<vec3> scales;
-} // namespace
+} // anonymous namespace
 
 component create(const create_info& info, entity::entity entity)
 {

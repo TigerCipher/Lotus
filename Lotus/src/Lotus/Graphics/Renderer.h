@@ -41,7 +41,7 @@ public:
 
     constexpr bool is_valid() const { return id::is_valid(m_id); }
 
-    void  resize(u32 width, u32 height) const;
+    void resize(u32 width, u32 height) const;
 
     u32 width() const;
     u32 height() const;
@@ -49,7 +49,7 @@ public:
     void render() const;
 
 private:
-    surface_id m_id{id::invalid_id};
+    surface_id m_id{ id::invalid_id };
 };
 
 struct render_surface
@@ -69,7 +69,7 @@ bool initialize(graphics_platform platform);
 void shutdown();
 
 surface create_surface(platform::window window);
-void remove_surface(surface_id id);
+void    remove_surface(surface_id id);
 
 const char* get_engine_shaders_path();
 const char* get_engine_shaders_path(graphics_platform platform);

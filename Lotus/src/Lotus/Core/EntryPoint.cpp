@@ -47,7 +47,7 @@ std::filesystem::path set_current_directory_to_exe_path()
     std::filesystem::current_path(p.parent_path());
     return std::filesystem::current_path();
 }
-}
+} // anonymous namespace
 
     #ifndef L_EDITOR
 extern bool engine_initialize();

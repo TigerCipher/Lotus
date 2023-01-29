@@ -33,7 +33,7 @@ using namespace lotus;
 namespace
 {
 
-graphics::render_surface gameWindow {};
+graphics::render_surface game_window{};
 
 LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -41,7 +41,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     {
     case WM_DESTROY:
     {
-        if (gameWindow.window.is_closed())
+        if (game_window.window.is_closed())
         {
             PostQuitMessage(0);
             return 0;
@@ -52,7 +52,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     case WM_SYSCHAR:
         if (wparam == VK_RETURN && (HIWORD(lparam) & KF_ALTDOWN))
         {
-            gameWindow.window.set_fullscreen(!gameWindow.window.is_fullscreen());
+            game_window.window.set_fullscreen(!game_window.window.is_fullscreen());
             return 0;
         }
         break;
@@ -67,13 +67,15 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 bool engine_initialize()
 {
-    if (!content::load_game()) return false;
+    if (!content::load_game())
+        return false;
 
-    constexpr platform::window_create_info info { &winproc, nullptr, L"Lotus Game" };
+    constexpr platform::window_create_info info{ &winproc, nullptr, L"Lotus Game" };
 
-    gameWindow.window = platform::create_window(&info);
+    game_window.window = platform::create_window(&info);
 
-    if (!gameWindow.window.is_valid()) return false;
+    if (!game_window.window.is_valid())
+        return false;
 
     return true;
 }
@@ -85,7 +87,7 @@ void engine_update()
 
 void engine_shutdown()
 {
-    platform::remove_window(gameWindow.window.get_id());
+    platform::remove_window(game_window.window.get_id());
     content::unload_game();
 }
 

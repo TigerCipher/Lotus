@@ -68,8 +68,8 @@ bool read_transform(const byte*& data, entity::create_info& info)
     memcpy(&transform_info.scale[0], data, sizeof(transform_info.scale));
     data += sizeof(transform_info.scale);
 
-    vec3a rot{&rotation[0]};
-    vec   quat{math::quat_rotation_roll_pitch_yaw_from_vec(math::load_float3a(&rot))};
+    vec3a rot{ &rotation[0] };
+    vec   quat{ math::quat_rotation_roll_pitch_yaw_from_vec(math::load_float3a(&rot)) };
     vec4a rotQuad{};
     math::store_float4a(&rotQuad, quat);
     memcpy(&transform_info.rotation[0], &rotQuad.x, sizeof(transform_info.rotation));
@@ -102,19 +102,21 @@ bool read_script(const byte*& data, entity::create_info& info)
 
 using comp_reader = bool (*)(const byte*&, entity::create_info&);
 
-comp_reader comp_readers[]{read_transform, read_script};
+comp_reader comp_readers[]{ read_transform, read_script };
 
 static_assert(_countof(comp_readers) == component_type::count);
 
 bool read_file(std::filesystem::path path, scope<byte[]>& data, u64& size)
 {
-    if (!std::filesystem::exists(path)) return false;
+    if (!std::filesystem::exists(path))
+        return false;
     size = std::filesystem::file_size(path);
     LASSERT(size);
-    if (!size) return false;
+    if (!size)
+        return false;
     data = create_scope<byte[]>(size);
     std::ifstream file(path, std::ios::in | std::ios::binary);
-    if(!file || !file.read((char*)data.get(), size))
+    if (!file || !file.read((char*) data.get(), size))
     {
         file.close();
         return false;
@@ -127,15 +129,14 @@ bool read_file(std::filesystem::path path, scope<byte[]>& data, u64& size)
 
 bool load_game()
 {
-
     scope<byte[]> game_data{};
-    u64 size{ 0 };
-    if(!read_file("game.bin", game_data, size))
+    u64           size{ 0 };
+    if (!read_file("game.bin", game_data, size))
     {
         return false;
     }
     LASSERT(game_data.get());
-    const byte* at = game_data.get();
+    const byte*   at     = game_data.get();
     constexpr u32 size32 = sizeof(u32);
 
     const u32 num_ents = *at;
@@ -147,7 +148,7 @@ bool load_game()
     for (u32 i = 0; i < num_ents; ++i)
     {
         entity::create_info info;
-//         const u32           entity_type = *at; // TODO
+        //         const u32           entity_type = *at; // TODO
         at += size32;
         const u32 comp_count = *at;
         at += size32;

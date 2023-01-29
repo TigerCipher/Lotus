@@ -30,8 +30,8 @@ namespace lotus::graphics
 {
 struct platform_interface
 {
-    bool (*initialize)(void);
-    void (*shutdown)(void);
+    bool (*initialize)(void){};
+    void (*shutdown)(void){};
 
     struct
     {
@@ -41,8 +41,8 @@ struct platform_interface
         u32 (*width)(surface_id);
         u32 (*height)(surface_id);
         void (*render)(surface_id);
-    } surface;
+    } surface{};
 
-    graphics_platform platform = (graphics_platform)-1;
+    graphics_platform platform = (graphics_platform) -1;
 };
 } // namespace lotus::graphics

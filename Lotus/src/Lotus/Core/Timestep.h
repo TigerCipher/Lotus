@@ -31,8 +31,8 @@ public:
 
     operator float() const { return m_time; }
 
-    float seconds() const { return m_time; }
-    float milliseconds() const { return m_time * 1000.0f; }
+    [[nodiscard]] float seconds() const { return m_time; }
+    [[nodiscard]] float milliseconds() const { return m_time * 1000.0f; }
 
 private:
     float m_time;

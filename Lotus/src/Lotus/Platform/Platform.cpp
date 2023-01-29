@@ -33,9 +33,9 @@ bool resized = false;
 struct window_info
 {
     HWND  hwnd = nullptr;
-    RECT  clientArea{ 0, 0, 1920, 1080 };
-    RECT  fullscreenArea{};
-    POINT topLeft{ 0, 0 };
+    RECT  client_area{ 0, 0, 1920, 1080 };
+    RECT  fullscreen_area{};
+    POINT top_left{ 0, 0 };
     DWORD style      = WS_VISIBLE;
     bool  fullscreen = false;
     bool  closed     = false;
@@ -77,7 +77,7 @@ LRESULT CALLBACK internal_window_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
     {
         window_info& info = get_from_handle(hwnd);
         LASSERT(info.hwnd);
-        GetClientRect(info.hwnd, info.fullscreen ? &info.fullscreenArea : &info.clientArea);
+        GetClientRect(info.hwnd, info.fullscreen ? &info.fullscreen_area : &info.client_area);
         resized = false;
     }
 
@@ -92,7 +92,7 @@ void resize_window(const window_info& info, const RECT& area)
     AdjustWindowRect(&winrect, info.style, FALSE);
     const i32 width  = winrect.right - winrect.left;
     const i32 height = winrect.bottom - winrect.top;
-    MoveWindow(info.hwnd, info.topLeft.x, info.topLeft.y, width, height, TRUE);
+    MoveWindow(info.hwnd, info.top_left.x, info.top_left.y, width, height, TRUE);
 }
 
 void resize_window(const window_id id, const u32 width, const u32 height)
@@ -101,10 +101,10 @@ void resize_window(const window_id id, const u32 width, const u32 height)
 
     if (info.style & WS_CHILD)
     {
-        GetClientRect(info.hwnd, &info.clientArea);
+        GetClientRect(info.hwnd, &info.client_area);
     } else
     {
-        RECT& area  = info.fullscreen ? info.fullscreenArea : info.clientArea;
+        RECT& area  = info.fullscreen ? info.fullscreen_area : info.client_area;
         area.bottom = area.top + height;
         area.right  = area.left + width;
         resize_window(info, area);
@@ -119,17 +119,17 @@ void set_window_fullscreen(window_id id, bool fullscreen)
         info.fullscreen = fullscreen;
         if (fullscreen)
         {
-            GetClientRect(info.hwnd, &info.clientArea);
+            GetClientRect(info.hwnd, &info.client_area);
             RECT rect;
             GetWindowRect(info.hwnd, &rect);
-            info.topLeft.x = rect.left;
-            info.topLeft.y = rect.top;
+            info.top_left.x = rect.left;
+            info.top_left.y = rect.top;
             SetWindowLongPtr(info.hwnd, GWL_STYLE, 0);
             ShowWindow(info.hwnd, SW_MAXIMIZE);
         } else
         {
             SetWindowLongPtr(info.hwnd, GWL_STYLE, info.style);
-            resize_window(info, info.clientArea);
+            resize_window(info, info.client_area);
             ShowWindow(info.hwnd, SW_SHOWNORMAL);
         }
     }
@@ -154,7 +154,7 @@ void set_window_caption(const window_id id, const wchar_t* caption)
 vec2u get_window_size(const window_id id)
 {
     const window_info& info = get_from_id(id);
-    const RECT&        area = info.fullscreen ? info.fullscreenArea : info.clientArea;
+    const RECT&        area = info.fullscreen ? info.fullscreen_area : info.client_area;
 
     return { (u32) area.right - (u32) area.left, (u32) area.bottom - (u32) area.top };
 }
@@ -162,7 +162,7 @@ vec2u get_window_size(const window_id id)
 vec4u get_window_rect(const window_id id)
 {
     const window_info& info = get_from_id(id);
-    const RECT&        area = info.fullscreen ? info.fullscreenArea : info.clientArea;
+    const RECT&        area = info.fullscreen ? info.fullscreen_area : info.client_area;
 
     return { (u32) area.left, (u32) area.top, (u32) area.right, (u32) area.bottom };
 }
@@ -198,26 +198,25 @@ window create_window(const window_create_info* const info)
     RegisterClassEx(&wc);
 
     window_info winInfo;
-    winInfo.clientArea.right = info && info->width ? winInfo.clientArea.left + info->width : winInfo.clientArea.right;
-    winInfo.clientArea.bottom =
-        info && info->height ? winInfo.clientArea.top + info->height : winInfo.clientArea.bottom;
+    winInfo.client_area.right  = info && info->width ? winInfo.client_area.left + info->width : winInfo.client_area.right;
+    winInfo.client_area.bottom = info && info->height ? winInfo.client_area.top + info->height : winInfo.client_area.bottom;
 
-    RECT rect{ winInfo.clientArea };
+    RECT rect{ winInfo.client_area };
 
     winInfo.style |= parent ? WS_CHILD : WS_OVERLAPPEDWINDOW;
 
     AdjustWindowRect(&rect, winInfo.style, FALSE);
 
     const wchar_t* caption = info && info->caption ? info->caption : L"Lotus Game";
-    const i32      left    = info ? info->left : winInfo.topLeft.x;
-    const i32      top     = info ? info->top : winInfo.topLeft.y;
+    const i32      left    = info ? info->left : winInfo.top_left.x;
+    const i32      top     = info ? info->top : winInfo.top_left.y;
     const i32      width   = rect.right - rect.left;
     const i32      height  = rect.bottom - rect.top;
 
 
     // extended style, window class name, instance title, window style, x pos, y pos, width, height, menu, hinstance, extra params
-    winInfo.hwnd = CreateWindowEx(0, wc.lpszClassName, caption, winInfo.style, left, top, width, height, parent,
-                                  nullptr, nullptr, nullptr);
+    winInfo.hwnd = CreateWindowEx(0, wc.lpszClassName, caption, winInfo.style, left, top, width, height, parent, nullptr,
+                                  nullptr, nullptr);
 
     if (winInfo.hwnd)
     {

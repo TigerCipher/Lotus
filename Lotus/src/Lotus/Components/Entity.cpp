@@ -29,16 +29,17 @@ namespace lotus::entity
 {
 namespace
 {
-    utl::vector<id::gen_type>         generations;
-    utl::deque<entity_id>             free_ids;
-    utl::vector<transform::component> transforms;
-    utl::vector<script::component>    scripts;
-} // namespace
+utl::vector<id::gen_type>         generations;
+utl::deque<entity_id>             free_ids;
+utl::vector<transform::component> transforms;
+utl::vector<script::component>    scripts;
+} // anonymous namespace
 
 entity create(const create_info& info)
 {
     LASSERT(info.transform);
-    if (!info.transform) return {};
+    if (!info.transform)
+        return {};
 
     entity_id ident;
     if (free_ids.size() > id::min_deleted_elements)
@@ -46,11 +47,11 @@ entity create(const create_info& info)
         ident = free_ids.front();
         LASSERT(!is_alive(ident));
         free_ids.pop_front();
-        ident = entity_id { id::new_generation(ident) };
-        ++generations [ id::index(ident) ];
+        ident = entity_id{ id::new_generation(ident) };
+        ++generations[id::index(ident)];
     } else
     {
-        ident = entity_id { (id::id_type) generations.size() };
+        ident = entity_id{ (id::id_type) generations.size() };
         generations.push_back(0);
 
         // transforms.resize(generations.size()) // --> more memory allocations than emplace_back
@@ -61,16 +62,17 @@ entity create(const create_info& info)
     const entity      newEnt(ident);
     const id::id_type index = id::index(ident);
 
-    LASSERT(!transforms [ index ].is_valid());
-    transforms [ index ] = transform::create(*info.transform, newEnt);
-    if (!transforms [ index ].is_valid()) return {};
+    LASSERT(!transforms[index].is_valid());
+    transforms[index] = transform::create(*info.transform, newEnt);
+    if (!transforms[index].is_valid())
+        return {};
 
     // Script
     if (info.script && info.script->script_creator)
     {
-        LASSERT(!scripts [ index ].is_valid());
-        scripts [ index ] = script::create(*info.script, newEnt);
-        LASSERT(scripts [ index ].is_valid());
+        LASSERT(!scripts[index].is_valid());
+        scripts[index] = script::create(*info.script, newEnt);
+        LASSERT(scripts[index].is_valid());
     }
 
     return newEnt;
@@ -81,14 +83,14 @@ void remove(const entity_id id)
     const id::id_type index = id::index(id);
     LASSERT(is_alive(id));
 
-    if (scripts [ index ].is_valid())
+    if (scripts[index].is_valid())
     {
-        script::remove(scripts [ index ]);
-        scripts [ index ] = {};
+        script::remove(scripts[index]);
+        scripts[index] = {};
     }
 
-    transform::remove(transforms [ index ]);
-    transforms [ index ] = {};
+    transform::remove(transforms[index]);
+    transforms[index] = {};
     free_ids.push_back(id);
 }
 
@@ -97,7 +99,7 @@ bool is_alive(const entity_id id)
     LASSERT(id::is_valid(id));
     const id::id_type index = id::index(id);
     LASSERT(index < generations.size());
-    return generations [ index ] == id::generation(id) && transforms [ index ].is_valid();
+    return generations[index] == id::generation(id) && transforms[index].is_valid();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +112,7 @@ transform::component entity::transform() const
 {
     LASSERT(is_alive(m_id));
     const id::id_type index = id::index(m_id);
-    return transforms [ index ];
+    return transforms[index];
 }
 
 
@@ -118,7 +120,7 @@ script::component entity::script() const
 {
     LASSERT(is_alive(m_id));
     const id::id_type index = id::index(m_id);
-    return scripts [ index ];
+    return scripts[index];
 }
 
 

@@ -28,7 +28,7 @@ namespace lotus::script
 
 struct create_info
 {
-    detail::script_creator script_creator;
+    detail::script_creator script_creator{};
 };
 
 component create(const create_info& info, entity::entity entity);

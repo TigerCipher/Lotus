@@ -33,24 +33,24 @@ public:
     constexpr window() = default;
     constexpr explicit window(const window_id id) : m_id(id) {}
 
-    constexpr window_id get_id() const { return m_id; }
+    [[nodiscard]] constexpr window_id get_id() const { return m_id; }
 
-    constexpr bool is_valid() const { return id::is_valid(m_id); }
+    [[nodiscard]] constexpr bool is_valid() const { return id::is_valid(m_id); }
 
     void set_fullscreen(bool fullscreen) const;
-    bool is_fullscreen() const;
     void set_caption(const wchar_t* caption) const;
+    void resize(u32 width, u32 height) const;
 
-    vec4u rect() const;
-    vec2u size() const;
-    void  resize(u32 width, u32 height) const;
+    [[nodiscard]] vec4u rect() const;
+    [[nodiscard]] bool  is_fullscreen() const;
+    [[nodiscard]] vec2u size() const;
 
-    u32 width() const;
-    u32 height() const;
+    [[nodiscard]] u32 width() const;
+    [[nodiscard]] u32 height() const;
 
-    bool is_closed() const;
+    [[nodiscard]] bool is_closed() const;
 
-    void* handle() const;
+    [[nodiscard]] void* handle() const;
 
 private:
     window_id m_id{ id::invalid_id };

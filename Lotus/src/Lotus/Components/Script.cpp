@@ -60,7 +60,7 @@ utl::vector<std::string>& script_names()
 }
 #endif
 
-} // namespace
+} // anonymous namespace
 
 namespace detail
 {
