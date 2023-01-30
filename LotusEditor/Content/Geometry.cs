@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using LotusEditor.DllWrapper;
+using LotusEditor.GameProject;
 using LotusEditor.Utility;
 
 namespace LotusEditor.Content
@@ -99,6 +101,8 @@ namespace LotusEditor.Content
 
     internal class Geometry : Asset
     {
+
+        private readonly object _lock = new();
 
         private readonly List<LODGroup> _lodGroups = new();
 
@@ -269,10 +273,50 @@ namespace LotusEditor.Content
             return savedFiles;
         }
 
+        public override void Import(string file)
+        {
+            Debug.Assert(File.Exists(file));
+            Debug.Assert(!string.IsNullOrEmpty(FullPath));
+
+            var ext = Path.GetExtension(file).ToLower();
+
+            SourcePath = file;
+
+            try
+            {
+                if (ext == ".fbx")
+                {
+                    ImportFbx(file);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to read {file} for import. Reason: {ex.Message}");
+            }
+        }
+
+        private void ImportFbx(string file)
+        {
+            Logger.Info($"Importing FBX file {file} (This may take a minute, especially if in a debug environment)");
+            var temp = Application.Current.Dispatcher.Invoke(() => Project.Current.TempFolder);
+            if (string.IsNullOrEmpty(temp)) return;
+
+            lock (_lock)
+            {
+                if (!Directory.Exists(temp)) Directory.CreateDirectory(temp);
+            }
+
+            var tempFile = $"{temp}{ContentUtil.GetRandomString()}.fbx";
+            File.Copy(file, tempFile, true);
+            ContentToolsAPI.ImportFbx(tempFile, this);
+        }
+
         private byte[] GenerateIcon(MeshLOD lod)
         {
             Logger.Info("Generating asset icon");
-            const int width = 90 * 4; // 90 pixels * 4, so 4x sampling
+            var width = AssetFileInfo.IconWidth * 4; // width pixels * 4, so 4x sampling
+
+            using var memStream = new MemoryStream();
             BitmapSource bmp = null;
 
             Application.Current.Dispatcher.Invoke(() =>
@@ -280,15 +324,14 @@ namespace LotusEditor.Content
                 bmp = Editors.GeometryEditor.GeometryView.RenderToBitmap(new Editors.GeometryEditor.MeshRenderer(lod, null),
                     width, width);
                 bmp = new TransformedBitmap(bmp, new ScaleTransform(0.25, 0.25, 0.5, 0.5));
+                memStream.SetLength(0);
+
+                Logger.Info("Encoding icon");
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+                encoder.Save(memStream);
             });
 
-            using var memStream = new MemoryStream();
-            memStream.SetLength(0);
-
-            Logger.Info("Encoding icon");
-            var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(bmp));
-            encoder.Save(memStream);
 
             Logger.Info("Icon created");
             return memStream.ToArray();

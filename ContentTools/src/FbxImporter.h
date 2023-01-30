@@ -54,17 +54,17 @@ public:
         ZeroMemory(this, sizeof(fbx_context));
     }
 
-    void get_scene(FbxNode* root = nullptr);
+    void get_scene(FbxNode* root = nullptr) const;
 
-    constexpr bool is_valid() const { return m_fbx_manager && m_fbx_scene; }
-    constexpr f32  scene_scale() const { return m_scene_scale; }
+    [[nodiscard]] constexpr bool is_valid() const { return m_fbx_manager && m_fbx_scene; }
+    [[nodiscard]] constexpr f32  scene_scale() const { return m_scene_scale; }
 
 private:
     bool initialize_fbx();
     void load_fbx_file(const char* file);
     bool get_mesh_data(FbxMesh* fbx_mesh, mesh& mesh) const;
-    void get_mesh(FbxNode* node, utl::vector<mesh>& meshes);
-    void get_lod_group(FbxNode* node);
+    void get_mesh(FbxNode* node, utl::vector<mesh>& meshes) const;
+    void get_lod_group(FbxNode* node) const;
 
     scene*      m_scene{ nullptr };
     scene_data* m_scene_data{ nullptr };

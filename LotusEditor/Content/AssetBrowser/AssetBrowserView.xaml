@@ -281,11 +281,13 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <ListView ItemsSource="{Binding FolderAssets}" Grid.Row="1" x:Name="folderListView" IsTextSearchEnabled="True" TextSearch.TextPath="FileName" SelectionChanged="OnFolderViewSelectionChanged">
+        <ListView ItemsSource="{Binding FolderAssets}" Grid.Row="1" x:Name="folderListView" IsTextSearchEnabled="True" TextSearch.TextPath="FileName" SelectionChanged="OnFolderViewSelectionChanged"
+                  Drop="FolderAssets_OnDrop">
             <ListView.Style>
                 <Style TargetType="{x:Type ListView}">
                     <Setter Property="Background" Value="{StaticResource Editor.Window.GrayBrush2}"/>
                     <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="AllowDrop" Value="{Binding Path=AllowDrop, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AssetBrowserView}}}"/>
                     <Setter Property="View" Value="{StaticResource gridView}"/>
                     <Setter Property="SelectionMode" Value="{Binding Path=SelectionMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AssetBrowserView}}}"/>
                     <Style.Triggers>

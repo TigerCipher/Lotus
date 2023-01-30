@@ -27,7 +27,7 @@ namespace LotusEditor.GameProject
         public string FullPath => $"{Path}{Name}{Extension}";
         public string SolutionName => $@"{Path}{Name}.sln";
         public string ContentPath => $@"{Path}Assets\";
-
+        public string TempFolder => $@"{Path}.Lotus\Temp\";
 
 
         private int _buildConfig;
@@ -82,7 +82,7 @@ namespace LotusEditor.GameProject
         public ICommand DebugStartCmd { get; private set; }
         public ICommand DebugStartWithoutDebuggingCmd { get; private set; }
         public ICommand DebugStopCmd { get; private set; }
-
+        
 
 
         public Project(string name, string path)
@@ -206,6 +206,15 @@ namespace LotusEditor.GameProject
             VisualStudio.CloseInstance();
             HistoryManager.Reset();
             SelectionHistoryManager.Reset();
+            DeleteTempFolder();
+        }
+
+        private void DeleteTempFolder()
+        {
+            if (Directory.Exists(TempFolder))
+            {
+                Directory.Delete(TempFolder, true);
+            }
         }
 
         [OnDeserialized]

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using LotusEditor.Content;
 using Microsoft.VisualBasic;
 
 namespace LotusEditor.Utility
@@ -175,7 +176,8 @@ namespace LotusEditor.Utility
             try
             {
                 return File.GetAttributes(path).HasFlag(FileAttributes.Directory);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Debug.WriteLine($"Error occurred while checking file attributes: {ex.Message}");
                 return false;
@@ -183,5 +185,70 @@ namespace LotusEditor.Utility
         }
 
         public static bool IsDirectory(this FileInfo info) => info.Attributes.HasFlag(FileAttributes.Directory);
+
+        public static async Task ImportFilesAsync(string[] files, string dest)
+        {
+            try
+            {
+                Debug.Assert(!string.IsNullOrEmpty(dest));
+                ContentWatcher.EnableFileWatcher(false);
+                var tasks = files.Select(async file => await Task.Run(() => { Import(file, dest); }));
+                await Task.WhenAll(tasks);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to import files to {dest}");
+                Logger.Error(ex.Message);
+            }
+            finally
+            {
+                ContentWatcher.EnableFileWatcher(true);
+            }
+        }
+
+        private static void Import(string file, string dest)
+        {
+            Debug.Assert(!string.IsNullOrEmpty(file));
+            if (IsDirectory(file)) return;
+            if (!dest.EndsWith(Path.DirectorySeparatorChar))
+                dest += Path.DirectorySeparatorChar;
+            var name = Path.GetFileNameWithoutExtension(file).ToLower();
+            var ext = Path.GetExtension(file).ToLower();
+
+            Asset asset = null;
+
+            switch (ext)
+            {
+                case ".fbx": asset = new Content.Geometry(); break;
+                case ".bmp": break;
+                case ".png": break;
+                case ".jpg": break;
+                case ".jpeg": break;
+                case ".tiff": break;
+                case ".tif": break;
+                case ".tga": break;
+                case ".wav": break;
+                case ".ogg": break;
+                default: break;
+            }
+
+            if (asset != null)
+            {
+                Import(asset, name, file, dest);
+            }
+        }
+
+        private static void Import(Asset asset, string name, string file, string dest)
+        {
+            Debug.Assert(asset != null);
+            asset.FullPath = dest + name + Asset.AssetFileExtension;
+
+            if (!string.IsNullOrEmpty(file))
+            {
+                asset.Import(file);
+            }
+
+            asset.Save(asset.FullPath);
+        }
     }
 }

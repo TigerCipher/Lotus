@@ -116,8 +116,8 @@ public:
     void release();
 
 
-    constexpr ID3D12Resource* const resource() const { return m_resource; }
-    constexpr descriptor_handle     srv() const { return m_srv; }
+    [[nodiscard]] constexpr ID3D12Resource* const resource() const { return m_resource; }
+    [[nodiscard]] constexpr descriptor_handle     srv() const { return m_srv; }
 
 private:
     constexpr void reset()
@@ -145,8 +145,7 @@ public:
     explicit d3d12_render_texture(d3d12_texture_init_info info);
     DISABLE_COPY(d3d12_render_texture);
 
-    constexpr d3d12_render_texture(d3d12_render_texture&& o) :
-        m_texture(std::move(o.m_texture)), m_mip_count(o.m_mip_count)
+    constexpr d3d12_render_texture(d3d12_render_texture&& o) : m_texture(std::move(o.m_texture)), m_mip_count(o.m_mip_count)
     {
         for (u32 i = 0; i < m_mip_count; ++i)
         {
@@ -168,16 +167,17 @@ public:
 
     void release();
 
-    constexpr u32                         mip_count() const { return m_mip_count; }
-    constexpr D3D12_CPU_DESCRIPTOR_HANDLE rtv(u32 mip_idx) const
+    [[nodiscard]] constexpr u32 mip_count() const { return m_mip_count; }
+
+    [[nodiscard]] constexpr D3D12_CPU_DESCRIPTOR_HANDLE rtv(u32 mip_idx) const
     {
         LASSERT(mip_idx < m_mip_count);
         return m_rtv[mip_idx].cpu;
     }
 
-    constexpr descriptor_handle srv() const { return m_texture.srv(); }
+    [[nodiscard]] constexpr descriptor_handle srv() const { return m_texture.srv(); }
 
-    constexpr ID3D12Resource* const resource() const { return m_texture.resource(); }
+    [[nodiscard]] constexpr ID3D12Resource* resource() const { return m_texture.resource(); }
 
 private:
     constexpr void reset()
@@ -232,9 +232,9 @@ public:
 
     void release();
 
-    constexpr D3D12_CPU_DESCRIPTOR_HANDLE dsv() const { return m_dsv.cpu; }
-    constexpr descriptor_handle           srv() const { return m_texture.srv(); }
-    constexpr ID3D12Resource* const       resource() const { return m_texture.resource(); }
+    [[nodiscard]] constexpr D3D12_CPU_DESCRIPTOR_HANDLE dsv() const { return m_dsv.cpu; }
+    [[nodiscard]] constexpr descriptor_handle           srv() const { return m_texture.srv(); }
+    [[nodiscard]] constexpr ID3D12Resource*             resource() const { return m_texture.resource(); }
 
 private:
     d3d12_texture     m_texture{};

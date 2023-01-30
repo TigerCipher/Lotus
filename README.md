@@ -24,14 +24,14 @@ ___
    + Vectors and free lists are implemented currently
  + [ ] Textures
  + [ ] Forward Lighting
- + [ ] HLSL shaders
- + [ ] Models and Meshes
+ + [X] HLSL shaders
+ + [X] Models and Meshes
  + [ ] Animation
  + [ ] Shadows
  + [ ] Physics
  + [ ] User input
  + [ ] Cameras
- + [ ] Forward+ rendering
+ + [X] Forward+ rendering
  + [ ] Material system
  + [ ] Physically Based Rendering - PBR
  + [ ] Image based lighting

@@ -14,7 +14,7 @@
             <RowDefinition/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <local:AssetBrowserView x:Name="assetBrowserView" SelectionMode="Single" FileAccess="Write" MouseDoubleClick="AssetBrowser_OnDoubleClick"/>
+        <local:AssetBrowserView x:Name="assetBrowserView" SelectionMode="Single" FileAccess="Write" MouseDoubleClick="AssetBrowser_OnDoubleClick" AllowDrop="False"/>
         
         <Border Grid.Row="1" Background="{StaticResource Editor.Window.GrayBrush3}">
             <StackPanel>

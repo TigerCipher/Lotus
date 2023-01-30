@@ -11,6 +11,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 
 using LotusEditor.GameProject;
+using LotusEditor.Utility;
 
 namespace LotusEditor.Content
 {
@@ -137,6 +138,7 @@ namespace LotusEditor.Content
             DataContext = null;
             InitializeComponent();
             Loaded += OnAssetBrowserLoaded;
+            AllowDrop = true;
         }
 
         private void OnAssetBrowserLoaded(object sender, RoutedEventArgs e)
@@ -287,6 +289,20 @@ namespace LotusEditor.Content
 
             (DataContext as AssetBrowser)?.Dispose();
             DataContext = null;
+        }
+
+        private void FolderAssets_OnDrop(object sender, DragEventArgs e)
+        {
+            var vm = DataContext as AssetBrowser;
+            if (vm.SelectedFolder != null && e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (files?.Length > 0 && Directory.Exists(vm.SelectedFolder))
+                {
+                    _ = ContentUtil.ImportFilesAsync(files, vm.SelectedFolder);
+                    e.Handled = true;
+                }
+            }
         }
     }
 }

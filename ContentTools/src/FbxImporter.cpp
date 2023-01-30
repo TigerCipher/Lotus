@@ -43,7 +43,7 @@ namespace
 std::mutex fbx_mutex;
 } // anonymous namespace
 
-void fbx_context::get_scene(FbxNode* root)
+void fbx_context::get_scene(FbxNode* root) const
 {
     LASSERT(is_valid());
 
@@ -232,7 +232,7 @@ bool fbx_context::get_mesh_data(FbxMesh* fbx_mesh, mesh& mesh) const
     return true;
 }
 
-void fbx_context::get_mesh(FbxNode* node, utl::vector<mesh>& meshes)
+void fbx_context::get_mesh(FbxNode* node, utl::vector<mesh>& meshes) const
 {
     LASSERT(node);
 
@@ -256,9 +256,11 @@ void fbx_context::get_mesh(FbxNode* node, utl::vector<mesh>& meshes)
             meshes.emplace_back(m);
         }
     }
+
+    get_scene(node);
 }
 
-void fbx_context::get_lod_group(FbxNode* node)
+void fbx_context::get_lod_group(FbxNode* node) const
 {
     LASSERT(node);
 
@@ -288,6 +290,7 @@ void fbx_context::get_lod_group(FbxNode* node)
     }
 }
 
+// ReSharper disable once CppInconsistentNaming
 EDITOR_INTERFACE void ImportFbx(const char* file, scene_data* data)
 {
     LASSERT(file && data);
@@ -303,7 +306,7 @@ EDITOR_INTERFACE void ImportFbx(const char* file, scene_data* data)
             fbx_context.get_scene();
         } else
         {
-            // Log error
+            // TODO: Log error
             return;
         }
     }

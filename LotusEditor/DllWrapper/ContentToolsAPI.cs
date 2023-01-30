@@ -77,14 +77,18 @@ namespace LotusEditor.DllWrapper
         [DllImport(_toolsDLL)]
         private static extern void CreatePrimitiveMesh([In, Out] SceneData data, PrimitiveCreateInfo info);
 
-        public static void CreatePrimitiveMesh(Content.Geometry geometry, PrimitiveCreateInfo info)
+        [DllImport(_toolsDLL)]
+        private static extern void ImportFbx(string file, [In, Out] SceneData data);
+
+        private static void GeometryFromSceneData(Content.Geometry geometry, Action<SceneData> sceneDataGenerator,
+            string failureMessage)
         {
             Debug.Assert(geometry != null);
             using var sceneData = new SceneData();
             try
             {
                 sceneData.ImportSettings.FromContentSettings(geometry);
-                CreatePrimitiveMesh(sceneData, info);
+                sceneDataGenerator(sceneData);
                 Debug.Assert(sceneData.Data != IntPtr.Zero && sceneData.DataSize > 0);
                 var data = new byte[sceneData.DataSize];
                 Marshal.Copy(sceneData.Data, data, 0, sceneData.DataSize);
@@ -92,9 +96,19 @@ namespace LotusEditor.DllWrapper
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to create {info.Type} primitive mesh");
-                Debug.WriteLine(ex.Message);
+                Logger.Error($"{failureMessage} with reason: {ex.Message}");
             }
+        }
+
+        public static void CreatePrimitiveMesh(Content.Geometry geometry, PrimitiveCreateInfo info)
+        {
+            GeometryFromSceneData(geometry, (sceneData) => CreatePrimitiveMesh(sceneData, info), $"Failed to create {info.Type} primitive mesh");
+        }
+
+
+        public static void ImportFbx(string file, Content.Geometry geometry)
+        {
+            GeometryFromSceneData(geometry, (sceneData) => ImportFbx(file, sceneData), $"Failed to import FBX file: {file}");
         }
     }
 }
