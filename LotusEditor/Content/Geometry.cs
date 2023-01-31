@@ -97,6 +97,16 @@ namespace LotusEditor.Content
             writer.Write(ImportEmbededTextures);
             writer.Write(ImportAnimations);
         }
+
+        public void FromBinary(BinaryReader reader)
+        {
+            CalculateNormals = reader.ReadBoolean();
+            CalculateTangents = reader.ReadBoolean();
+            SmoothingAngle = reader.ReadSingle();
+            ReverseHandedness = reader.ReadBoolean();
+            ImportEmbededTextures = reader.ReadBoolean();
+            ImportAnimations = reader.ReadBoolean();
+        }
     }
 
     internal class Geometry : Asset
@@ -207,7 +217,7 @@ namespace LotusEditor.Content
         public LODGroup GetLodGroup(int lodGroup = 0)
         {
             Debug.Assert(lodGroup >= 0 && lodGroup < _lodGroups.Count);
-            return _lodGroups.Any() ? _lodGroups[lodGroup] : null;
+            return lodGroup < _lodGroups.Count ? _lodGroups[lodGroup] : null;
         }
 
         public override IEnumerable<string> Save(string file)
@@ -227,7 +237,7 @@ namespace LotusEditor.Content
                     var meshName = ContentUtil.FixFilename(_lodGroups.Count > 1 ?
                         path + fileName + "_" + lodGroup.LODS[0].Name + AssetFileExtension :
                         path + fileName + AssetFileExtension);
-                    Guid = Guid.NewGuid(); // need dif id for each asset file
+                    Guid = TryGetAssetInfo(meshName) is AssetInfo info && info.Type == Type ? info.Guid : Guid.NewGuid();
                     Logger.Info($"Saving mesh with highest lod with name {lodGroup.LODS[0].Name} and guid {Guid.ToString()}");
                     byte[] data = null;
                     using (var writer = new BinaryWriter(new MemoryStream()))
@@ -295,6 +305,47 @@ namespace LotusEditor.Content
             }
         }
 
+        public override void Load(string file)
+        {
+            Debug.Assert(File.Exists(file));
+            Debug.Assert(Path.GetExtension(file).ToLower() == AssetFileExtension);
+
+            try
+            {
+                byte[] data = null;
+                using (var reader = new BinaryReader(File.Open(file, FileMode.Open, FileAccess.Read)))
+                {
+                    ReadAssetFileHeader(reader);
+                    ImportSettings.FromBinary(reader);
+                    int dataLen = reader.ReadInt32();
+                    Debug.Assert(dataLen > 0);
+                    data = reader.ReadBytes(dataLen);
+                }
+
+                Debug.Assert(data.Length > 0);
+
+                using (var reader = new BinaryReader(new MemoryStream(data)))
+                {
+                    LODGroup lodgroup = new LODGroup();
+                    lodgroup.Name = reader.ReadString();
+                    var lodCount = reader.ReadInt32();
+
+                    for (var i = 0; i < lodCount; ++i)
+                    {
+                        lodgroup.LODS.Add(BinaryToLOD(reader));
+                    }
+
+                    _lodGroups.Clear();
+                    _lodGroups.Add(lodgroup);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to load geometry asset from file: {file}");
+                Logger.Error($"Encountered exception: {ex.Message}");
+            }
+        }
+
         private void ImportFbx(string file)
         {
             Logger.Info($"Importing FBX file {file} (This may take a minute, especially if in a debug environment)");
@@ -350,7 +401,7 @@ namespace LotusEditor.Content
             {
                 writer.Write(mesh.VertexSize);
                 writer.Write(mesh.VertexCount);
-                writer.Write(mesh.IndexCount);
+                writer.Write(mesh.IndexSize);
                 writer.Write(mesh.IndexCount);
                 writer.Write(mesh.Vertices);
                 writer.Write(mesh.Indices);
@@ -359,8 +410,32 @@ namespace LotusEditor.Content
             var meshDataSize = writer.BaseStream.Position - meshBegin;
             Debug.Assert(meshDataSize > 0);
 
-            var buffer = (writer.BaseStream as MemoryStream).ToArray();
+            var buffer = (writer.BaseStream as MemoryStream)?.ToArray();
             hash = ContentUtil.ComputeHash(buffer, (int)meshBegin, (int)meshDataSize);
+        }
+
+        private MeshLOD BinaryToLOD(BinaryReader reader)
+        {
+            var lod = new MeshLOD();
+            lod.Name = reader.ReadString();
+            lod.LodThreshold = reader.ReadSingle();
+            var meshCount = reader.ReadInt32();
+            for (var i = 0; i < meshCount; ++i)
+            {
+                var mesh = new Mesh()
+                {
+                    VertexSize = reader.ReadInt32(),
+                    VertexCount = reader.ReadInt32(),
+                    IndexSize = reader.ReadInt32(),
+                    IndexCount = reader.ReadInt32()
+                };
+                mesh.Vertices = reader.ReadBytes(mesh.VertexSize * mesh.VertexCount);
+                mesh.Indices = reader.ReadBytes(mesh.IndexSize * mesh.IndexCount);
+
+                lod.Meshes.Add(mesh);
+            }
+
+            return lod;
         }
     }
 }

@@ -9,7 +9,8 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
-
+using LotusEditor.Editors;
+using LotusEditor.Editors.GeometryEditor;
 using LotusEditor.GameProject;
 using LotusEditor.Utility;
 
@@ -177,13 +178,12 @@ namespace LotusEditor.Content
         {
             (DataContext as AssetBrowser)?.Dispose();
             DataContext = null;
-            if (e.NewValue is Project project)
-            {
-                Debug.Assert(e.NewValue == Project.Current);
-                var assetBrowser = new AssetBrowser(project);
-                assetBrowser.PropertyChanged += OnSelectedFolderChanged;
-                DataContext = assetBrowser;
-            }
+            if (e.NewValue is not Project project) return;
+
+            Debug.Assert(e.NewValue == Project.Current);
+            var assetBrowser = new AssetBrowser(project);
+            assetBrowser.PropertyChanged += OnSelectedFolderChanged;
+            DataContext = assetBrowser;
         }
 
         private void OnSelectedFolderChanged(object sender, PropertyChangedEventArgs e)
@@ -212,7 +212,7 @@ namespace LotusEditor.Content
                 paths[i] = path;
                 labels[i] = path[(path.LastIndexOf(Path.DirectorySeparatorChar) + 1)..];
                 if (path == contentPath) break;
-                path = path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar));
+                path = path[..path.LastIndexOf(Path.DirectorySeparatorChar)];
             }
 
             if (i == 3) i = 2;
@@ -231,7 +231,7 @@ namespace LotusEditor.Content
         private void OnGridViewColumnHeader_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not GridViewColumnHeader column) return;
-            if(column.Tag == null) return;
+            if (column.Tag == null) return;
             var sortBy = column.Tag.ToString();
 
             folderListView.Items.SortDescriptions.Clear();
@@ -256,9 +256,76 @@ namespace LotusEditor.Content
 
         private void ExecuteSelection(AssetFileInfo info)
         {
-            if (info is not { IsDirectory: true }) return;
+            if(info == null) return;
 
-            if (DataContext is AssetBrowser vm) vm.SelectedFolder = info.FullPath;
+            if (info.IsDirectory)
+            {
+                var vm = DataContext as AssetBrowser;
+                Debug.Assert(vm != null, nameof(vm) + " != null");
+                vm.SelectedFolder = info.FullPath;
+            }
+            else if (FileAccess.HasFlag(FileAccess.Read))
+            {
+                var assetInfo = Asset.GetAssetInfo(info.FullPath);
+                if (assetInfo != null)
+                {
+                    OpenAssetEditor(assetInfo);
+                }
+            }
+        }
+
+        private IAssetEditor OpenAssetEditor(AssetInfo info)
+        {
+            IAssetEditor editor = null;
+            try
+            {
+                switch (info.Type)
+                {
+                    case AssetType.Animation: break;
+                    case AssetType.Audio: break;
+                    case AssetType.Material: break;
+                    case AssetType.Mesh:
+                        editor = OpenEditorPanel<GeometryEditorView>(info, info.Guid, "GeometryEditor");
+                        break;
+                    case AssetType.Skeleton: break;
+                    case AssetType.Texture: break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"Encountered exception while attempting to open an asset editor: {ex.Message}");
+            }
+
+            return editor;
+        }
+
+        private IAssetEditor OpenEditorPanel<T>(AssetInfo info, Guid guid, string title) where T : FrameworkElement, new()
+        {
+
+            // In case a window with the asset is already open, bring it to the front
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.Content is not FrameworkElement { DataContext: IAssetEditor editor } ||
+                    editor.Asset.Guid != info.Guid) continue;
+                window.Activate();
+                return editor;
+            }
+
+            var newEditor = new T();
+            Debug.Assert(newEditor.DataContext is IAssetEditor);
+            (newEditor.DataContext as IAssetEditor)?.SetAsset(info);
+
+            var win = new Window()
+            {
+                Content = newEditor,
+                Title = title,
+                Owner = Application.Current.MainWindow,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Style = Application.Current.FindResource("LotusWindowStyle") as Style
+            };
+
+            win.Show();
+            return newEditor.DataContext as IAssetEditor;
         }
 
         private void OnContent_Item_KeyDown(object sender, KeyEventArgs e)

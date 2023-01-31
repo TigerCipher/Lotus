@@ -53,6 +53,7 @@ namespace LotusEditor.Content
 
         public abstract IEnumerable<string> Save(string file);
         public abstract void Import(string file);
+        public abstract void Load(string file);
 
         private static AssetInfo GetAssetInfo(BinaryReader reader)
         {
@@ -92,6 +93,11 @@ namespace LotusEditor.Content
 
             return null;
         }
+
+        public static AssetInfo TryGetAssetInfo(string file) =>
+            File.Exists(file) && Path.GetExtension(file) == AssetFileExtension
+                ? AssetRegistry.GetAssetInfo(file) ?? GetAssetInfo(file)
+                : null;
 
         protected void WriteAssetFileHeader(BinaryWriter writer)
         {

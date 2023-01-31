@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -105,6 +106,7 @@ namespace LotusEditor.Editors.GeometryEditor
                         var normY = reader.ReadUInt16() * intervals - 1.0f;
                         var normZ = Math.Sqrt(Math.Clamp(1f - (normX * normX + normY * normY), 0f, 1f)) * ((signs & 0x2) - 1f);
                         var normal = new Vector3D(normX, normY, normZ);
+                        normal.Normalize();
                         vertexData.Normals.Add(normal);
                         avgNormal += normal;
 
@@ -162,14 +164,57 @@ namespace LotusEditor.Editors.GeometryEditor
 
     internal class GeometryEditor : ViewModelBase, IAssetEditor
     {
-        public Content.Asset Asset => Geometry;
+        Asset IAssetEditor.Asset => Geometry;
 
         private Content.Geometry _geometry;
         public Content.Geometry Geometry { get => _geometry; set { if (_geometry == value) return; _geometry = value; OnPropertyChanged(nameof(Geometry)); } }
 
         private MeshRenderer _meshRenderer;
-        public MeshRenderer MeshRenderer { get => _meshRenderer; set { if (_meshRenderer == value) return; _meshRenderer = value; OnPropertyChanged(nameof(MeshRenderer)); } }
 
+        public MeshRenderer MeshRenderer
+        {
+            get => _meshRenderer;
+            set
+            {
+                if (_meshRenderer == value) return;
+                _meshRenderer = value;
+                OnPropertyChanged(nameof(MeshRenderer));
+                var lods = Geometry.GetLodGroup().LODS;
+                MaxLODIndex = (lods.Count > 0) ? lods.Count - 1 : 0;
+                OnPropertyChanged(nameof(MaxLODIndex));
+                if (lods.Count > 1)
+                {
+                    MeshRenderer.PropertyChanged += (s, e) =>
+                    {
+                        if(e.PropertyName == nameof(MeshRenderer.OffsetCameraPosition) && AutoLOD) ComputeLOD(lods);
+                    };
+                    ComputeLOD(lods);
+                }
+            }
+        }
+
+
+
+        private bool _autoLOD = true;
+        public bool AutoLOD { get => _autoLOD; set { if (_autoLOD == value) return; _autoLOD = value; OnPropertyChanged(nameof(AutoLOD)); } }
+
+        public int MaxLODIndex { get; private set; }
+
+        private int _lodIndex;
+
+        public int LodIndex
+        {
+            get => _lodIndex;
+            set
+            {
+                var lods = Geometry.GetLodGroup().LODS;
+                value = Math.Clamp(value, 0, lods.Count - 1);
+                if (_lodIndex == value) return;
+                _lodIndex = value;
+                OnPropertyChanged(nameof(LodIndex));
+                MeshRenderer = new MeshRenderer(lods[value], MeshRenderer);
+            }
+        }
 
         public void SetAsset(Content.Asset asset)
         {
@@ -177,7 +222,52 @@ namespace LotusEditor.Editors.GeometryEditor
             if (asset is Content.Geometry geometry)
             {
                 Geometry = geometry;
-                MeshRenderer = new MeshRenderer(Geometry.GetLodGroup().LODS[0], MeshRenderer);
+                var numLods = geometry.GetLodGroup().LODS.Count;
+                if (LodIndex >= numLods)
+                {
+                    LodIndex = numLods - 1;
+                }
+                else
+                {
+                    MeshRenderer = new MeshRenderer(Geometry.GetLodGroup().LODS[0], MeshRenderer);
+                }
+            }
+        }
+
+        public async void SetAsset(AssetInfo info)
+        {
+            try
+            {
+                Debug.Assert(info != null && File.Exists(info.FullPath));
+                var geometry = new Content.Geometry();
+                await Task.Run(() =>
+                {
+                    geometry.Load(info.FullPath);
+                });
+
+                SetAsset(geometry);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"Exception occurred while loading asset: {ex.Message}");
+            }
+        }
+
+
+
+        private void ComputeLOD(IList<MeshLOD> lods)
+        {
+            if (!AutoLOD) return;
+
+            var p = MeshRenderer.OffsetCameraPosition;
+            var dist = new Vector3D(p.X, p.Y, p.Z).Length;
+            for (var i = MaxLODIndex; i >= 0; --i)
+            {
+                if (lods[i].LodThreshold < dist)
+                {
+                    LodIndex = i;
+                    break;
+                }
             }
         }
     }
