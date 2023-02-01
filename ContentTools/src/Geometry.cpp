@@ -201,7 +201,7 @@ u64 get_mesh_size(const mesh& m)
 {
     const u64     num_verts         = m.vertices.size();
     const u64     vert_buffer_size  = sizeof(packed_vertex::vertex_static) * num_verts;
-    const u64     index_size        = num_verts < 1 << 16 ? sizeof(u16) : sizeof(u32);
+    const u64     index_size        = num_verts < (1 << 16) ? sizeof(u16) : sizeof(u32);
     const u64     index_buffer_size = index_size * m.indices.size();
     constexpr u64 size32            = sizeof(u32);
 

@@ -63,8 +63,9 @@ private:
     bool initialize_fbx();
     void load_fbx_file(const char* file);
     bool get_mesh_data(FbxMesh* fbx_mesh, mesh& mesh) const;
-    void get_mesh(FbxNode* node, utl::vector<mesh>& meshes) const;
-    void get_lod_group(FbxNode* node) const;
+    void get_meshes(FbxNode* node, utl::vector<mesh>& meshes, u32 lod_id, f32 lod_threshold) const;
+    void get_mesh(FbxNodeAttribute* attrib, utl::vector<mesh>& meshes, u32 lod_id, f32 lod_threshold) const;
+    void get_lod_group(FbxNodeAttribute* attrib) const;
 
     scene*      m_scene{ nullptr };
     scene_data* m_scene_data{ nullptr };
