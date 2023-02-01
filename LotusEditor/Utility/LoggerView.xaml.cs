@@ -38,5 +38,11 @@ namespace LotusEditor.Utility
             if (toggleError.IsChecked == true) filter |= (int)Level.Error;
             Logger.SetMessageFilter(filter);
         }
+
+        private void OnTextChanged(object sender, DataTransferEventArgs e)
+        {
+            // TODO Doesn't seem to always work
+            scrollViewer.ScrollToBottom();
+        }
     }
 }
