@@ -60,9 +60,9 @@ namespace LotusEditor.ContentToolsAPIStructs
     class PrimitiveCreateInfo
     {
         public Content.PrimitiveMeshType Type;
-        public int SegmentX;
-        public int SegmentY;
-        public int SegmentZ;
+        public int SegmentX = 1;
+        public int SegmentY = 1;
+        public int SegmentZ = 1;
         public Vector3 Size = new(1f);
         public int LOD = 0;
     }

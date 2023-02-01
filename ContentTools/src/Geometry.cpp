@@ -38,7 +38,6 @@ void recalculate_normals(mesh& m)
 
     for (u32 i = 0; i < num_indices; ++i)
     {
-        //
         const u32 i0 = m.raw_indices[i];
         const u32 i1 = m.raw_indices[++i];
         const u32 i2 = m.raw_indices[++i];
@@ -169,7 +168,7 @@ void pack_vertices(mesh& m)
     for (u32 i = 0; i < num_verts; ++i)
     {
         const auto& [tangent, position, normal, uv] = m.vertices[i];
-        const u8  signs                             = ((u8) normal.z > 0.0f) << 1;
+        const u8  signs                             = (u8)((normal.z > 0.0f) << 1);
         const u16 n_x                               = (u16) math::pack_float<16>(normal.x, -1.0f, 1.0f);
         const u16 n_y                               = (u16) math::pack_float<16>(normal.y, -1.0f, 1.0f);
 
