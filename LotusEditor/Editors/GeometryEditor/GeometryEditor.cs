@@ -23,16 +23,34 @@ namespace LotusEditor.Editors.GeometryEditor
     {
 
         private Brush _diffuse = Brushes.White;
-        public Brush Diffuse { get => _diffuse; set { if (_diffuse == value) return; _diffuse = value; OnPropertyChanged(nameof(Diffuse)); } }
+        public Brush Diffuse { get => IsHighlighted ? Brushes.Orange : _diffuse; set { if (_diffuse == value) return; _diffuse = value; OnPropertyChanged(nameof(Diffuse)); } }
 
         private Brush _specular = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#ff111111"));
         public Brush Specular { get => _specular; set { if (_specular == value) return; _specular = value; OnPropertyChanged(nameof(Specular)); } }
+
+        private bool _isHighlighted;
+
+        public bool IsHighlighted
+        {
+            get => _isHighlighted;
+            set
+            {
+                if (_isHighlighted == value) return;
+                _isHighlighted = value;
+                OnPropertyChanged(nameof(IsHighlighted));
+                OnPropertyChanged(nameof(Diffuse));
+            }
+        }
+
+        private bool _isIsolated;
+        public bool IsIsolated { get => _isIsolated; set { if (_isIsolated == value) return; _isIsolated = value; OnPropertyChanged(nameof(IsIsolated)); } }
 
 
         public Point3DCollection Positions { get; } = new();
         public Vector3DCollection Normals { get; } = new();
         public PointCollection UVs { get; } = new();
         public Int32Collection Indices { get; } = new();
+        public string Name { get; set; }
     }
 
     // also temp
@@ -84,7 +102,7 @@ namespace LotusEditor.Editors.GeometryEditor
             var intervals = 2.0f / ((1 << 16) - 1);
             foreach (var mesh in lod.Meshes)
             {
-                var vertexData = new MeshRendererVertexData();
+                var vertexData = new MeshRendererVertexData() { Name = mesh.Name };
                 using (var reader = new BinaryReader(new MemoryStream(mesh.Vertices)))
                     for (int i = 0; i < mesh.VertexCount; ++i)
                     {
@@ -139,6 +157,16 @@ namespace LotusEditor.Editors.GeometryEditor
             {
                 CameraTarget = old.CameraTarget;
                 CameraPosition = old.CameraPosition;
+
+                foreach (var mesh in old.Meshes)
+                {
+                    mesh.IsHighlighted = false;
+                }
+
+                foreach (var mesh in Meshes)
+                {
+                    mesh.Diffuse = old.Meshes.First().Diffuse;
+                }
             }
             else
             {
@@ -186,7 +214,7 @@ namespace LotusEditor.Editors.GeometryEditor
                 {
                     MeshRenderer.PropertyChanged += (s, e) =>
                     {
-                        if(e.PropertyName == nameof(MeshRenderer.OffsetCameraPosition) && AutoLOD) ComputeLOD(lods);
+                        if (e.PropertyName == nameof(MeshRenderer.OffsetCameraPosition) && AutoLOD) ComputeLOD(lods);
                     };
                     ComputeLOD(lods);
                 }

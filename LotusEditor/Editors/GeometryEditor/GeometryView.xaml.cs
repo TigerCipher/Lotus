@@ -35,7 +35,7 @@ namespace LotusEditor.Editors.GeometryEditor
             DataContextChanged += (s, e) => SetGeometry();
         }
 
-        private void SetGeometry(int index = -1)
+        public void SetGeometry(int index = -1)
         {
             if (DataContext is not MeshRenderer vm) return;
             if (vm.Meshes.Any() && viewport.Children.Count == 2)

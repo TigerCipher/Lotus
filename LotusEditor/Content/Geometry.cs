@@ -35,6 +35,9 @@ namespace LotusEditor.Content
         private int _indexCount;
         public int IndexCount { get => _indexCount; set { if (_indexCount == value) return; _indexCount = value; OnPropertyChanged(nameof(IndexCount)); } }
 
+        private string _name;
+        public string Name { get => _name; set { if(_name == value) return; _name = value; OnPropertyChanged(nameof(Name)); } }
+
         public byte[] Vertices { get; set; }
         public byte[] Indices { get; set; }
     }
@@ -185,7 +188,7 @@ namespace LotusEditor.Content
                 meshName = $"mesh_{ContentUtil.GetRandomString()}";
             }
 
-            var mesh = new Mesh();
+            var mesh = new Mesh() { Name = meshName };
             var lodId = reader.ReadInt32();
             mesh.VertexSize = reader.ReadInt32();
             mesh.VertexCount = reader.ReadInt32();
@@ -234,9 +237,8 @@ namespace LotusEditor.Content
                 {
                     Debug.Assert(lodGroup.LODS.Any());
                     // use name of highest detail mesh
-                    var meshName = ContentUtil.FixFilename(_lodGroups.Count > 1 ?
-                        path + fileName + "_" + lodGroup.LODS[0].Name + AssetFileExtension :
-                        path + fileName + AssetFileExtension);
+                    var meshName = ContentUtil.FixFilename(
+                        path + fileName + ((_lodGroups.Count > 1) ? "_" + ((lodGroup.LODS.Count > 1) ? lodGroup.Name : lodGroup.LODS[0].Name) : string.Empty)) + AssetFileExtension;
                     Guid = TryGetAssetInfo(meshName) is AssetInfo info && info.Type == Type ? info.Guid : Guid.NewGuid();
                     Logger.Info($"Saving mesh with highest lod with name {lodGroup.LODS[0].Name} and guid {Guid.ToString()}");
                     byte[] data = null;
@@ -399,6 +401,7 @@ namespace LotusEditor.Content
 
             foreach (var mesh in lod.Meshes)
             {
+                writer.Write(mesh.Name);
                 writer.Write(mesh.VertexSize);
                 writer.Write(mesh.VertexCount);
                 writer.Write(mesh.IndexSize);
@@ -424,6 +427,7 @@ namespace LotusEditor.Content
             {
                 var mesh = new Mesh()
                 {
+                    Name = reader.ReadString(),
                     VertexSize = reader.ReadInt32(),
                     VertexCount = reader.ReadInt32(),
                     IndexSize = reader.ReadInt32(),

@@ -48,6 +48,9 @@
                 <ColumnDefinition MinWidth="250" MaxWidth="400"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
+
+            <local:GeometryDetailView Tag="{Binding ElementName=geometryView}"/>
+
             <GridSplitter HorizontalAlignment="Right" Width="5" Background="{StaticResource Editor.Window.GrayBrush1}" VerticalAlignment="Stretch"/>
             <local:GeometryView DataContext="{Binding MeshRenderer}" Grid.Column="1" x:Name="geometryView"/>
             <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left" IsHitTestVisible="False">
