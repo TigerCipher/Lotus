@@ -137,15 +137,20 @@ namespace LotusEditor.Editors.GeometryEditor
 
                 using (var reader = new BinaryReader(new MemoryStream(mesh.Indices)))
                     if (mesh.IndexSize == sizeof(short))
-                        for (int i = 0; i < mesh.IndexCount; ++i)
+                    {
+                        for (var i = 0; i < mesh.IndexCount; ++i)
                         {
                             vertexData.Indices.Add(reader.ReadUInt16());
                         }
+                    }
                     else
-                        for (int i = 0; i < mesh.IndexCount; ++i)
+                    {
+                        for (var i = 0; i < mesh.IndexCount; ++i)
                         {
                             vertexData.Indices.Add(reader.ReadInt32());
                         }
+                    }
+
                 vertexData.Positions.Freeze();
                 vertexData.Normals.Freeze();
                 vertexData.UVs.Freeze();
