@@ -21,10 +21,22 @@ namespace LotusEditor.Content
         Plane, Cube, UvSphere, IcoSphere, Cylinder, Capsule
     }
 
+    enum ElementsType
+    {
+        Position = 0x00,
+        Normals = 0x01,
+        TSpace = 0x03,
+        Joints = 0x04,
+        Colors = 0x08,
+    }
+
     class Mesh : ViewModelBase
     {
-        private int _vertexSize;
-        public int VertexSize { get => _vertexSize; set { if (_vertexSize == value) return; _vertexSize = value; OnPropertyChanged(nameof(VertexSize)); } }
+
+        public static int PositionSize = sizeof(float) * 3;
+
+        private int _elementSize;
+        public int ElementSize { get => _elementSize; set { if(_elementSize == value) return; _elementSize = value; OnPropertyChanged(nameof(ElementSize)); } }
 
         private int _vertexCount;
         public int VertexCount { get => _vertexCount; set { if (_vertexCount == value) return; _vertexCount = value; OnPropertyChanged(nameof(VertexCount)); } }
@@ -36,9 +48,12 @@ namespace LotusEditor.Content
         public int IndexCount { get => _indexCount; set { if (_indexCount == value) return; _indexCount = value; OnPropertyChanged(nameof(IndexCount)); } }
 
         private string _name;
-        public string Name { get => _name; set { if(_name == value) return; _name = value; OnPropertyChanged(nameof(Name)); } }
+        public string Name { get => _name; set { if (_name == value) return; _name = value; OnPropertyChanged(nameof(Name)); } }
 
-        public byte[] Vertices { get; set; }
+        public ElementsType ElementsType { get; set; }
+
+        public byte[] Positions { get; set; }
+        public byte[] Elements { get; set; }
         public byte[] Indices { get; set; }
     }
 
@@ -190,15 +205,17 @@ namespace LotusEditor.Content
 
             var mesh = new Mesh() { Name = meshName };
             var lodId = reader.ReadInt32();
-            mesh.VertexSize = reader.ReadInt32();
+            mesh.ElementSize = reader.ReadInt32();
+            mesh.ElementsType = (ElementsType)reader.ReadInt32();
             mesh.VertexCount = reader.ReadInt32();
             mesh.IndexSize = reader.ReadInt32();
             mesh.IndexCount = reader.ReadInt32();
             var lodThreshold = reader.ReadSingle();
 
-            var vertexBufferSize = mesh.VertexSize * mesh.VertexCount;
-            var indexBufferSize = mesh.IndexSize * mesh.IndexCount;
-            mesh.Vertices = reader.ReadBytes(vertexBufferSize);
+            var elementBufferSize = mesh.ElementSize * mesh.VertexCount;
+            var indexBufferSize = mesh.IndexSize    * mesh.IndexCount;
+            mesh.Positions = reader.ReadBytes(Mesh.PositionSize * mesh.VertexCount);
+            mesh.Elements = reader.ReadBytes(elementBufferSize);
             mesh.Indices = reader.ReadBytes(indexBufferSize);
 
             MeshLOD lod;
@@ -402,11 +419,13 @@ namespace LotusEditor.Content
             foreach (var mesh in lod.Meshes)
             {
                 writer.Write(mesh.Name);
-                writer.Write(mesh.VertexSize);
+                writer.Write(mesh.ElementSize);
+                writer.Write((int)mesh.ElementsType);
                 writer.Write(mesh.VertexCount);
                 writer.Write(mesh.IndexSize);
                 writer.Write(mesh.IndexCount);
-                writer.Write(mesh.Vertices);
+                writer.Write(mesh.Positions);
+                writer.Write(mesh.Elements);
                 writer.Write(mesh.Indices);
             }
 
@@ -428,12 +447,14 @@ namespace LotusEditor.Content
                 var mesh = new Mesh()
                 {
                     Name = reader.ReadString(),
-                    VertexSize = reader.ReadInt32(),
+                    ElementSize = reader.ReadInt32(),
+                    ElementsType = (ElementsType)reader.ReadInt32(),
                     VertexCount = reader.ReadInt32(),
                     IndexSize = reader.ReadInt32(),
                     IndexCount = reader.ReadInt32()
                 };
-                mesh.Vertices = reader.ReadBytes(mesh.VertexSize * mesh.VertexCount);
+                mesh.Positions = reader.ReadBytes(Mesh.PositionSize * mesh.VertexCount);
+                mesh.Elements = reader.ReadBytes(mesh.ElementSize * mesh.VertexCount);
                 mesh.Indices = reader.ReadBytes(mesh.IndexSize * mesh.IndexCount);
 
                 lod.Meshes.Add(mesh);

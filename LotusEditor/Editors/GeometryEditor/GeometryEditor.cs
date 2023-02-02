@@ -91,7 +91,6 @@ namespace LotusEditor.Editors.GeometryEditor
         public MeshRenderer(MeshLOD lod, MeshRenderer old)
         {
             Debug.Assert(lod?.Meshes.Any() == true);
-            var offset = lod.Meshes[0].VertexSize - 3 * sizeof(float) - sizeof(int) - 2 * sizeof(short);
 
             double minX, minY, minZ;
             minX = minY = minZ = double.MaxValue;
@@ -103,13 +102,13 @@ namespace LotusEditor.Editors.GeometryEditor
             foreach (var mesh in lod.Meshes)
             {
                 var vertexData = new MeshRendererVertexData() { Name = mesh.Name };
-                using (var reader = new BinaryReader(new MemoryStream(mesh.Vertices)))
+                using (var reader = new BinaryReader(new MemoryStream(mesh.Positions)))
                     for (int i = 0; i < mesh.VertexCount; ++i)
                     {
                         var posX = reader.ReadSingle();
                         var posY = reader.ReadSingle();
                         var posZ = reader.ReadSingle();
-                        var signs = (reader.ReadUInt32() >> 24) & 0x000000ff;
+                        
                         vertexData.Positions.Add(new Point3D(posX, posY, posZ));
 
                         minX = Math.Min(minX, posX);
@@ -118,22 +117,45 @@ namespace LotusEditor.Editors.GeometryEditor
                         maxY = Math.Max(maxY, posY);
                         minZ = Math.Min(minZ, posZ);
                         maxZ = Math.Max(maxZ, posZ);
-
-                        // read normals
-                        var normX = reader.ReadUInt16() * intervals - 1.0f;
-                        var normY = reader.ReadUInt16() * intervals - 1.0f;
-                        var normZ = Math.Sqrt(Math.Clamp(1f - (normX * normX + normY * normY), 0f, 1f)) * ((signs & 0x2) - 1f);
-                        var normal = new Vector3D(normX, normY, normZ);
-                        normal.Normalize();
-                        vertexData.Normals.Add(normal);
-                        avgNormal += normal;
-
-                        // Read UVs
-                        reader.BaseStream.Position += (offset - sizeof(float) * 2); // skip over tangents
-                        var u = reader.ReadSingle();
-                        var v = reader.ReadSingle();
-                        vertexData.UVs.Add(new Point(u, v));
                     }
+                // Read normals
+                if (mesh.ElementsType.HasFlag(ElementsType.Normals))
+                {
+                    var tSpaceOffset = 0;
+                    if (mesh.ElementsType.HasFlag(ElementsType.Joints)) tSpaceOffset = sizeof(short) * 4;
+
+                    // Read tangent space
+                    using (var reader = new BinaryReader(new MemoryStream(mesh.Elements)))
+                        for (int i = 0; i < mesh.VertexCount; i++)
+                        {
+                            var signs = (reader.ReadUInt32() >> 24) & 0x000000ff;
+                            reader.BaseStream.Position += tSpaceOffset;
+                            var normX = reader.ReadUInt16() * intervals - 1.0f;
+                            var normY = reader.ReadUInt16() * intervals - 1.0f;
+                            var normZ = Math.Sqrt(Math.Clamp(1f - (normX * normX + normY * normY), 0f, 1f)) *
+                                        ((signs & 0x2) - 1f);
+                            var normal = new Vector3D(normX, normY, normZ);
+                            normal.Normalize();
+                            vertexData.Normals.Add(normal);
+                            avgNormal += normal;
+
+                            // Read UVs
+                            if (mesh.ElementsType.HasFlag(ElementsType.TSpace))
+                            {
+                                reader.BaseStream.Position += (sizeof(short) * 2); // skip over tangents
+                                var u = reader.ReadSingle();
+                                var v = reader.ReadSingle();
+                                vertexData.UVs.Add(new Point(u, v));
+                            }
+
+                            if (mesh.ElementsType.HasFlag(ElementsType.Joints) &&
+                                mesh.ElementsType.HasFlag(ElementsType.Colors))
+                            {
+                                reader.BaseStream.Position += 4;
+                            }
+                        }
+                }
+
 
                 using (var reader = new BinaryReader(new MemoryStream(mesh.Indices)))
                     if (mesh.IndexSize == sizeof(short))

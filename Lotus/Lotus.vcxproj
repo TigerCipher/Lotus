@@ -241,6 +241,7 @@
     <ClInclude Include="src\Lotus\EngineApi\ScriptComponent.h" />
     <ClInclude Include="src\Lotus\EngineApi\TransformComponent.h" />
     <ClInclude Include="src\Lotus\Util\FreeList.h" />
+    <ClInclude Include="src\Lotus\Util\IOStream.h" />
     <ClInclude Include="src\Lotus\Util\MathUtil.h" />
     <ClInclude Include="src\Lotus\Util\Util.h" />
     <ClInclude Include="src\Lotus\Util\Vector.h" />

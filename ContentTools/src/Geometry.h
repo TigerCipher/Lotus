@@ -27,33 +27,128 @@
 namespace lotus::tools
 {
 
-namespace packed_vertex
+
+struct vertex
 {
-// static mesh
-struct vertex_static
+    vec4  tangent{};
+    vec4  joint_weights{};
+    vec4u joint_indices{ invalid_id_u32, invalid_id_u32, invalid_id_u32, invalid_id_u32 };
+    vec3  position{};
+    vec3  normal{};
+    vec2  uv{};
+    u8    red{};
+    u8    green{};
+    u8    blue{};
+    u8    pad{};
+};
+
+namespace elements
 {
-    vec3 position;
-    u8   reserved[3];
-    u8   tsign; // if z is neg: Bit 1 = 0, if pos: Bit 1 = 1
+struct elements_type
+{
+    enum type : u32
+    {
+        position_only                 = 0x00,
+        static_normal                 = 0x01,
+        static_normal_texture         = 0x03,
+        static_color                  = 0x04,
+        skeletal                      = 0x08,
+        skeletal_color                = skeletal | static_color,
+        skeletal_normal               = skeletal | static_normal,
+        skeletal_normal_color         = skeletal_normal | static_color,
+        skeletal_normal_texture       = skeletal | static_normal_texture,
+        skeletal_normal_texture_color = skeletal_normal_texture | static_color,
+    };
+};
+
+
+struct static_color
+{
+    u8 color[3];
+    u8 pad;
+};
+
+struct static_normal
+{
+    u8  color[3];
+    u8  tsign; // Bit 0: tangent handedness * (tangent.z sign), Bit 1: normal.z sign (0 means -1, 1 means +1)
+    u16 normal[2];
+};
+
+struct static_normal_texture
+{
+    u8   color[3];
+    u8   tsign; // Bit 0: tangent handedness * (tangent.z sign), Bit 1: normal.z sign (0 means -1, 1 means +1)
     u16  normal[2];
     u16  tangent[2];
     vec2 uv;
 };
-} // namespace packed_vertex
 
-struct vertex
+struct skeletal
 {
-    vec4 tangent;
-    vec3 position;
-    vec3 normal;
+    u8  joint_weights[3];
+    u8  pad;
+    u16 joint_indices[4];
+};
+
+struct skeletal_color
+{
+    u8  joint_weights[3];
+    u8  pad;
+    u16 joint_indices[4];
+    u8  color[3];
+    u8  pad2;
+};
+
+struct skeletal_normal
+{
+    u8  joint_weights[3];
+    u8  tsign; // Bit 0: tangent handedness * (tangent.z sign), Bit 1: normal.z sign (0 means -1, 1 means +1)
+    u16 joint_indices[4];
+    u16 normal[2];
+};
+
+struct skeletal_normal_color
+{
+    u8  joint_weights[3];
+    u8  tsign; // Bit 0: tangent handedness * (tangent.z sign), Bit 1: normal.z sign (0 means -1, 1 means +1)
+    u16 joint_indices[4];
+    u16 normal[2];
+    u8  color[3];
+    u8  pad;
+};
+
+struct skeletal_normal_texture
+{
+    u8   joint_weights[3];
+    u8   tsign; // Bit 0: tangent handedness * (tangent.z sign), Bit 1: normal.z sign (0 means -1, 1 means +1)
+    u16  joint_indices[4];
+    u16  normal[2];
+    u16  tangent[2];
     vec2 uv;
 };
 
+struct skeletal_normal_texture_color
+{
+    u8   joint_weights[3];
+    u8   tsign; // Bit 0: tangent handedness * (tangent.z sign), Bit 1: normal.z sign (0 means -1, 1 means +1)
+    u16  joint_indices[4];
+    u16  normal[2];
+    u16  tangent[2];
+    vec2 uv;
+    u8   color[3];
+    u8   pad;
+};
+
+} // namespace elements
+
 struct mesh
 {
-    utl::vector<vec3>              positions;
-    utl::vector<vec3>              normals;
-    utl::vector<vec4>              tangents;
+    utl::vector<vec3> positions;
+    utl::vector<vec3> normals;
+    utl::vector<vec4> tangents;
+    utl::vector<vec3> colors;
+
     utl::vector<utl::vector<vec2>> uv_sets;
 
     utl::vector<u32> material_indices;
@@ -66,10 +161,13 @@ struct mesh
 
 
     // output
-    std::string                               name;
-    utl::vector<packed_vertex::vertex_static> packed_vertices_static;
-    f32                                       lod_threshold = -1.0f;
-    u32                                       lod_id{ invalid_id_u32 };
+    std::string                   name;
+    elements::elements_type::type elements_type;
+    utl::vector<u8>               position_buffer;
+    utl::vector<u8>               element_buffer;
+
+    f32 lod_threshold = -1.0f;
+    u32 lod_id{ invalid_id_u32 };
 };
 
 struct lod_group
