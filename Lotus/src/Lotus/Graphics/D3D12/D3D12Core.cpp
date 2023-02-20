@@ -26,6 +26,7 @@
 #include "D3D12Shaders.h"
 #include "D3D12GPass.h"
 #include "D3D12PostProcess.h"
+#include "D3D12Upload.h"
 
 
 namespace lotus::graphics::d3d12::core
@@ -95,6 +96,8 @@ public:
 
         m_fence_event = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
         LASSERT(m_fence_event);
+
+        if(!m_fence_event) release();
     }
 
     ~d3d12_command() { LASSERT(!m_cmd_queue && !m_cmd_list && !m_fence); }
@@ -359,7 +362,7 @@ bool initialize()
         return failed_init();
 
     // Initialize various graphics api sub modules
-    if (!(shaders::initialize() && gpass::initialize() && fx::initialize()))
+    if (!(shaders::initialize() && gpass::initialize() && fx::initialize() && upload::initialize()))
         return failed_init();
 
     NAME_D3D_OBJ(main_device, L"MAIN_DEVICE");
@@ -382,6 +385,7 @@ void shutdown()
     }
 
     // Shutdown the render submodules
+    upload::shutdown();
     fx::shutdown();
     gpass::shutdown();
     shaders::shutdown();

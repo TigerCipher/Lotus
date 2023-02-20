@@ -27,12 +27,11 @@
 
 #include "D3D12Common.h"
 
-#define ROOT_FLAGS_DISABLED_COMMON                                                                                     \
-    D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS |                                                         \
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |                                                       \
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |                                                     \
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |                                                   \
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |                                              \
+#define ROOT_FLAGS_DISABLED_COMMON                                                                                          \
+    D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |     \
+        D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |                                                          \
+        D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |                                                        \
+        D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |                                                   \
         D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS
 
 namespace lotus::graphics::d3d12::d3dx
@@ -42,8 +41,22 @@ ID3D12RootSignature* create_root_signature(const D3D12_ROOT_SIGNATURE_DESC1& des
 
 constexpr struct
 {
-    const D3D12_HEAP_PROPERTIES default_heap{ D3D12_HEAP_TYPE_DEFAULT, D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-                                              D3D12_MEMORY_POOL_UNKNOWN, 0, 0 };
+    const D3D12_HEAP_PROPERTIES default_heap{
+        D3D12_HEAP_TYPE_DEFAULT,         // Type
+        D3D12_CPU_PAGE_PROPERTY_UNKNOWN, // CPU Page property
+        D3D12_MEMORY_POOL_UNKNOWN,       // Memory pool preference
+        0,                               // Creation node mask
+        0                                // visible node mask
+    };
+
+    const D3D12_HEAP_PROPERTIES upload_heap{
+        D3D12_HEAP_TYPE_UPLOAD,          // Type
+        D3D12_CPU_PAGE_PROPERTY_UNKNOWN, // CPU Page property
+        D3D12_MEMORY_POOL_UNKNOWN,       // Memory pool preference
+        0,                               // Creation node mask
+        0                                // visible node mask
+    };
+
 } heap_properties;
 
 
@@ -150,23 +163,24 @@ public:
         LASSERT(resource);
         LASSERT(m_offset < max_resource_barriers);
         D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
-        barrier.Type  = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-        barrier.Flags = flags;
+        barrier.Type          = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+        barrier.Flags         = flags;
         barrier.UAV.pResource = resource;
 
         ++m_offset;
     }
 
     // Adds an aliasing barrier
-    constexpr void add(ID3D12Resource* resource_before, ID3D12Resource* resource_after, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE)
+    constexpr void add(ID3D12Resource* resource_before, ID3D12Resource* resource_after,
+                       D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE)
     {
         LASSERT(resource_before && resource_after);
         LASSERT(m_offset < max_resource_barriers);
         D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
-        barrier.Type          = D3D12_RESOURCE_BARRIER_TYPE_ALIASING;
-        barrier.Flags         = flags;
+        barrier.Type                     = D3D12_RESOURCE_BARRIER_TYPE_ALIASING;
+        barrier.Flags                    = flags;
         barrier.Aliasing.pResourceBefore = resource_before;
-        barrier.Aliasing.pResourceAfter = resource_after;
+        barrier.Aliasing.pResourceAfter  = resource_after;
 
         ++m_offset;
     }
@@ -184,16 +198,15 @@ private:
 };
 
 void transition_resource(id3d12_graphics_command_list* cmd_list, ID3D12Resource* resource, D3D12_RESOURCE_STATES before,
-                         D3D12_RESOURCE_STATES        after,
-                         D3D12_RESOURCE_BARRIER_FLAGS flags       = D3D12_RESOURCE_BARRIER_FLAG_NONE,
-                         u32                          subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
+                         D3D12_RESOURCE_STATES after, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+                         u32 subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
 
 struct d3d12_descriptor_range : D3D12_DESCRIPTOR_RANGE1
 {
-    constexpr explicit d3d12_descriptor_range(D3D12_DESCRIPTOR_RANGE_TYPE type, u32 descriptor_count,
-                                              u32 shader_register, u32 space = 0,
+    constexpr explicit d3d12_descriptor_range(D3D12_DESCRIPTOR_RANGE_TYPE type, u32 descriptor_count, u32 shader_register,
+                                              u32                          space = 0,
                                               D3D12_DESCRIPTOR_RANGE_FLAGS flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE,
-                                              u32 offset_from_start = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND) :
+                                              u32 offset_from_start              = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND) :
         D3D12_DESCRIPTOR_RANGE1{ type, descriptor_count, shader_register, space, flags, offset_from_start }
     {}
 };
@@ -227,8 +240,7 @@ struct d3d12_root_parameter : D3D12_ROOT_PARAMETER1
         as_descriptor(D3D12_ROOT_PARAMETER_TYPE_UAV, visibility, shader_register, space, flags);
     }
 
-    constexpr void as_descriptor_table(D3D12_SHADER_VISIBILITY visibility, d3d12_descriptor_range* ranges,
-                                       u32 range_count)
+    constexpr void as_descriptor_table(D3D12_SHADER_VISIBILITY visibility, d3d12_descriptor_range* ranges, u32 range_count)
     {
         ParameterType                       = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
         ShaderVisibility                    = visibility;
@@ -237,8 +249,8 @@ struct d3d12_root_parameter : D3D12_ROOT_PARAMETER1
     }
 
 private:
-    constexpr void as_descriptor(D3D12_ROOT_PARAMETER_TYPE type, D3D12_SHADER_VISIBILITY visibility,
-                                 u32 shader_register, u32 space, D3D12_ROOT_DESCRIPTOR_FLAGS flags)
+    constexpr void as_descriptor(D3D12_ROOT_PARAMETER_TYPE type, D3D12_SHADER_VISIBILITY visibility, u32 shader_register,
+                                 u32 space, D3D12_ROOT_DESCRIPTOR_FLAGS flags)
     {
         ParameterType             = type;
         ShaderVisibility          = visibility;
@@ -320,5 +332,10 @@ PSS(ms, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_MS, D3D12_SHADER_BYTECODE);
 
 ID3D12PipelineState* create_pipeline_state(D3D12_PIPELINE_STATE_STREAM_DESC desc);
 ID3D12PipelineState* create_pipeline_state(void* stream, u64 stream_size);
+
+ID3D12Resource* create_buffer(const void* data, u32 buffer_size, bool is_cpu_accessible = false,
+                              D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
+                              D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE, ID3D12Heap* heap = nullptr,
+                              u64 heap_offset = 0);
 
 } // namespace lotus::graphics::d3d12::d3dx

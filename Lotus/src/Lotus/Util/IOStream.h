@@ -40,6 +40,7 @@ public:
     template<typename T>
     [[nodiscard]] T read()
     {
+        static_assert(std::is_arithmetic_v<T>, "Template argument should be a primitive type");
         T value = *(T*) m_position;
         m_position += sizeof(T);
         return value;
@@ -76,6 +77,7 @@ public:
     template<typename T>
     void write(T value)
     {
+        static_assert(std::is_arithmetic_v<T>, "Template argument should be a primitive type");
         LASSERT(&m_position[sizeof(T)] <= &m_buffer[m_buffer_size]);
         *(T*) m_position = value;
         m_position += sizeof(T);

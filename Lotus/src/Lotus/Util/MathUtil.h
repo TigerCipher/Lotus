@@ -111,6 +111,38 @@ constexpr f32 unpack_to_float(u32 i, f32 min, f32 max)
     return unpack_to_unit_float<Bits>(i) * (max - min) + min;
 }
 
+/**
+ * \brief Aligns by rounding up. Results in a multiple of Alignment bytes.
+ * \tparam Alignment The multiple of bytes to align to
+ * \param size The size to be aligned
+ * \return The aligned size
+ */
+template<u64 Alignment>
+constexpr u64 align_size_up(u32 size)
+{
+    static_assert(Alignment, "Alignment must be non-zero");
+    constexpr u32 mask = Alignment - 1;
+    static_assert(!(Alignment & mask),  "Alignment must be a power of 2");
+
+    return (size + mask) & ~mask;
+}
+
+/**
+ * \brief Aligns by rounding down. Results in a multiple of Alignment bytes.
+ * \tparam Alignment The multiple of bytes to align to
+ * \param size The size to be aligned
+ * \return The aligned size
+ */
+template<u64 Alignment>
+constexpr u64 align_size_down(u32 size)
+{
+    static_assert(Alignment, "Alignment must be non-zero");
+    constexpr u32 mask = Alignment - 1;
+    static_assert(!(Alignment & mask), "Alignment must be a power of 2");
+
+    return size & ~mask;
+}
+
 // clang-format off
 
 inline vec load_float(const f32* src) { return DirectX::XMLoadFloat(src); }

@@ -112,8 +112,8 @@ bool fbx_context::get_mesh_data(FbxMesh* fbx_mesh, mesh& mesh) const
     geometric_transform.SetR(node->GetGeometricRotation(FbxNode::eSourcePivot));
     geometric_transform.SetS(node->GetGeometricScaling(FbxNode::eSourcePivot));
 
-    FbxAMatrix transform         = node->EvaluateGlobalTransform() * geometric_transform;
-    FbxAMatrix inverse_transpose = transform.Inverse().Transpose();
+    const FbxAMatrix transform         = node->EvaluateGlobalTransform() * geometric_transform;
+    const FbxAMatrix inverse_transpose = transform.Inverse().Transpose();
 
     const i32 num_polys = fbx_mesh->GetPolygonCount();
     if (num_polys <= 0)
@@ -205,8 +205,8 @@ bool fbx_context::get_mesh_data(FbxMesh* fbx_mesh, mesh& mesh) const
                 FbxVector4 t          = tangents->GetAt(i);
                 const f32  handedness = (f32) t[3];
                 t[3]                  = 0.0;
+                t = transform.MultT(t);
                 t.Normalize();
-                t = inverse_transpose.MultT(t);
                 mesh.tangents.emplace_back((f32) t[0], (f32) t[1], (f32) t[2], handedness);
             }
         } else

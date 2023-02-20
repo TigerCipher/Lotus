@@ -214,11 +214,13 @@
     <ClInclude Include="src\Lotus\Components\Script.h" />
     <ClInclude Include="src\Lotus\Components\Transform.h" />
     <ClInclude Include="src\Lotus\Content\ContentLoader.h" />
+    <ClInclude Include="src\Lotus\Content\ContentToEngine.h" />
     <ClInclude Include="src\Lotus\Core\Common.h" />
     <ClInclude Include="src\Lotus\Core\Id.h" />
     <ClInclude Include="src\Lotus\Core\Timestep.h" />
     <ClInclude Include="src\Lotus\Core\Types.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Common.h" />
+    <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Content.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Core.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12GPass.h">
       <SubType>
@@ -233,6 +235,7 @@
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Resources.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Shaders.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Surface.h" />
+    <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Upload.h" />
     <ClInclude Include="src\Lotus\Graphics\GraphicsPlatformInterface.h" />
     <ClInclude Include="src\Lotus\Graphics\Renderer.h" />
     <ClInclude Include="src\Lotus\Platform\Platform.h" />
@@ -253,6 +256,8 @@
     <ClCompile Include="src\Lotus\Content\ContentLoader.cpp" />
     <ClCompile Include="src\Lotus\Core\Engine.cpp" />
     <ClCompile Include="src\Lotus\Core\EntryPoint.cpp" />
+    <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Content.cpp" />
+    <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Upload.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Core.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12GPass.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Helpers.cpp" />
