@@ -27,12 +27,6 @@
 
 // Types and shortcuts
 
-namespace lotus
-{
-// byte is contained in the lotus namespace, because I've had issues with it conflicting with std::byte in other
-// projects
-using byte = uint8_t;
-} // namespace lotus
 using ulong = unsigned long;
 
 // ensure x bit, but I hate using _t, it looks ugly

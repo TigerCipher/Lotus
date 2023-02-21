@@ -29,6 +29,6 @@ namespace lotus::content
 {
 bool load_game();
 void unload_game();
-bool load_engine_shaders(scope<byte[]>& shaders_blob, u64& size);
+bool load_engine_shaders(scope<u8[]>& shaders_blob, u64& size);
 } // namespace lotus::content
 #endif

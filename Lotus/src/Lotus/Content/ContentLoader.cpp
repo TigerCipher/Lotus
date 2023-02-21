@@ -47,13 +47,13 @@ enum component_type
     count
 };
 
-using comp_type = bool (*)(const byte*&, entity::create_info&);
+using comp_type = bool (*)(const u8*&, entity::create_info&);
 
 utl::vector<entity::entity> entities;
 transform::create_info      transform_info;
 script::create_info         script_info;
 
-bool read_transform(const byte*& data, entity::create_info& info)
+bool read_transform(const u8*& data, entity::create_info& info)
 {
     LASSERT(!info.transform);
 
@@ -78,7 +78,7 @@ bool read_transform(const byte*& data, entity::create_info& info)
     return true;
 }
 
-bool read_script(const byte*& data, entity::create_info& info)
+bool read_script(const u8*& data, entity::create_info& info)
 {
     LASSERT(!info.script);
     const u32 name_length = *data;
@@ -100,13 +100,13 @@ bool read_script(const byte*& data, entity::create_info& info)
     return script_info.script_creator != nullptr;
 }
 
-using comp_reader = bool (*)(const byte*&, entity::create_info&);
+using comp_reader = bool (*)(const u8*&, entity::create_info&);
 
 comp_reader comp_readers[]{ read_transform, read_script };
 
 static_assert(_countof(comp_readers) == component_type::count);
 
-bool read_file(std::filesystem::path path, scope<byte[]>& data, u64& size)
+bool read_file(std::filesystem::path path, scope<u8[]>& data, u64& size)
 {
     if (!std::filesystem::exists(path))
         return false;
@@ -114,7 +114,7 @@ bool read_file(std::filesystem::path path, scope<byte[]>& data, u64& size)
     LASSERT(size);
     if (!size)
         return false;
-    data = create_scope<byte[]>(size);
+    data = create_scope<u8[]>(size);
     std::ifstream file(path, std::ios::in | std::ios::binary);
     if (!file || !file.read((char*) data.get(), size))
     {
@@ -129,14 +129,14 @@ bool read_file(std::filesystem::path path, scope<byte[]>& data, u64& size)
 
 bool load_game()
 {
-    scope<byte[]> game_data{};
-    u64           size{ 0 };
+    scope<u8[]> game_data{};
+    u64         size{ 0 };
     if (!read_file("game.bin", game_data, size))
     {
         return false;
     }
     LASSERT(game_data.get());
-    const byte*   at     = game_data.get();
+    const u8*     at     = game_data.get();
     constexpr u32 size32 = sizeof(u32);
 
     const u32 num_ents = *at;
@@ -186,7 +186,7 @@ void unload_game()
     }
 }
 
-bool load_engine_shaders(scope<byte[]>& shaders_blob, u64& size)
+bool load_engine_shaders(scope<u8[]>& shaders_blob, u64& size)
 {
     auto path = graphics::get_engine_shaders_path();
     return read_file(path, shaders_blob, size);

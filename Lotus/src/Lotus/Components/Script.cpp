@@ -64,7 +64,7 @@ utl::vector<std::string>& script_names()
 
 namespace detail
 {
-byte register_script(size_t tag, script_creator func)
+u8 register_script(size_t tag, script_creator func)
 {
     const bool res = registry().insert(script_registry::value_type{ tag, func }).second;
     LASSERT(res);
