@@ -34,7 +34,10 @@ public:
 
     DISABLE_COPY_AND_MOVE(d3d12_upload_context);
 
-    ~d3d12_upload_context() = default;
+    ~d3d12_upload_context()
+    {
+        LASSERT(m_frame_index == invalid_id_u32);
+    }
 
     void end_upload();
 

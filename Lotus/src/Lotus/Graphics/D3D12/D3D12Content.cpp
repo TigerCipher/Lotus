@@ -34,22 +34,17 @@ namespace lotus::graphics::d3d12::content
 namespace
 {
 
-struct position_view
+struct submesh_view
 {
     D3D12_VERTEX_BUFFER_VIEW position_buffer_view{};
-    D3D12_INDEX_BUFFER_VIEW  index_buffer_view{};
-};
-
-struct element_view
-{
     D3D12_VERTEX_BUFFER_VIEW element_buffer_view{};
-    u32                      element_type{};
+    D3D12_INDEX_BUFFER_VIEW  index_buffer_view{};
     D3D_PRIMITIVE_TOPOLOGY   primitive_topology{};
+    u32                      element_type{};
 };
 
 utl::free_list<ID3D12Resource*> submesh_buffers{};
-utl::free_list<position_view>   position_views{};
-utl::free_list<element_view>    element_views{};
+utl::free_list<submesh_view>   submesh_views{};
 
 std::mutex submesh_mutex{};
 
@@ -121,42 +116,38 @@ id::id_type add(const byte*& data)
     blob.skip(total_buffer_size);
     data = blob.position();
 
-    position_view pos_view{};
-    pos_view.position_buffer_view.BufferLocation = res->GetGPUVirtualAddress();
-    pos_view.position_buffer_view.SizeInBytes    = pos_buffer_size;
-    pos_view.position_buffer_view.StrideInBytes  = sizeof(vec3);
+    submesh_view view{};
+    view.position_buffer_view.BufferLocation = res->GetGPUVirtualAddress();
+    view.position_buffer_view.SizeInBytes    = pos_buffer_size;
+    view.position_buffer_view.StrideInBytes  = sizeof(vec3);
 
-    pos_view.index_buffer_view.BufferLocation =
-        res->GetGPUVirtualAddress() + aligned_pos_buffer_size + aligned_elem_buffer_size;
-    pos_view.index_buffer_view.Format      = index_size == sizeof(u16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
-    pos_view.index_buffer_view.SizeInBytes = index_buffer_size;
-
-    element_view elem_view{};
     if (element_size)
     {
-        elem_view.element_buffer_view.BufferLocation = res->GetGPUVirtualAddress() + aligned_pos_buffer_size;
-        elem_view.element_buffer_view.SizeInBytes    = elem_buffer_size;
-        elem_view.element_buffer_view.StrideInBytes  = element_size;
+        view.element_buffer_view.BufferLocation = res->GetGPUVirtualAddress() + aligned_pos_buffer_size;
+        view.element_buffer_view.SizeInBytes    = elem_buffer_size;
+        view.element_buffer_view.StrideInBytes  = element_size;
     }
 
-    elem_view.element_type       = elements_type;
-    elem_view.primitive_topology = get_d3d_primitive_topology((lotus::content::primitive_topology::type) primitive_topology);
+    view.index_buffer_view.BufferLocation = res->GetGPUVirtualAddress() + aligned_pos_buffer_size + aligned_elem_buffer_size;
+    view.index_buffer_view.Format         = index_size == sizeof(u16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+    view.index_buffer_view.SizeInBytes    = index_buffer_size;
+
+
+    view.primitive_topology = get_d3d_primitive_topology((lotus::content::primitive_topology::type) primitive_topology);
+    view.element_type       = elements_type;
 
 
     std::lock_guard lock(submesh_mutex);
 
     submesh_buffers.add(res);
-    position_views.add(pos_view);
-
-    return element_views.add(elem_view);
+    return submesh_views.add(view);
 }
 
 void remove(id::id_type id)
 {
     std::lock_guard lock(submesh_mutex);
     
-    position_views.remove(id);
-    element_views.remove(id);
+    submesh_views.remove(id);
 
     core::deferred_release(submesh_buffers[id]);
     submesh_buffers.remove(id);

@@ -115,6 +115,8 @@ u32 get_available_upload_frame()
 
 d3d12_upload_context::d3d12_upload_context(u32 aligned_size)
 {
+    LASSERT(upload_cmd_queue);
+
     {
         std::lock_guard lock(frame_mutex);
         m_frame_index = get_available_upload_frame();
