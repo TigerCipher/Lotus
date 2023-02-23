@@ -26,6 +26,7 @@
 #include "Lotus/Core/Common.h"
 #include "Lotus/Graphics/Renderer.h"
 #include "D3D12Core.h"
+#include "D3D12Content.h"
 
 namespace lotus::graphics::d3d12
 {
@@ -40,6 +41,9 @@ void get_platform_interface(platform_interface& pinterface)
     pinterface.surface.width  = core::surface_width;
     pinterface.surface.height = core::surface_height;
     pinterface.surface.render = core::render_surface;
+
+    pinterface.resources.add_submesh = content::submesh::add;
+    pinterface.resources.remove_submesh = content::submesh::remove;
 
     pinterface.platform = graphics_platform::d3d12;
 }

@@ -32,7 +32,7 @@ namespace lotus::utl
 class blob_stream_reader
 {
 public:
-    explicit blob_stream_reader(const byte* buffer) : m_buffer(buffer), m_position(buffer) { LASSERT(buffer); }
+    explicit blob_stream_reader(const u8* buffer) : m_buffer(buffer), m_position(buffer) { LASSERT(buffer); }
 
     DISABLE_COPY_AND_MOVE(blob_stream_reader);
 
@@ -46,7 +46,7 @@ public:
         return value;
     }
 
-    void read(byte* buffer, const size_t length)
+    void read(u8* buffer, const size_t length)
     {
         memcpy(buffer, m_position, length);
         m_position += length;
@@ -54,19 +54,19 @@ public:
 
     void skip(const size_t offset) { m_position += offset; }
 
-    [[nodiscard]] constexpr const byte* const buffer_start() const { return m_buffer; }
-    [[nodiscard]] constexpr const byte* const position() const { return m_position; }
-    [[nodiscard]] constexpr const size_t      offset() const { return m_position - m_buffer; }
+    [[nodiscard]] constexpr const u8* buffer_start() const { return m_buffer; }
+    [[nodiscard]] constexpr const u8* position() const { return m_position; }
+    [[nodiscard]] constexpr size_t    offset() const { return m_position - m_buffer; }
 
 private:
-    const byte* const m_buffer;
-    const byte*       m_position;
+    const u8* const m_buffer;
+    const u8*       m_position;
 };
 
 class blob_stream_writer
 {
 public:
-    explicit blob_stream_writer(byte* buffer, const size_t buffer_size) :
+    explicit blob_stream_writer(u8* buffer, const size_t buffer_size) :
         m_buffer(buffer), m_position(buffer), m_buffer_size(buffer_size)
     {
         LASSERT(buffer && buffer_size);
@@ -83,7 +83,7 @@ public:
         m_position += sizeof(T);
     }
 
-    void write(const byte* buffer, const size_t length)
+    void write(const u8* buffer, const size_t length)
     {
         LASSERT(&m_position[length] <= &m_buffer[m_buffer_size]);
         memcpy(m_position, buffer, length);
@@ -103,15 +103,15 @@ public:
         m_position += offset;
     }
 
-    [[nodiscard]] constexpr const byte* const buffer_start() const { return m_buffer; }
-    [[nodiscard]] constexpr const byte* const buffer_end() const { return &m_buffer[m_buffer_size]; }
-    [[nodiscard]] constexpr const byte* const position() const { return m_position; }
-    [[nodiscard]] constexpr const size_t      offset() const { return m_position - m_buffer; }
+    [[nodiscard]] constexpr const u8* buffer_start() const { return m_buffer; }
+    [[nodiscard]] constexpr const u8* buffer_end() const { return &m_buffer[m_buffer_size]; }
+    [[nodiscard]] constexpr const u8* position() const { return m_position; }
+    [[nodiscard]] constexpr size_t    offset() const { return m_position - m_buffer; }
 
 private:
-    byte* const m_buffer;
-    byte*       m_position;
-    size_t      m_buffer_size;
+    u8* const m_buffer;
+    u8*       m_position;
+    size_t    m_buffer_size;
 };
 
 } // namespace lotus::utl

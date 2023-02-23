@@ -254,6 +254,7 @@
     <ClCompile Include="src\Lotus\Components\Script.cpp" />
     <ClCompile Include="src\Lotus\Components\Transform.cpp" />
     <ClCompile Include="src\Lotus\Content\ContentLoader.cpp" />
+    <ClCompile Include="src\Lotus\Content\ContentToEngine.cpp" />
     <ClCompile Include="src\Lotus\Core\Engine.cpp" />
     <ClCompile Include="src\Lotus\Core\EntryPoint.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Content.cpp" />

@@ -106,4 +106,15 @@ const char* get_engine_shaders_path(graphics_platform platform)
 {
     return engine_shader_paths[(u32) platform];
 }
+
+id::id_type add_submesh(const u8*& data)
+{
+    return gfx.resources.add_submesh(data);
+}
+
+void remove_submesh(id::id_type id)
+{
+    gfx.resources.remove_submesh(id);
+}
+
 } // namespace lotus::graphics

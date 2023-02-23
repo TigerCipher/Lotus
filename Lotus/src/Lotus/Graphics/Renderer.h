@@ -74,4 +74,7 @@ void    remove_surface(surface_id id);
 const char* get_engine_shaders_path();
 const char* get_engine_shaders_path(graphics_platform platform);
 
+id::id_type add_submesh(const u8*& data);
+void remove_submesh(id::id_type id);
+
 } // namespace lotus::graphics
