@@ -29,6 +29,24 @@ namespace LotusEditor.Utility
             if (!value.HasValue || !other.HasValue) return false;
             return Math.Abs(value.Value - other.Value) < Epsilon;
         }
+
+        public static long AlignSizeUp(long size, long alignment)
+        {
+            Debug.Assert(alignment > 0, "Alignment must be non-zero");
+            long mask = alignment - 1;
+            Debug.Assert((alignment & mask) == 0, "Alignment must be a power of 2");
+
+            return (size + mask) & ~mask;
+        }
+
+        public static long AlignSizeDown(long size, long alignment)
+        {
+            Debug.Assert(alignment > 0, "Alignment must be non-zero");
+            long mask = alignment - 1;
+            Debug.Assert((alignment & mask) == 0, "Alignment must be a power of 2");
+
+            return (size & ~mask);
+        }
     }
 
     internal static class ID

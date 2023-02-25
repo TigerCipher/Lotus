@@ -91,6 +91,9 @@ private:
     u32          m_lod_count;
 };
 
+// Indicates an element in geometry_hiarchies is a fake pointer and is actually a gpu_id
+constexpr uintptr_t single_mesh_marker = (uintptr_t)0x01;
+
 utl::free_list<u8*> geometry_hierarchies;
 std::mutex          geometry_mutex;
 
@@ -146,7 +149,7 @@ id::id_type create_mesh_hierarchy(const void* const data)
 
     LASSERT([&] {
         f32 prev_threshold = stream.thresholds()[0];
-        for (u32 i = 0; i < lod_count; ++i)
+        for (u32 i = 1; i < lod_count; ++i)
         {
             if (stream.thresholds()[i] <= prev_threshold)
                 return false;
@@ -155,10 +158,51 @@ id::id_type create_mesh_hierarchy(const void* const data)
         return true;
     }());
 
+    static_assert(alignof(void*) > 2, "The least significant bit is needed for the single_mesh_marker");
+
     std::lock_guard lock(geometry_mutex);
 
     return geometry_hierarchies.add(hierarchy_buffer);
 }
+
+// Determines if geometry has a single LOD and a single submesh
+bool is_single_mesh(const void* const data)
+{
+    LASSERT(data);
+    utl::blob_stream_reader blob((const u8*)data);
+    const u32 lod_count = blob.read<u32>();
+    LASSERT(lod_count);
+    if(lod_count > 1) return false;
+
+    // Skip threshold
+    blob.skip(sizeof(f32));
+    const u32 submesh_count = blob.read<u32>();
+    LASSERT(submesh_count);
+
+    return submesh_count == 1;
+}
+
+
+id::id_type create_single_submesh(const void* const data)
+{
+    LASSERT(data);
+    utl::blob_stream_reader blob((const u8*)data);
+
+    // Skip lod count, threshold, submesh count, and submesh size
+    blob.skip(sizeof(u32) + sizeof(f32) + sizeof(u32) + sizeof(u32));
+
+    const u8* at = blob.position();
+    const id::id_type gpu_id = graphics::add_submesh(at);
+
+    // Create a fake pointer
+    static_assert(sizeof(uintptr_t) > sizeof(id::id_type));
+    constexpr u8 shift_bits = (sizeof(uintptr_t) - sizeof(id::id_type)) << 3;
+    u8* const fake_ptr = (u8* const)(((uintptr_t)gpu_id << shift_bits) | single_mesh_marker);
+
+    std::lock_guard lock(geometry_mutex);
+    return geometry_hierarchies.add(fake_ptr);
+}
+
 
 // Data should contain the following format:
 // struct {
@@ -190,7 +234,16 @@ id::id_type create_mesh_hierarchy(const void* const data)
 // } geometry_hierarchy
 id::id_type create_geometry_resource(const void* const data)
 {
-    return create_mesh_hierarchy(data);
+    LASSERT(data);
+    return is_single_mesh(data) ? create_single_submesh(data) : create_mesh_hierarchy(data);
+}
+
+id::id_type gpu_id_from_fake_pointer(u8* const pointer)
+{
+    LASSERT((uintptr_t)pointer & single_mesh_marker);
+    static_assert(sizeof(uintptr_t) > sizeof(id::id_type));
+    constexpr u8 shift_bits = (sizeof(uintptr_t) - sizeof(id::id_type)) << 3;
+    return ((uintptr_t)pointer >> shift_bits) & (uintptr_t)id::invalid_id;
 }
 
 void destroy_geometry_resource(id::id_type id)
@@ -198,20 +251,26 @@ void destroy_geometry_resource(id::id_type id)
     std::lock_guard lock(geometry_mutex);
 
     u8* const pointer = geometry_hierarchies[id];
-
-    geometry_hiearchy_stream stream(pointer);
-    const u32 lod_count = stream.lod_count();
-
-    u32 id_idx = 0;
-    for (u32 lod = 0; lod < lod_count; ++lod)
+    // If the pointer is fake
+    if((uintptr_t)pointer & single_mesh_marker)
     {
-        for (u32 i = 0; i < stream.lod_offsets()[lod].count; ++i)
-        {
-            graphics::remove_submesh(stream.gpu_ids()[id_idx++]);
-        }
-    }
+        graphics::remove_submesh(gpu_id_from_fake_pointer(pointer));
+    }else
+    {
+        geometry_hiearchy_stream stream(pointer);
+        const u32                lod_count = stream.lod_count();
 
-    free(pointer);
+        u32 id_idx = 0;
+        for (u32 lod = 0; lod < lod_count; ++lod)
+        {
+            for (u32 i = 0; i < stream.lod_offsets()[lod].count; ++i)
+            {
+                graphics::remove_submesh(stream.gpu_ids()[id_idx++]);
+            }
+        }
+
+        free(pointer);
+    }
 
     geometry_hierarchies.remove(id);
 }

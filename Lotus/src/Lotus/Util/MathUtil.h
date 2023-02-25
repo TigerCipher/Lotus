@@ -118,10 +118,10 @@ constexpr f32 unpack_to_float(u32 i, f32 min, f32 max)
  * \return The aligned size
  */
 template<u64 Alignment>
-constexpr u64 align_size_up(u32 size)
+constexpr u64 align_size_up(u64 size)
 {
     static_assert(Alignment, "Alignment must be non-zero");
-    constexpr u32 mask = Alignment - 1;
+    constexpr u64 mask = Alignment - 1;
     static_assert(!(Alignment & mask),  "Alignment must be a power of 2");
 
     return (size + mask) & ~mask;
@@ -134,10 +134,10 @@ constexpr u64 align_size_up(u32 size)
  * \return The aligned size
  */
 template<u64 Alignment>
-constexpr u64 align_size_down(u32 size)
+constexpr u64 align_size_down(u64 size)
 {
     static_assert(Alignment, "Alignment must be non-zero");
-    constexpr u32 mask = Alignment - 1;
+    constexpr u64 mask = Alignment - 1;
     static_assert(!(Alignment & mask), "Alignment must be a power of 2");
 
     return size & ~mask;

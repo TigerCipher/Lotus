@@ -30,6 +30,15 @@ namespace LotusEditor.Content
         Colors = 0x08,
     }
 
+    enum PrimitiveTopology
+    {
+        PointList = 1,
+        LineList,
+        LineStrip,
+        TriangleList,
+        TriangleStrip,
+    }
+
     class Mesh : ViewModelBase
     {
 
@@ -51,6 +60,7 @@ namespace LotusEditor.Content
         public string Name { get => _name; set { if (_name == value) return; _name = value; OnPropertyChanged(nameof(Name)); } }
 
         public ElementsType ElementsType { get; set; }
+        public PrimitiveTopology PrimitiveTopology { get; set; }
 
         public byte[] Positions { get; set; }
         public byte[] Elements { get; set; }
@@ -207,6 +217,7 @@ namespace LotusEditor.Content
             var lodId = reader.ReadInt32();
             mesh.ElementSize = reader.ReadInt32();
             mesh.ElementsType = (ElementsType)reader.ReadInt32();
+            mesh.PrimitiveTopology = PrimitiveTopology.TriangleList; // Tools currently only supports triangle list
             mesh.VertexCount = reader.ReadInt32();
             mesh.IndexSize = reader.ReadInt32();
             mesh.IndexCount = reader.ReadInt32();
@@ -302,6 +313,77 @@ namespace LotusEditor.Content
             return savedFiles;
         }
 
+        // struct {
+        //      u32 lod_count,
+        //      struct {
+        //          f32 lod_threshold,
+        //          u32 submesh_count,
+        //          u32 size_of_submeshes,
+        //          struct {
+        //              u32 element_size, u32 vertex_count,
+        //              u32 index_count, u32 elements_type, u32 primitive_topology,
+        //              u8 positions[sizeof(f32) * 3 * vertex_count],
+        //              u8 elements[sizeof(element_size) * vertex_count],
+        //              u8 indices[index_size * index_count]
+        //          } submeshes[submesh_count]
+        //      } mesh_lods[lod_count]
+        // } geometry
+        public override byte[] PackForEngine()
+        {
+            using var writer = new BinaryWriter(new MemoryStream());
+
+            writer.Write(GetLodGroup().LODS.Count);
+            foreach (var lod in GetLodGroup().LODS)
+            {
+                writer.Write(lod.LodThreshold);
+                writer.Write(lod.Meshes.Count);
+                var sizeOfSubmeshesPosition = writer.BaseStream.Position;
+                writer.Write(0);
+                foreach (var mesh in lod.Meshes)
+                {
+                    writer.Write(mesh.ElementSize);
+                    writer.Write(mesh.VertexCount);
+                    writer.Write(mesh.IndexCount);
+                    writer.Write((int)mesh.ElementsType);
+                    writer.Write((int)mesh.PrimitiveTopology);
+
+                    var alignedPos = new byte[MathHelper.AlignSizeUp(mesh.Positions.Length, 4)];
+                    Array.Copy(mesh.Positions, alignedPos, mesh.Positions.Length);
+
+                    var alignedElem = new byte[MathHelper.AlignSizeUp(mesh.Elements.Length, 4)];
+                    Array.Copy(mesh.Elements, alignedElem, mesh.Elements.Length);
+
+                    writer.Write(alignedPos);
+                    writer.Write(alignedElem);
+                    writer.Write(mesh.Indices);
+                }
+
+                var endOfSubmeshes = writer.BaseStream.Position;
+                var sizeOfSubmeshes = (int)(endOfSubmeshes - sizeOfSubmeshesPosition - sizeof(int));
+
+                writer.BaseStream.Position = sizeOfSubmeshesPosition;
+                writer.Write(sizeOfSubmeshes);
+                writer.BaseStream.Position = endOfSubmeshes;
+
+            }
+
+            writer.Flush();
+
+            var data = (writer.BaseStream as MemoryStream)?.ToArray();
+            Debug.Assert(data?.Length > 0);
+
+            // Testing purposes only
+
+            using (var fs = new FileStream(@"..\..\Tests\model.model", FileMode.Create))
+            {
+                fs.Write(data, 0, data.Length);
+            }
+
+            //////////////////
+
+            return data;
+        }
+
         public override void Import(string file)
         {
             Debug.Assert(File.Exists(file));
@@ -357,6 +439,13 @@ namespace LotusEditor.Content
                     _lodGroups.Clear();
                     _lodGroups.Add(lodgroup);
                 }
+
+                // Testing
+
+                // PackForEngine();
+
+
+                //////////////////
             }
             catch (Exception ex)
             {
@@ -421,6 +510,7 @@ namespace LotusEditor.Content
                 writer.Write(mesh.Name);
                 writer.Write(mesh.ElementSize);
                 writer.Write((int)mesh.ElementsType);
+                writer.Write((int)mesh.PrimitiveTopology);
                 writer.Write(mesh.VertexCount);
                 writer.Write(mesh.IndexSize);
                 writer.Write(mesh.IndexCount);
@@ -449,6 +539,7 @@ namespace LotusEditor.Content
                     Name = reader.ReadString(),
                     ElementSize = reader.ReadInt32(),
                     ElementsType = (ElementsType)reader.ReadInt32(),
+                    PrimitiveTopology = (PrimitiveTopology)reader.ReadInt32(),
                     VertexCount = reader.ReadInt32(),
                     IndexSize = reader.ReadInt32(),
                     IndexCount = reader.ReadInt32()

@@ -60,7 +60,7 @@
     #define L_DBG(x)           x
 #else
     #define LASSERT(condition) (void(0))
-    #define L_DBG(x)           (void(0))
+    #define L_DBG(x)
 #endif
 
 #ifndef DISABLE_COPY

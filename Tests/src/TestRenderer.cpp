@@ -22,19 +22,73 @@
 // ------------------------------------------------------------------------------
 
 #include "TestRenderer.h"
+
+#include <filesystem>
+#include <fstream>
+
 #include "ShaderCompiler.h"
 
 #include "Lotus/Platform/Platform.h"
 #include "Lotus/Graphics/Renderer.h"
+#include "Lotus/Graphics/D3D12/D3D12Core.h"
+
+#include "Lotus/Content/ContentToEngine.h"
+
 #if TEST_RENDERER
 
 using namespace lotus;
+
+    // Multithreading
+    #define ENABLE_TEST_WORKERS 0
+constexpr u32 num_threads     = 8;
+bool          should_shutdown = false;
+std::thread   workers[num_threads];
+
+utl::vector<u8> buffer(1024 * 1024, 0);
+
+void buffer_test_worker()
+{
+    while(!should_shutdown)
+    {
+        auto* res = graphics::d3d12::d3dx::create_buffer(buffer.data(), (u32)buffer.size());
+        graphics::d3d12::core::deferred_release(res);
+    }
+}
+
+
+template<class Func, class... Args>
+void init_test_workers(Func&& fn, Args&&... args)
+{
+    #if ENABLE_TEST_WORKERS
+    should_shutdown = false;
+    for (auto& w : workers)
+    {
+        w = std::thread(std::forward<Func>(fn), std::forward<Args>(args)...);
+    }
+    #endif
+}
+
+void join_test_workers()
+{
+    #if ENABLE_TEST_WORKERS
+    should_shutdown = true;
+    for (auto& w : workers)
+    {
+        w.join();
+    }
+    #endif
+}
+
+/////////////////////
+
 
 constexpr u32 numWindows = 4;
 
 timer_lt timer;
 
 graphics::render_surface surfaces[numWindows];
+
+id::id_type model_id = id::invalid_id;
 
 bool is_restarting = false;
 bool resized       = false;
@@ -134,12 +188,31 @@ void destroy_render_surface(graphics::render_surface& surface)
         platform::remove_window(temp.window.get_id());
 }
 
+bool read_file(std::filesystem::path path, scope<u8[]>& data, u64& size)
+{
+    if (!std::filesystem::exists(path))
+        return false;
+    size = std::filesystem::file_size(path);
+    LASSERT(size);
+    if (!size)
+        return false;
+    data = create_scope<u8[]>(size);
+    std::ifstream file(path, std::ios::in | std::ios::binary);
+    if (!file || !file.read((char*) data.get(), size))
+    {
+        file.close();
+        return false;
+    }
+
+    file.close();
+    return true;
+}
+
 bool test_initialize()
 {
     while (!compile_shaders())
     {
-        if (MessageBox(nullptr, L"Failed to compile engine shaders", L"Shader Compilation Error", MB_RETRYCANCEL) !=
-            IDRETRY)
+        if (MessageBox(nullptr, L"Failed to compile engine shaders", L"Shader Compilation Error", MB_RETRYCANCEL) != IDRETRY)
             return false;
     }
 
@@ -160,12 +233,27 @@ bool test_initialize()
         create_render_surface(surfaces[i], info[i]);
     }
 
+    scope<u8[]> model;
+    u64 size = 0;
+    if(!read_file(R"(..\..\Tests\model.model)", model, size)) return false;
+    model_id = content::create_resource(model.get(), content::asset_type::mesh);
+    if(!id::is_valid(model_id)) return false;
+
+    init_test_workers(buffer_test_worker);
+
     is_restarting = false;
     return true;
 }
 
 void test_shutdown()
 {
+    join_test_workers();
+
+    if(id::is_valid(model_id))
+    {
+        content::destroy_resource(model_id, content::asset_type::mesh);
+    }
+
     for (auto& s : surfaces)
     {
         destroy_render_surface(s);

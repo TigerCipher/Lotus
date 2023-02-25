@@ -34,16 +34,13 @@ public:
 
     DISABLE_COPY_AND_MOVE(d3d12_upload_context);
 
-    ~d3d12_upload_context()
-    {
-        LASSERT(m_frame_index == invalid_id_u32);
-    }
+    ~d3d12_upload_context() { LASSERT(m_frame_index == invalid_id_u32); }
 
     void end_upload();
 
-    [[nodiscard]] constexpr id3d12_graphics_command_list* const command_list() const { return m_cmd_list; }
-    [[nodiscard]] constexpr ID3D12Resource* const               upload_buffer() const { return m_upload_buffer; }
-    [[nodiscard]] constexpr void* const                         cpu_address() const { return m_cpu_address; }
+    [[nodiscard]] constexpr id3d12_graphics_command_list* command_list() const { return m_cmd_list; }
+    [[nodiscard]] constexpr ID3D12Resource*               upload_buffer() const { return m_upload_buffer; }
+    [[nodiscard]] constexpr void*                         cpu_address() const { return m_cpu_address; }
 
 private:
     L_DBG(d3d12_upload_context() = default);
