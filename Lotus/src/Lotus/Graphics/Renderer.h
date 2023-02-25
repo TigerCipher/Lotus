@@ -24,7 +24,7 @@
 
 #include "../Core/Common.h"
 #include "../Platform/Window.h"
-
+#include "../EngineApi/Camera.h"
 
 namespace lotus::graphics
 {

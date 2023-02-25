@@ -219,6 +219,7 @@
     <ClInclude Include="src\Lotus\Core\Id.h" />
     <ClInclude Include="src\Lotus\Core\Timestep.h" />
     <ClInclude Include="src\Lotus\Core\Types.h" />
+    <ClInclude Include="src\Lotus\EngineApi\Camera.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Common.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Content.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Core.h" />
