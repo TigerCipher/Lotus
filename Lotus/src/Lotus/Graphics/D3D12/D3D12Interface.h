@@ -21,7 +21,7 @@
 //
 // ------------------------------------------------------------------------------
 #pragma once
-#include "Lotus/Graphics/GraphicsPlatformInterface.h"
+#include "Graphics/GraphicsPlatformInterface.h"
 
 namespace lotus::graphics
 {

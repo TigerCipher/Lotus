@@ -22,9 +22,9 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "../Core/Common.h"
+#include "../Common.h"
 #include "../Core/Id.h"
 #include "../Util/Util.h"
 
-#include "../EngineApi/GameEntity.h"
+#include "../API/GameEntity.h"
 

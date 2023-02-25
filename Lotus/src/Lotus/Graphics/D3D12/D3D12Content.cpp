@@ -24,8 +24,8 @@
 #include "D3D12Content.h"
 
 #include "D3D12Core.h"
-#include "Lotus/Util/IOStream.h"
-#include "Lotus/Content/ContentToEngine.h"
+#include "Util/IOStream.h"
+#include "Content/ContentToEngine.h"
 
 
 namespace lotus::graphics::d3d12::content

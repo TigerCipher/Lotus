@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "../Core/Common.h"
+#include "../Common.h"
 
 namespace lotus::utl
 {

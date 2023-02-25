@@ -23,8 +23,8 @@
 
 #include "D3D12Interface.h"
 
-#include "Lotus/Core/Common.h"
-#include "Lotus/Graphics/Renderer.h"
+#include "Common.h"
+#include "Graphics/Renderer.h"
 #include "D3D12Core.h"
 #include "D3D12Content.h"
 

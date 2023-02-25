@@ -22,9 +22,9 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "../Core/Common.h"
-#include "../Platform/Window.h"
-#include "../EngineApi/Camera.h"
+#include "Common.h"
+#include "Platform/Window.h"
+#include "API/Camera.h"
 
 namespace lotus::graphics
 {

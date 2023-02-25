@@ -96,7 +96,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;L_DEBUG;L_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;src/Lotus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -123,7 +123,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>L_EDITOR;_CRT_SECURE_NO_WARNINGS;L_DEBUG;L_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;src/Lotus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -150,7 +150,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;L_RELEASE;L_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;src/Lotus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -182,7 +182,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>L_EDITOR;_CRT_SECURE_NO_WARNINGS;L_RELEASE;L_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;src/Lotus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -215,11 +215,11 @@
     <ClInclude Include="src\Lotus\Components\Transform.h" />
     <ClInclude Include="src\Lotus\Content\ContentLoader.h" />
     <ClInclude Include="src\Lotus\Content\ContentToEngine.h" />
-    <ClInclude Include="src\Lotus\Core\Common.h" />
+    <ClInclude Include="src\Lotus\Common.h" />
     <ClInclude Include="src\Lotus\Core\Id.h" />
     <ClInclude Include="src\Lotus\Core\Timestep.h" />
     <ClInclude Include="src\Lotus\Core\Types.h" />
-    <ClInclude Include="src\Lotus\EngineApi\Camera.h" />
+    <ClInclude Include="src\Lotus\API\Camera.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Common.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Content.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Core.h" />
@@ -241,9 +241,9 @@
     <ClInclude Include="src\Lotus\Graphics\Renderer.h" />
     <ClInclude Include="src\Lotus\Platform\Platform.h" />
     <ClInclude Include="src\Lotus\Platform\Window.h" />
-    <ClInclude Include="src\Lotus\EngineApi\GameEntity.h" />
-    <ClInclude Include="src\Lotus\EngineApi\ScriptComponent.h" />
-    <ClInclude Include="src\Lotus\EngineApi\TransformComponent.h" />
+    <ClInclude Include="src\Lotus\API\GameEntity.h" />
+    <ClInclude Include="src\Lotus\API\ScriptComponent.h" />
+    <ClInclude Include="src\Lotus\API\TransformComponent.h" />
     <ClInclude Include="src\Lotus\Util\FreeList.h" />
     <ClInclude Include="src\Lotus\Util\IOStream.h" />
     <ClInclude Include="src\Lotus\Util\MathUtil.h" />

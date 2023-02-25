@@ -23,10 +23,10 @@
 
 #ifndef PRODUCTION
 
-    #include "Lotus/Content/ContentLoader.h"
-    #include "Lotus/Components/Script.h"
-    #include "Lotus/Platform/Platform.h"
-    #include "Lotus/Graphics/Renderer.h"
+    #include "Content/ContentLoader.h"
+    #include "Components/Script.h"
+    #include "Platform/Platform.h"
+    #include "Graphics/Renderer.h"
 
     #include <thread>
 using namespace lotus;

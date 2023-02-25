@@ -22,7 +22,7 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "../Core/Common.h"
+#include "Common.h"
 
 #ifndef PRODUCTION
 namespace lotus::content

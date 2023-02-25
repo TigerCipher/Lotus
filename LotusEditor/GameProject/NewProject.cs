@@ -222,7 +222,7 @@ namespace LotusEditor.GameProject
 
             // TODO Production build path will likely be $(LOTUS_ENGINE)includes\Lotus\EngineApi\
             // Maybe a good idea to set up a pre/post build script that copies the current headers to includes folder?
-            var engineApiPath = @"$(LOTUS_ENGINE)Lotus\src\Lotus\EngineApi\";
+            var engineApiPath = @"$(LOTUS_ENGINE)Lotus\src\Lotus\API\";
             //Debug.Assert(Directory.Exists(engineApiPath), engineApiPath);
 
             var _0 = ProjectName;

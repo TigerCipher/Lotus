@@ -23,7 +23,7 @@
 
 #pragma comment(lib, "Lotus.lib")
 
-#include <Lotus/Core/Common.h>
+#include <Lotus/Common.h>
 #include "Test.h"
 
 #include <filesystem>

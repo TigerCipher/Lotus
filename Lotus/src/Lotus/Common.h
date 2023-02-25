@@ -112,7 +112,7 @@
 
 // Lotus includes
 
-#include "Id.h"
-#include "Types.h"
-#include "../Util/Util.h"
-#include "../Util/MathUtil.h"
+#include "Core/Id.h"
+#include "Core/Types.h"
+#include "Util/Util.h"
+#include "Util/MathUtil.h"

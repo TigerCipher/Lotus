@@ -23,8 +23,8 @@
 
 #include "ContentToEngine.h"
 
-#include "Lotus/Util/IOStream.h"
-#include "Lotus/Graphics/Renderer.h"
+#include "Util/IOStream.h"
+#include "Graphics/Renderer.h"
 
 namespace lotus::content
 {

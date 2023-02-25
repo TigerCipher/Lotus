@@ -22,7 +22,7 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "../Components/Components.h"
+#include "Components.h"
 
 #define COMPONENT_INFO(name)                                                                                                \
     namespace name                                                                                                          \
