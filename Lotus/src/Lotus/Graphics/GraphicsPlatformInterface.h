@@ -22,9 +22,9 @@
 // ------------------------------------------------------------------------------
 #pragma once
 
-#include "../Common.h"
+#include "Common.h"
 #include "Renderer.h"
-#include "../Platform/Window.h"
+#include "Platform/Window.h"
 
 namespace lotus::graphics
 {
@@ -48,6 +48,14 @@ struct platform_interface
         id::id_type (*add_submesh)(const u8*&);
         void (*remove_submesh)(id::id_type);
     } resources{};
+
+    struct
+    {
+        camera(*create)(camera_init_info);
+        void(*remove)(camera_id);
+        void(*set_parameter)(camera_id, camera_parameter::parameter, const void* const, u32);
+        void(*get_parameter)(camera_id, camera_parameter::parameter, void* const, u32);
+    } camera{};
 
     graphics_platform platform = (graphics_platform) -1;
 };

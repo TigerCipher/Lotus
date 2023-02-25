@@ -117,4 +117,169 @@ void remove_submesh(id::id_type id)
     gfx.resources.remove_submesh(id);
 }
 
+camera create_camera(camera_init_info info)
+{
+    return gfx.camera.create(info);
+}
+
+void remove_camera(camera_id id)
+{
+    gfx.camera.remove(id);
+}
+
+
+///////////////////////////////////////////// Camera Class
+
+void camera::up(vec3 up) const
+{
+    LASSERT(is_valid());
+    gfx.camera.set_parameter(m_id, camera_parameter::up_vector, &up, sizeof(up));
+}
+
+void camera::field_of_view(f32 fov) const
+{
+    LASSERT(is_valid());
+    gfx.camera.set_parameter(m_id, camera_parameter::field_of_view, &fov, sizeof(fov));
+}
+
+void camera::aspect_ratio(f32 ratio) const
+{
+    LASSERT(is_valid());
+    gfx.camera.set_parameter(m_id, camera_parameter::aspect_ratio, &ratio, sizeof(ratio));
+}
+
+void camera::view_width(f32 width) const
+{
+    LASSERT(is_valid());
+    gfx.camera.set_parameter(m_id, camera_parameter::view_width, &width, sizeof(width));
+}
+
+void camera::view_height(f32 height) const
+{
+    LASSERT(is_valid());
+    gfx.camera.set_parameter(m_id, camera_parameter::view_height, &height, sizeof(height));
+}
+
+void camera::range(f32 near_z, f32 far_z) const
+{
+    LASSERT(is_valid());
+    gfx.camera.set_parameter(m_id, camera_parameter::near_z, &near_z, sizeof(near_z));
+    gfx.camera.set_parameter(m_id, camera_parameter::far_z, &far_z, sizeof(far_z));
+}
+
+mat4 camera::view() const
+{
+    LASSERT(is_valid());
+    mat4 matrix;
+    gfx.camera.get_parameter(m_id, camera_parameter::view, &matrix, sizeof(matrix));
+    return matrix;
+}
+
+mat4 camera::projection() const
+{
+    LASSERT(is_valid());
+    mat4 matrix;
+    gfx.camera.get_parameter(m_id, camera_parameter::projection, &matrix, sizeof(matrix));
+    return matrix;
+}
+
+mat4 camera::inverse_projection() const
+{
+    LASSERT(is_valid());
+    mat4 matrix;
+    gfx.camera.get_parameter(m_id, camera_parameter::inverse_projection, &matrix, sizeof(matrix));
+    return matrix;
+}
+
+mat4 camera::view_projection() const
+{
+    LASSERT(is_valid());
+    mat4 matrix;
+    gfx.camera.get_parameter(m_id, camera_parameter::view_projection, &matrix, sizeof(matrix));
+    return matrix;
+}
+
+mat4 camera::inverse_view_projection() const
+{
+    LASSERT(is_valid());
+    mat4 matrix;
+    gfx.camera.get_parameter(m_id, camera_parameter::inverse_view_projection, &matrix, sizeof(matrix));
+    return matrix;
+}
+
+vec3 camera::up() const
+{
+    LASSERT(is_valid());
+    vec3 v;
+    gfx.camera.get_parameter(m_id, camera_parameter::up_vector, &v, sizeof(v));
+    return v;
+}
+
+f32 camera::field_of_view() const
+{
+    LASSERT(is_valid());
+    f32 f;
+    gfx.camera.get_parameter(m_id, camera_parameter::field_of_view, &f, sizeof(f));
+    return f;
+}
+
+f32 camera::aspect_ratio() const
+{
+    LASSERT(is_valid());
+    f32 f;
+    gfx.camera.get_parameter(m_id, camera_parameter::aspect_ratio, &f, sizeof(f));
+    return f;
+}
+
+f32 camera::view_width() const
+{
+    LASSERT(is_valid());
+    f32 f;
+    gfx.camera.get_parameter(m_id, camera_parameter::view_width, &f, sizeof(f));
+    return f;
+}
+
+f32 camera::view_height() const
+{
+    LASSERT(is_valid());
+    f32 f;
+    gfx.camera.get_parameter(m_id, camera_parameter::view_height, &f, sizeof(f));
+    return f;
+}
+
+f32 camera::near_z() const
+{
+    LASSERT(is_valid());
+    f32 f;
+    gfx.camera.get_parameter(m_id, camera_parameter::near_z, &f, sizeof(f));
+    return f;
+}
+
+f32 camera::far_z() const
+{
+    LASSERT(is_valid());
+    f32 f;
+    gfx.camera.get_parameter(m_id, camera_parameter::far_z, &f, sizeof(f));
+    return f;
+}
+
+camera::type camera::projection_type() const
+{
+    LASSERT(is_valid());
+    type t;
+    gfx.camera.get_parameter(m_id, camera_parameter::type, &t, sizeof(t));
+    return t;
+}
+
+id::id_type  camera::entity_id() const
+{
+    LASSERT(is_valid());
+    id::id_type id;
+    gfx.camera.get_parameter(m_id, camera_parameter::entity_id, &id, sizeof(id));
+    return id;
+}
+
+///////////////////////////////////////////// End of Camera Class
+
+
 } // namespace lotus::graphics

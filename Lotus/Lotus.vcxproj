@@ -220,6 +220,7 @@
     <ClInclude Include="src\Lotus\Core\Timestep.h" />
     <ClInclude Include="src\Lotus\Core\Types.h" />
     <ClInclude Include="src\Lotus\API\Camera.h" />
+    <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Camera.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Common.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Content.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Core.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="src\Lotus\Content\ContentToEngine.cpp" />
     <ClCompile Include="src\Lotus\Core\Engine.cpp" />
     <ClCompile Include="src\Lotus\Core\EntryPoint.cpp" />
+    <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Camera.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Content.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Upload.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Core.cpp" />
