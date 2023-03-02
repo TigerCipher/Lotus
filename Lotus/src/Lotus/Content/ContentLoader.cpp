@@ -22,18 +22,14 @@
 // ------------------------------------------------------------------------------
 #include "ContentLoader.h"
 
-#include "../Components/Entity.h"
-#include "../Components/Transform.h"
-#include "../Components/Script.h"
-#include "../Graphics/Renderer.h"
+#include "Components/Entity.h"
+#include "Components/Transform.h"
+#include "Components/Script.h"
+#include "Graphics/Renderer.h"
 
 #include <fstream>
 #include <filesystem>
 
-#ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN
-#endif
-#include <Windows.h>
 
 namespace lotus::content
 {
@@ -44,6 +40,8 @@ enum component_type
 {
     transform = 0,
     script,
+
+
     count
 };
 

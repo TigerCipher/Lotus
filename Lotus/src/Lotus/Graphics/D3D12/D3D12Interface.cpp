@@ -23,10 +23,9 @@
 
 #include "D3D12Interface.h"
 
-#include "Common.h"
-#include "Graphics/Renderer.h"
 #include "D3D12Core.h"
 #include "D3D12Content.h"
+#include "D3D12Camera.h"
 
 namespace lotus::graphics::d3d12
 {
@@ -44,6 +43,11 @@ void get_platform_interface(platform_interface& pinterface)
 
     pinterface.resources.add_submesh = content::submesh::add;
     pinterface.resources.remove_submesh = content::submesh::remove;
+
+    pinterface.camera.create = camera::create;
+    pinterface.camera.remove = camera::remove;
+    pinterface.camera.set_parameter = camera::set_parameter;
+    pinterface.camera.get_parameter = camera::get_parameter;
 
     pinterface.platform = graphics_platform::d3d12;
 }

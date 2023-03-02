@@ -41,6 +41,7 @@ public:
     vec3 position() const;
     vec4 rotation() const;
     vec3 scale() const;
+    vec3 orientation() const;
 
 private:
     transform_id m_id;

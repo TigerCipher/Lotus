@@ -90,4 +90,11 @@ private:
     bool m_is_dirty;
 };
 
+graphics::camera create(camera_init_info info);
+void             remove(camera_id id);
+void             set_parameter(camera_id id, camera_parameter::parameter param, const void* const data, u32 data_size);
+void             get_parameter(camera_id id, camera_parameter::parameter param, void* const data, u32 data_size);
+
+[[nodiscard]] d3d12_camera& get(camera_id id);
+
 } // namespace lotus::graphics::d3d12::camera

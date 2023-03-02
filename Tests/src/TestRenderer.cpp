@@ -34,6 +34,9 @@
 
 #include "Lotus/Content/ContentToEngine.h"
 
+#include "Lotus/Components/Entity.h"
+#include "Lotus/Components/Transform.h"
+
 #if TEST_RENDERER
 
 using namespace lotus;
@@ -89,6 +92,8 @@ timer_lt timer;
 graphics::render_surface surfaces[numWindows];
 
 id::id_type model_id = id::invalid_id;
+entity::entity test_entity{};
+graphics::camera camera{};
 
 bool is_restarting = false;
 bool resized       = false;
@@ -188,6 +193,22 @@ void destroy_render_surface(graphics::render_surface& surface)
         platform::remove_window(temp.window.get_id());
 }
 
+entity::entity create_one_entity()
+{
+    transform::create_info transform_info{};
+    vec3a rot{0, 3.14f, 0};
+    vec quat = math::quat_rotation_roll_pitch_yaw_from_vec(math::load_float3a(&rot));
+    vec4a rot_quat;
+    math::store_float4a(&rot_quat, quat);
+    memcpy(&transform_info.rotation[0], &rot_quat.x, sizeof(transform_info.rotation));
+
+    entity::create_info entity_info{};
+    entity_info.transform = &transform_info;
+    entity::entity ent(entity::create(entity_info));
+    LASSERT(ent.is_valid());
+    return ent;
+}
+
 bool read_file(std::filesystem::path path, scope<u8[]>& data, u64& size)
 {
     if (!std::filesystem::exists(path))
@@ -241,12 +262,18 @@ bool test_initialize()
 
     init_test_workers(buffer_test_worker);
 
+    test_entity = create_one_entity();
+    camera = graphics::create_camera(graphics::perspective_camera_init_info(test_entity.get_id()));
+    LASSERT(camera.is_valid());
+
     is_restarting = false;
     return true;
 }
 
 void test_shutdown()
 {
+    if(camera.is_valid()) graphics::remove_camera(camera.get_id());
+    if(test_entity.is_valid()) entity::remove(test_entity.get_id());
     join_test_workers();
 
     if(id::is_valid(model_id))

@@ -27,7 +27,17 @@
 
 // Math types
 
+// SIMD variant of vector
 using vec = DirectX::XMVECTOR;
+
+// SIMD variant of matrix
+using mat = DirectX::XMMATRIX;
+
+using fvec = DirectX::FXMVECTOR;
+using cvec = DirectX::CXMVECTOR;
+
+using fmat = DirectX::FXMMATRIX;
+using cmat = DirectX::CXMMATRIX;
 
 // hlsl style naming
 using float2  = DirectX::XMFLOAT2;
@@ -63,8 +73,7 @@ using mat3  = DirectX::XMFLOAT3X3;
 using mat4  = DirectX::XMFLOAT4X4;
 using mat4a = DirectX::XMFLOAT4X4A;
 
-
-using mat = DirectX::XMMATRIX; // SIMD
+constexpr f32 dx_pi = DirectX::XM_PI;
 
 constexpr f32 pi      = 3.1415926535897932384626433832795f;
 constexpr f32 two_pi  = 2.0f * pi;
@@ -157,25 +166,41 @@ inline vec load_float2a(const vec2a* src) { return DirectX::XMLoadFloat2A(src); 
 inline vec load_float3a(const vec3a* src) { return DirectX::XMLoadFloat3A(src); }
 inline vec load_float4a(const vec4a* src) { return DirectX::XMLoadFloat4A(src); }
 
-inline void store_float(f32* dest, vec v) { DirectX::XMStoreFloat(dest, v); }
-inline void store_float2(vec2* dest, vec v) { DirectX::XMStoreFloat2(dest, v); }
-inline void store_float3(vec3* dest, vec v) { DirectX::XMStoreFloat3(dest, v); }
-inline void store_float4(vec4* dest, vec v) { DirectX::XMStoreFloat4(dest, v); }
+inline void store_float(f32* dest, fvec v) { DirectX::XMStoreFloat(dest, v); }
+inline void store_float2(vec2* dest, fvec v) { DirectX::XMStoreFloat2(dest, v); }
+inline void store_float3(vec3* dest, fvec v) { DirectX::XMStoreFloat3(dest, v); }
+inline void store_float4(vec4* dest, fvec v) { DirectX::XMStoreFloat4(dest, v); }
 
-inline void store_float2a(vec2a* dest, vec v) { DirectX::XMStoreFloat2A(dest, v); }
-inline void store_float3a(vec3a* dest, vec v) { DirectX::XMStoreFloat3A(dest, v); }
-inline void store_float4a(vec4a* dest, vec v) { DirectX::XMStoreFloat4A(dest, v); }
+inline void store_float2a(vec2a* dest, fvec v) { DirectX::XMStoreFloat2A(dest, v); }
+inline void store_float3a(vec3a* dest, fvec v) { DirectX::XMStoreFloat3A(dest, v); }
+inline void store_float4a(vec4a* dest, fvec v) { DirectX::XMStoreFloat4A(dest, v); }
 
-inline vec normalize_vec3(const vec v) { return DirectX::XMVector3Normalize(v); }
-inline vec dot_vec3(const vec v1, const vec v2) { return DirectX::XMVector3Dot(v1, v2); }
-inline vec cross_vec3(vec v1, vec v2) { return DirectX::XMVector3Cross(v1, v2); }
-inline vec reciprocal_length_vec3(const vec v1) { return DirectX::XMVector3ReciprocalLength(v1); }
+inline void store_float4x4(mat4* dest, fmat m) { DirectX::XMStoreFloat4x4(dest, m); }
+
+inline vec normalize_vec3(fvec v) { return DirectX::XMVector3Normalize(v); }
+inline vec dot_vec3(fvec v1, fvec v2) { return DirectX::XMVector3Dot(v1, v2); }
+inline vec cross_vec3(fvec v1, fvec v2) { return DirectX::XMVector3Cross(v1, v2); }
+inline vec reciprocal_length_vec3(fvec v1) { return DirectX::XMVector3ReciprocalLength(v1); }
 
 inline f32  scalar_cos(f32 value) { return DirectX::XMScalarCos(value); }
 inline f32 scalar_sin(f32 value) { return DirectX::XMScalarSin(value); }
 inline bool scalar_near_equal(f32 s1, f32 s2) { return DirectX::XMScalarNearEqual(s1, s2, epsilon); }
 
+inline vec rotate_vec3(fvec v, fvec quat) { return DirectX::XMVector3Rotate(v, quat); }
+
 inline vec quat_rotation_roll_pitch_yaw_from_vec(vec v) {return DirectX::XMQuaternionRotationRollPitchYawFromVector(v); }
+
+inline mat look_to_rh(fvec eye_pos, fvec focus_pos, fvec up_dir) { return DirectX::XMMatrixLookToRH(eye_pos, focus_pos, up_dir); }
+
+inline mat perspective_fov_rh(f32 angle_y, f32 aspect_ratio, f32 near_z, f32 far_z) { return DirectX::XMMatrixPerspectiveFovRH(angle_y, aspect_ratio, near_z, far_z); }
+
+inline mat orthographic_rh(f32 width, f32 height, f32 near_z, f32 far_z) { return DirectX::XMMatrixOrthographicRH(width, height, near_z, far_z); }
+
+inline mat inverse_matrix(vec* determinant, fmat m) { return DirectX::XMMatrixInverse(determinant, m); }
+
+inline mat mul_matrix(fmat a, cmat b) { return DirectX::XMMatrixMultiply(a, b); }
+
+inline vec set_vector(f32 x, f32 y, f32 z, f32 w) { return DirectX::XMVectorSet(x, y, z, w); }
 
 // clang-format on
 

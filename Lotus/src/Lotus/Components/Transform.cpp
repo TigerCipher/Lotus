@@ -27,9 +27,21 @@ namespace lotus::transform
 
 namespace
 {
-utl::vector<vec3> positions;
 utl::vector<vec4> rotations;
+utl::vector<vec3> orientations;
+utl::vector<vec3> positions;
 utl::vector<vec3> scales;
+
+vec3 calculate_orientation(vec4 rotation)
+{
+    vec rotation_quat = math::load_float4(&rotation);
+    vec front = math::set_vector(0.0f, 0.0f, 1.0f, 0.0f);
+    vec3 orientation;
+    math::store_float3(&orientation, math::rotate_vec3(front, rotation_quat));
+
+    return orientation;
+}
+
 } // anonymous namespace
 
 component create(const create_info& info, entity::entity entity)
@@ -39,14 +51,17 @@ component create(const create_info& info, entity::entity entity)
 
     if (positions.size() > ent_index)
     {
-        positions[ent_index] = vec3(info.position);
-        rotations[ent_index] = vec4(info.rotation);
-        scales[ent_index]    = vec3(info.scale);
+        vec4 rotation {info.rotation};
+        rotations[ent_index] = rotation;
+        orientations[ent_index] = calculate_orientation(rotation);
+        positions[ent_index] = vec3{info.position};
+        scales[ent_index]    = vec3{info.scale};
     } else
     {
         LASSERT(positions.size() == ent_index);
-        positions.emplace_back(info.position);
         rotations.emplace_back(info.rotation);
+        orientations.emplace_back(calculate_orientation(vec4{info.rotation}));
+        positions.emplace_back(info.position);
         scales.emplace_back(info.scale);
     }
 
@@ -80,6 +95,12 @@ vec3 component::scale() const
 {
     LASSERT(is_valid());
     return scales[id::index(m_id)];
+}
+
+vec3 component::orientation() const
+{
+    LASSERT(is_valid());
+    return orientations[id::index(m_id)];
 }
 
 
