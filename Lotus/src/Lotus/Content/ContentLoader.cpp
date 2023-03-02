@@ -45,13 +45,13 @@ enum component_type
     count
 };
 
-using comp_type = bool (*)(const u8*&, entity::create_info&);
+using comp_type = bool (*)(const u8*&, game_entity::create_info&);
 
-utl::vector<entity::entity> entities;
+utl::vector<game_entity::entity> entities;
 transform::create_info      transform_info;
 script::create_info         script_info;
 
-bool read_transform(const u8*& data, entity::create_info& info)
+bool read_transform(const u8*& data, game_entity::create_info& info)
 {
     LASSERT(!info.transform);
 
@@ -76,7 +76,7 @@ bool read_transform(const u8*& data, entity::create_info& info)
     return true;
 }
 
-bool read_script(const u8*& data, entity::create_info& info)
+bool read_script(const u8*& data, game_entity::create_info& info)
 {
     LASSERT(!info.script);
     const u32 name_length = *data;
@@ -98,7 +98,7 @@ bool read_script(const u8*& data, entity::create_info& info)
     return script_info.script_creator != nullptr;
 }
 
-using comp_reader = bool (*)(const u8*&, entity::create_info&);
+using comp_reader = bool (*)(const u8*&, game_entity::create_info&);
 
 comp_reader comp_readers[]{ read_transform, read_script };
 
@@ -145,7 +145,7 @@ bool load_game()
 
     for (u32 i = 0; i < num_ents; ++i)
     {
-        entity::create_info info;
+        game_entity::create_info info;
         //         const u32           entity_type = *at; // TODO
         at += size32;
         const u32 comp_count = *at;
@@ -166,7 +166,7 @@ bool load_game()
         }
 
         LASSERT(info.transform);
-        entity::entity ent(entity::create(info));
+        game_entity::entity ent(game_entity::create(info));
         if (!ent.is_valid())
             return false;
         entities.emplace_back(ent);
@@ -180,7 +180,7 @@ void unload_game()
 {
     for (auto ent : entities)
     {
-        entity::remove(ent.get_id());
+        game_entity::remove(ent.get_id());
     }
 }
 

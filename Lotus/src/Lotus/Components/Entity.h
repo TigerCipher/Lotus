@@ -37,7 +37,7 @@ COMPONENT_INFO(transform)
 COMPONENT_INFO(script)
 
 #undef COMPONENT_INFO
-namespace entity
+namespace game_entity
 {
 struct create_info
 {
@@ -48,5 +48,5 @@ struct create_info
 entity create(const create_info& info);
 void   remove(entity_id id);
 bool   is_alive(entity_id id);
-} // namespace entity
+} // namespace game_entity
 } // namespace lotus

@@ -28,7 +28,7 @@
 
 namespace lotus
 {
-namespace entity
+namespace game_entity
 {
 L_TYPED_ID(entity_id)
 
@@ -48,11 +48,11 @@ public:
 private:
     entity_id m_id;
 };
-} // namespace entity
+} // namespace game_entity
 
 namespace script
 {
-class scriptable_entity : public entity::entity
+class scriptable_entity : public game_entity::entity
 {
 public:
     virtual ~scriptable_entity() = default;
@@ -68,14 +68,14 @@ protected:
 namespace detail
 {
 using script_ptr     = scope<scriptable_entity>;
-using script_creator = script_ptr (*)(entity::entity entity);
+using script_creator = script_ptr (*)(game_entity::entity entity);
 
 u8 register_script(size_t tag, script_creator func);
 
 L_EXPORT script_creator get_script_creator(size_t tag);
 
 template<class T>
-script_ptr create_script(entity::entity entity)
+script_ptr create_script(game_entity::entity entity)
 {
     LASSERT(entity.is_valid());
     return create_scope<T>(entity);

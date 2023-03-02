@@ -31,7 +31,7 @@ struct create_info
     detail::script_creator script_creator{};
 };
 
-component create(const create_info& info, entity::entity entity);
+component create(const create_info& info, game_entity::entity entity);
 void      remove(component comp);
 void      update_all(timestep ts);
 

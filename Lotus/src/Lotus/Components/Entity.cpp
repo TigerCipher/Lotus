@@ -25,7 +25,7 @@
 #include "Script.h"
 
 
-namespace lotus::entity
+namespace lotus::game_entity
 {
 namespace
 {
@@ -124,4 +124,4 @@ script::component entity::script() const
 }
 
 
-} // namespace lotus::entity
+} // namespace lotus::game_entity

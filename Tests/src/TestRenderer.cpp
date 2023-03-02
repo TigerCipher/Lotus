@@ -92,7 +92,7 @@ timer_lt timer;
 graphics::render_surface surfaces[numWindows];
 
 id::id_type model_id = id::invalid_id;
-entity::entity test_entity{};
+game_entity::entity test_entity{};
 graphics::camera camera{};
 
 bool is_restarting = false;
@@ -193,7 +193,7 @@ void destroy_render_surface(graphics::render_surface& surface)
         platform::remove_window(temp.window.get_id());
 }
 
-entity::entity create_one_entity()
+game_entity::entity create_one_entity()
 {
     transform::create_info transform_info{};
     vec3a rot{0, 3.14f, 0};
@@ -202,9 +202,9 @@ entity::entity create_one_entity()
     math::store_float4a(&rot_quat, quat);
     memcpy(&transform_info.rotation[0], &rot_quat.x, sizeof(transform_info.rotation));
 
-    entity::create_info entity_info{};
+    game_entity::create_info entity_info{};
     entity_info.transform = &transform_info;
-    entity::entity ent(entity::create(entity_info));
+    game_entity::entity ent(game_entity::create(entity_info));
     LASSERT(ent.is_valid());
     return ent;
 }
@@ -273,7 +273,7 @@ bool test_initialize()
 void test_shutdown()
 {
     if(camera.is_valid()) graphics::remove_camera(camera.get_id());
-    if(test_entity.is_valid()) entity::remove(test_entity.get_id());
+    if(test_entity.is_valid()) game_entity::remove(test_entity.get_id());
     join_test_workers();
 
     if(id::is_valid(model_id))

@@ -62,14 +62,14 @@ private:
         uint32 count = rand() % 20;
         if (mEntities.empty()) count = 1000;
         transform::create_info transformDesc {};
-        entity::create_info    entityDesc {
+        game_entity::create_info    entityDesc {
             &transformDesc,
         };
 
         while (count > 0)
         {
             ++mAdded;
-            entity::entity ent = create(entityDesc);
+            game_entity::entity ent = create(entityDesc);
             LASSERT(ent.is_valid());
             mEntities.push_back(ent);
             LASSERT(is_alive(ent.get_id()));
@@ -84,11 +84,11 @@ private:
         while (count > 0)
         {
             const uint32         index = (uint32) rand() % (uint32) mEntities.size();
-            const entity::entity ent   = mEntities [ index ];
+            const game_entity::entity ent   = mEntities [ index ];
             LASSERT(ent.is_valid());
             if (ent.is_valid())
             {
-                entity::remove(ent.get_id());
+                game_entity::remove(ent.get_id());
                 mEntities.erase(mEntities.begin() + index);
                 LASSERT(!is_alive(ent.get_id()));
                 ++mRemoved;
@@ -104,7 +104,7 @@ private:
     }
 
 private:
-    utl::vector<entity::entity> mEntities;
+    utl::vector<game_entity::entity> mEntities;
 
     uint32 mAdded { 0 };
     uint32 mRemoved { 0 };

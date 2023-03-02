@@ -74,7 +74,7 @@ struct EntityDesc
 };
 
 
-entity::entity EntityFromId(id::id_type id) { return entity::entity { entity::entity_id { id } }; }
+game_entity::entity EntityFromId(id::id_type id) { return game_entity::entity { game_entity::entity_id { id } }; }
 
 
 } // namespace
@@ -85,13 +85,13 @@ EDITOR_INTERFACE id::id_type CreateEntity(EntityDesc* e)
     EntityDesc&            desc { *e };
     transform::create_info transform = desc.transform.to_create_info();
     script::create_info    scriptInfo = desc.script.to_create_info();
-    entity::create_info    entity    = { &transform, &scriptInfo };
+    game_entity::create_info    entity    = { &transform, &scriptInfo };
 
-    return entity::create(entity).get_id();
+    return game_entity::create(entity).get_id();
 }
 
 EDITOR_INTERFACE void RemoveEntity(id::id_type id)
 {
     LASSERT(id::is_valid(id));
-    entity::remove(entity::entity_id { id });
+    game_entity::remove(game_entity::entity_id { id });
 }

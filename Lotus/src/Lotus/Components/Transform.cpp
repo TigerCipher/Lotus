@@ -44,7 +44,7 @@ vec3 calculate_orientation(vec4 rotation)
 
 } // anonymous namespace
 
-component create(const create_info& info, entity::entity entity)
+component create(const create_info& info, game_entity::entity entity)
 {
     LASSERT(entity.is_valid());
     const id::id_type ent_index = id::index(entity.get_id());

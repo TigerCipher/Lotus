@@ -228,7 +228,7 @@ d3d12_camera::d3d12_camera(camera_init_info info) :
 
 void d3d12_camera::update()
 {
-    entity::entity entity(entity::entity_id{m_entity_id});
+    game_entity::entity entity(game_entity::entity_id{m_entity_id});
     vec3 pos = entity.transform().position();
     vec3 dir = entity.transform().orientation();
 

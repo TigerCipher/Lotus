@@ -90,7 +90,7 @@ u8 add_script_name(const char* name)
 } // namespace detail
 
 
-component create(const create_info& info, const entity::entity entity)
+component create(const create_info& info, const game_entity::entity entity)
 {
     LASSERT(entity.is_valid() && info.script_creator);
     script_id scriptId;
