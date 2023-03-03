@@ -23,17 +23,20 @@
 
 #include "ShaderCompiler.h"
 
+#include <d3d12shader.h>
+#include <dxcapi.h>
+
 #include <Lotus/Graphics/D3D12/D3D12Core.h>
 #include <Lotus/Graphics/D3D12/D3D12Shaders.h>
 
 
-#include "../../vendor/DirectXShaderCompiler/inc/d3d12shader.h"
-#include "../../vendor/DirectXShaderCompiler/inc/dxcapi.h"
+// #include "../../vendor/DirectXShaderCompiler/inc/d3d12shader.h"
+// #include "../../vendor/DirectXShaderCompiler/inc/dxcapi.h"
 
 #include <filesystem>
 #include <fstream>
 
-#pragma comment(lib, "../../vendor/DirectXShaderCompiler/lib/x64/dxcompiler.lib")
+// #pragma comment(lib, "../../vendor/DirectXShaderCompiler/lib/x64/dxcompiler.lib")
 
 using namespace lotus;
 using namespace graphics::d3d12::shaders;
