@@ -21,7 +21,7 @@
 //
 // ------------------------------------------------------------------------------
 #include "Common.h"
-#include <Lotus/Core/Common.h>
+#include <Lotus/Common.h>
 #include <Lotus/Core/Id.h>
 #include <Lotus/Components/Entity.h>
 #include <Lotus/Components/Transform.h>

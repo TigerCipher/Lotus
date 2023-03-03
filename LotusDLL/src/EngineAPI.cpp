@@ -22,7 +22,7 @@
 // ------------------------------------------------------------------------------
 
 #include "Common.h"
-#include <Lotus/Core/Common.h>
+#include <Lotus/Common.h>
 #include <Lotus/Components/Script.h>
 #include <Lotus/Graphics/Renderer.h>
 #include <Lotus/Platform/Platform.h>

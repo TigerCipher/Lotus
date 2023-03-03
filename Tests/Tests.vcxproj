@@ -176,6 +176,7 @@ xcopy /Y /D $(SolutionDir)vendor\DirectXShaderCompiler\bin\x64\dxil.dll $(OutDir
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\RenderItem.cpp" />
     <ClCompile Include="src\ShaderCompiler.cpp" />
     <ClCompile Include="src\TestRenderer.cpp" />
   </ItemGroup>

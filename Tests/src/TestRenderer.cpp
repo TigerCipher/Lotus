@@ -92,6 +92,7 @@ timer_lt timer;
 graphics::render_surface surfaces[numWindows];
 
 id::id_type model_id = id::invalid_id;
+id::id_type item_id = id::invalid_id;
 game_entity::entity test_entity{};
 graphics::camera camera{};
 
@@ -101,6 +102,9 @@ bool resized       = false;
 void destroy_render_surface(graphics::render_surface& surface);
 bool test_initialize();
 void test_shutdown();
+
+id::id_type create_render_item(id::id_type entity_id);
+void destroy_render_item(id::id_type id);
 
 LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -266,12 +270,15 @@ bool test_initialize()
     camera = graphics::create_camera(graphics::perspective_camera_init_info(test_entity.get_id()));
     LASSERT(camera.is_valid());
 
+    item_id = create_render_item(create_one_entity().get_id());
+
     is_restarting = false;
     return true;
 }
 
 void test_shutdown()
 {
+    destroy_render_item(item_id);
     if(camera.is_valid()) graphics::remove_camera(camera.get_id());
     if(test_entity.is_valid()) game_entity::remove(test_entity.get_id());
     join_test_workers();
