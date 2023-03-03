@@ -21,7 +21,7 @@
 //
 // ------------------------------------------------------------------------------
 #pragma once
-#include "Graphics/D3D12/D3D12Shaders.h"
+#include <Lotus/Common.h>
 
 struct shader_type
 {
@@ -47,4 +47,5 @@ struct shader_file_info
     shader_type::type type;
 };
 
+scope<u8[]> compile_shader(shader_file_info info, const char* file_path);
 bool compile_shaders();

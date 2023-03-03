@@ -23,43 +23,38 @@
 
 #include "D3D12Shaders.h"
 #include "../../Content/ContentLoader.h"
+#include "Content/ContentToEngine.h"
 
 namespace lotus::graphics::d3d12::shaders
 {
 
 namespace
 {
-
-typedef struct compiled_shader
-{
-    u64         size{};
-    const byte* byte_code;
-} const* compiled_shader_ptr;
-
-compiled_shader_ptr engine_shaders[engine_shader::count]{};
+content::compiled_shader_ptr engine_shaders[engine_shader::count]{};
 
 // memory containing all compiled shaders in format of size->bytecode->size->bytecode...
-scope<byte[]> shaders_blob{};
+scope<byte[]> engine_shaders_blob{};
 
 bool load_engine_shaders()
 {
-    LASSERT(!shaders_blob);
+    LASSERT(!engine_shaders_blob);
     u64 size = 0;
 
-    bool result = content::load_engine_shaders(shaders_blob, size);
-    LASSERT(shaders_blob && size);
+    bool result = content::load_engine_shaders(engine_shaders_blob, size);
+    LASSERT(engine_shaders_blob && size);
 
     u64 offset = 0;
-    u32 idx = 0;
-    while(offset < size && result)
+    u32 idx    = 0;
+    while (offset < size && result)
     {
         LASSERT(idx < engine_shader::count);
-        compiled_shader_ptr& shader = engine_shaders[idx];
+        content::compiled_shader_ptr& shader = engine_shaders[idx];
         LASSERT(!shader);
         result &= idx < engine_shader::count && !shader;
-        if (!result) break;
-        shader = reinterpret_cast<const compiled_shader_ptr>(&shaders_blob[offset]);
-        offset += sizeof(u64) + shader->size;
+        if (!result)
+            break;
+        shader = reinterpret_cast<const content::compiled_shader_ptr>(&engine_shaders_blob[offset]);
+        offset += sizeof(u64) + content::compiled_shader::hash_length + shader->byte_code_size();
         ++idx;
     }
 
@@ -81,15 +76,15 @@ void shutdown()
     {
         engine_shaders[i] = {};
     }
-    shaders_blob.reset();
+    engine_shaders_blob.reset();
 }
 
 D3D12_SHADER_BYTECODE get_engine_shader(engine_shader::id id)
 {
     LASSERT(id < engine_shader::count);
-    const compiled_shader_ptr shader = engine_shaders[id];
-    LASSERT(shader && shader->size);
-    return {&shader->byte_code, shader->size};
+    const content::compiled_shader_ptr& shader = engine_shaders[id];
+    LASSERT(shader && shader->byte_code_size());
+    return { shader->byte_code(), shader->byte_code_size() };
 }
 
 } // namespace lotus::graphics::d3d12::shaders

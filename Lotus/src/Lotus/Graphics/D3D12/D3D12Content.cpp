@@ -49,7 +49,7 @@ utl::free_list<submesh_view>   submesh_views{};
 std::mutex submesh_mutex{};
 
 
-D3D_PRIMITIVE_TOPOLOGY get_d3d_primitive_topology(const lotus::content::primitive_topology::type type)
+D3D_PRIMITIVE_TOPOLOGY get_d3d_primitive_topology(const primitive_topology::type type)
 {
     using namespace lotus::content;
     LASSERT(type < primitive_topology::count);
@@ -133,7 +133,7 @@ id::id_type add(const byte*& data)
     view.index_buffer_view.SizeInBytes    = index_buffer_size;
 
 
-    view.primitive_topology = get_d3d_primitive_topology((lotus::content::primitive_topology::type) primitive_topology);
+    view.primitive_topology = get_d3d_primitive_topology((primitive_topology::type) primitive_topology);
     view.element_type       = elements_type;
 
 

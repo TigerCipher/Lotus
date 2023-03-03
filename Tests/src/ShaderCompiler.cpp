@@ -26,15 +26,14 @@
 #include <d3d12shader.h>
 #include <dxcapi.h>
 
-#include <Lotus/Graphics/D3D12/D3D12Core.h>
-#include <Lotus/Graphics/D3D12/D3D12Shaders.h>
-
-
-// #include "../../vendor/DirectXShaderCompiler/inc/d3d12shader.h"
-// #include "../../vendor/DirectXShaderCompiler/inc/dxcapi.h"
 
 #include <filesystem>
 #include <fstream>
+
+#include <Lotus/Graphics/D3D12/D3D12Core.h>
+#include <Lotus/Graphics/D3D12/D3D12Shaders.h>
+#include <Lotus/Content/ContentToEngine.h>
+#include <Lotus/Util/IOStream.h>
 
 // #pragma comment(lib, "../../vendor/DirectXShaderCompiler/lib/x64/dxcompiler.lib")
 
@@ -293,6 +292,33 @@ bool save_compiled_shaders(utl::vector<dxc_compiled_shader>& shaders)
 
 } // anonymous namespace
 
+
+scope<u8[]> compile_shader(shader_file_info info, const char* file_path)
+{
+    std::filesystem::path full_path(file_path);
+    full_path += info.file_name;
+    if(!std::filesystem::exists(full_path)) return {};
+
+    shader_compiler compiler{};
+    dxc_compiled_shader compiled_shader{compiler.compile(info, full_path)};
+
+    if (compiled_shader.byte_code && compiled_shader.byte_code->GetBufferPointer() &&
+        compiled_shader.byte_code->GetBufferSize())
+    {
+        static_assert(content::compiled_shader::hash_length == _countof(DxcShaderHash::HashDigest));
+        const u64 buffer_size = sizeof(u64) + content::compiled_shader::hash_length + compiled_shader.byte_code->GetBufferSize();
+        scope<u8[]> buffer = create_scope<u8[]>(buffer_size);
+        utl::blob_stream_writer blob(buffer.get(), buffer_size);
+        blob.write(compiled_shader.byte_code->GetBufferSize());
+        blob.write(compiled_shader.hash.HashDigest, content::compiled_shader::hash_length);
+        blob.write((u8*)compiled_shader.byte_code->GetBufferPointer(), compiled_shader.byte_code->GetBufferSize());
+
+        LASSERT(blob.offset() == buffer_size);
+        return buffer;
+    }
+
+    return {};
+}
 
 bool compile_shaders()
 {

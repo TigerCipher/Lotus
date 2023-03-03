@@ -43,23 +43,26 @@ struct asset_type
     };
 };
 
-struct primitive_topology
+typedef struct compiled_shader
 {
-    enum type : u32
-    {
-        point_list = 1,
-        line_list,
-        line_strip,
-        triangle_list,
-        triangle_strip,
+    static constexpr u32 hash_length = 16;
 
+    [[nodiscard]] constexpr u64       byte_code_size() const { return m_byte_code_size; }
+    [[nodiscard]] constexpr const u8* hash() const { return &m_hash[0]; }
+    [[nodiscard]] constexpr const u8* byte_code() const { return &m_byte_code; }
 
-        count
-    };
-};
+private:
+    u64 m_byte_code_size{};
+    u8  m_hash[hash_length]{};
+    u8  m_byte_code{};
+} const* compiled_shader_ptr;
+
 
 id::id_type create_resource(const void* const data, asset_type::type type);
-
 void destroy_resource(id::id_type id, asset_type::type type);
+
+id::id_type add_shader(const u8* data);
+void remove_shader(id::id_type id);
+compiled_shader_ptr get_shader(id::id_type id);
 
 } // namespace lotus::content

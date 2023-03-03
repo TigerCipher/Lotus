@@ -92,10 +92,13 @@ private:
 };
 
 // Indicates an element in geometry_hiarchies is a fake pointer and is actually a gpu_id
-constexpr uintptr_t single_mesh_marker = (uintptr_t)0x01;
+constexpr uintptr_t single_mesh_marker = (uintptr_t) 0x01;
 
 utl::free_list<u8*> geometry_hierarchies;
 std::mutex          geometry_mutex;
+
+utl::free_list<scope<u8[]>> shaders;
+std::mutex                  shader_mutex;
 
 u32 get_geometry_hierarchy_size(const void* const data)
 {
@@ -135,7 +138,7 @@ id::id_type create_mesh_hierarchy(const void* const data)
         stream.thresholds()[lod_idx] = blob.read<f32>();
         const u32 id_count           = blob.read<u32>();
         LASSERT(id_count < (1 << 16));
-        stream.lod_offsets()[lod_idx] = { (u16)submesh_index, (u16) id_count };
+        stream.lod_offsets()[lod_idx] = { (u16) submesh_index, (u16) id_count };
         blob.skip(sizeof(u32)); // Skip size_of_submeshes
 
         for (u32 id_idx = 0; id_idx < id_count; ++id_idx)
@@ -169,10 +172,11 @@ id::id_type create_mesh_hierarchy(const void* const data)
 bool is_single_mesh(const void* const data)
 {
     LASSERT(data);
-    utl::blob_stream_reader blob((const u8*)data);
-    const u32 lod_count = blob.read<u32>();
+    utl::blob_stream_reader blob((const u8*) data);
+    const u32               lod_count = blob.read<u32>();
     LASSERT(lod_count);
-    if(lod_count > 1) return false;
+    if (lod_count > 1)
+        return false;
 
     // Skip threshold
     blob.skip(sizeof(f32));
@@ -186,18 +190,18 @@ bool is_single_mesh(const void* const data)
 id::id_type create_single_submesh(const void* const data)
 {
     LASSERT(data);
-    utl::blob_stream_reader blob((const u8*)data);
+    utl::blob_stream_reader blob((const u8*) data);
 
     // Skip lod count, threshold, submesh count, and submesh size
     blob.skip(sizeof(u32) + sizeof(f32) + sizeof(u32) + sizeof(u32));
 
-    const u8* at = blob.position();
+    const u8*         at     = blob.position();
     const id::id_type gpu_id = graphics::add_submesh(at);
 
     // Create a fake pointer
     static_assert(sizeof(uintptr_t) > sizeof(id::id_type));
     constexpr u8 shift_bits = (sizeof(uintptr_t) - sizeof(id::id_type)) << 3;
-    u8* const fake_ptr = (u8* const)(((uintptr_t)gpu_id << shift_bits) | single_mesh_marker);
+    u8* const    fake_ptr   = (u8* const) (((uintptr_t) gpu_id << shift_bits) | single_mesh_marker);
 
     std::lock_guard lock(geometry_mutex);
     return geometry_hierarchies.add(fake_ptr);
@@ -238,12 +242,12 @@ id::id_type create_geometry_resource(const void* const data)
     return is_single_mesh(data) ? create_single_submesh(data) : create_mesh_hierarchy(data);
 }
 
-id::id_type gpu_id_from_fake_pointer(u8* const pointer)
+constexpr id::id_type gpu_id_from_fake_pointer(u8* const pointer)
 {
-    LASSERT((uintptr_t)pointer & single_mesh_marker);
+    LASSERT((uintptr_t) pointer & single_mesh_marker);
     static_assert(sizeof(uintptr_t) > sizeof(id::id_type));
     constexpr u8 shift_bits = (sizeof(uintptr_t) - sizeof(id::id_type)) << 3;
-    return ((uintptr_t)pointer >> shift_bits) & (uintptr_t)id::invalid_id;
+    return ((uintptr_t) pointer >> shift_bits) & (uintptr_t) id::invalid_id;
 }
 
 void destroy_geometry_resource(id::id_type id)
@@ -252,10 +256,10 @@ void destroy_geometry_resource(id::id_type id)
 
     u8* const pointer = geometry_hierarchies[id];
     // If the pointer is fake
-    if((uintptr_t)pointer & single_mesh_marker)
+    if ((uintptr_t) pointer & single_mesh_marker)
     {
         graphics::remove_submesh(gpu_id_from_fake_pointer(pointer));
-    }else
+    } else
     {
         geometry_hiearchy_stream stream(pointer);
         const u32                lod_count = stream.lod_count();
@@ -310,6 +314,31 @@ void destroy_resource(id::id_type id, asset_type::type type)
     case asset_type::texture: break;
     default: LASSERT(false); break;
     }
+}
+
+id::id_type add_shader(const u8* data)
+{
+    const compiled_shader_ptr shader_ptr = (const compiled_shader_ptr) data;
+    const u64                 size       = sizeof(u64) + compiled_shader::hash_length + shader_ptr->byte_code_size();
+    scope<u8[]>               shader     = create_scope<u8[]>(size);
+    memcpy(shader.get(), data, size);
+
+    std::lock_guard lock(shader_mutex);
+    return shaders.add(std::move(shader));
+}
+
+void remove_shader(id::id_type id)
+{
+    std::lock_guard lock(shader_mutex);
+    LASSERT(id::is_valid(id));
+    shaders.remove(id);
+}
+
+compiled_shader_ptr get_shader(id::id_type id)
+{
+    std::lock_guard lock(shader_mutex);
+    LASSERT(id::is_valid(id));
+    return (const compiled_shader_ptr) shaders[id].get();
 }
 
 } // namespace lotus::content
