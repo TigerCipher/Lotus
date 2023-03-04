@@ -27,12 +27,6 @@
 
 #include "D3D12Common.h"
 
-#define ROOT_FLAGS_DISABLED_COMMON                                                                                          \
-    D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |     \
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |                                                          \
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |                                                        \
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |                                                   \
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS
 
 namespace lotus::graphics::d3d12::d3dx
 {
@@ -267,10 +261,17 @@ private:
 // Static samplers = 0 DWORDs
 struct d3d12_root_signature_desc : D3D12_ROOT_SIGNATURE_DESC1
 {
+    constexpr static D3D12_ROOT_SIGNATURE_FLAGS default_flags =
+        D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+        D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+        D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS |
+        D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
+        D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED;
+
     constexpr explicit d3d12_root_signature_desc(const d3d12_root_parameter* parameters, u32 param_count,
+                                                 D3D12_ROOT_SIGNATURE_FLAGS       flags           = default_flags,
                                                  const D3D12_STATIC_SAMPLER_DESC* static_samplers = nullptr,
-                                                 u32                              sampler_count   = 0,
-                                                 D3D12_ROOT_SIGNATURE_FLAGS       flags = ROOT_FLAGS_DISABLED_COMMON) :
+                                                 u32                              sampler_count   = 0) :
         D3D12_ROOT_SIGNATURE_DESC1{ param_count, parameters, sampler_count, static_samplers, flags }
     {}
 

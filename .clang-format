@@ -28,7 +28,7 @@ BraceWrapping:
 BreakBeforeBinaryOperators: None
 BreakInheritanceList: BeforeComma
 BreakConstructorInitializers: AfterColon
-ColumnLimit: 125
+ColumnLimit: 130
 #NamespaceIndentation: All
 CompactNamespaces: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: true

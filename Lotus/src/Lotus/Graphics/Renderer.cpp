@@ -36,19 +36,51 @@ constexpr const char* engine_shader_paths[]{
     R"(.\shaders\d3d12\shaders.bin)",
 };
 
-bool set_platform_interface(graphics_platform platform)
+bool set_platform_interface(graphics_platform platform, platform_interface& pi)
 {
     switch (platform)
     {
-    case graphics_platform::d3d12: d3d12::get_platform_interface(gfx); break;
+    case graphics_platform::d3d12: d3d12::get_platform_interface(pi); break;
     default: return false;
     }
 
-    LASSERT(gfx.platform == platform);
+    LASSERT(pi.platform == platform);
     return true;
 }
 
 } // anonymous namespace
+
+bool initialize(graphics_platform platform)
+{
+    return set_platform_interface(platform, gfx) && gfx.initialize();
+}
+
+void shutdown()
+{
+    if (gfx.platform != (graphics_platform) -1)
+        gfx.shutdown();
+}
+
+const char* get_engine_shaders_path()
+{
+    return engine_shader_paths[(u32) gfx.platform];
+}
+
+const char* get_engine_shaders_path(graphics_platform platform)
+{
+    return engine_shader_paths[(u32) platform];
+}
+
+surface create_surface(platform::window window)
+{
+    return gfx.surface.create(window);
+}
+
+void remove_surface(surface_id id)
+{
+    LASSERT(id::is_valid(id));
+    gfx.surface.remove(id);
+}
 
 void surface::resize(u32 width, u32 height) const
 {
@@ -74,38 +106,17 @@ void surface::render() const
     gfx.surface.render(m_id);
 }
 
-bool initialize(graphics_platform platform)
+
+camera create_camera(camera_init_info info)
 {
-    return set_platform_interface(platform) && gfx.initialize();
+    return gfx.camera.create(info);
 }
 
-void shutdown()
+void remove_camera(camera_id id)
 {
-    if (gfx.platform != (graphics_platform) -1)
-        gfx.shutdown();
+    gfx.camera.remove(id);
 }
 
-
-surface create_surface(platform::window window)
-{
-    return gfx.surface.create(window);
-}
-
-void remove_surface(surface_id id)
-{
-    LASSERT(id::is_valid(id));
-    gfx.surface.remove(id);
-}
-
-const char* get_engine_shaders_path()
-{
-    return engine_shader_paths[(u32) gfx.platform];
-}
-
-const char* get_engine_shaders_path(graphics_platform platform)
-{
-    return engine_shader_paths[(u32) platform];
-}
 
 id::id_type add_submesh(const u8*& data)
 {
@@ -117,14 +128,14 @@ void remove_submesh(id::id_type id)
     gfx.resources.remove_submesh(id);
 }
 
-camera create_camera(camera_init_info info)
+id::id_type add_material(material_init_info info)
 {
-    return gfx.camera.create(info);
+    return gfx.resources.add_material(info);
 }
 
-void remove_camera(camera_id id)
+void remove_material(id::id_type id)
 {
-    gfx.camera.remove(id);
+    gfx.resources.remove_material(id);
 }
 
 
@@ -271,7 +282,7 @@ camera::type camera::projection_type() const
     return t;
 }
 
-id::id_type  camera::entity_id() const
+id::id_type camera::entity_id() const
 {
     LASSERT(is_valid());
     id::id_type id;

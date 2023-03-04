@@ -36,7 +36,6 @@ namespace
 struct fx_root_param_indices {
     enum : u32 {
         root_constants,
-        descriptor_table,
 
         count
     };
@@ -49,21 +48,22 @@ bool create_fx_pso_root_sig()
 {
     LASSERT(!fx_root_sig && !fx_pso);
 
-    d3dx::d3d12_descriptor_range range{
-        D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
-        D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND,
-        0,
-        0,
-        D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE,
-    };
+    // d3dx::d3d12_descriptor_range range{
+    //     D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+    //     D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND,
+    //     0,
+    //     0,
+    //     D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE,
+    // };
 
     // fx sig
     using idx = fx_root_param_indices;
     d3dx::d3d12_root_parameter params[idx::count]{};
     params[idx::root_constants].as_constants(1, D3D12_SHADER_VISIBILITY_PIXEL, 1);
-    params[idx::descriptor_table].as_descriptor_table(D3D12_SHADER_VISIBILITY_PIXEL, &range, 1);
+    // params[idx::descriptor_table].as_descriptor_table(D3D12_SHADER_VISIBILITY_PIXEL, &range, 1);
 
-    const d3dx::d3d12_root_signature_desc root_sig{ &params[0], _countof(params) };
+    d3dx::d3d12_root_signature_desc root_sig{ &params[0], _countof(params) };
+    root_sig.Flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
     fx_root_sig = root_sig.create();
     LASSERT(fx_root_sig);
 
@@ -116,7 +116,7 @@ void post_process(id3d12_graphics_command_list* cmd_list, D3D12_CPU_DESCRIPTOR_H
 
     using idx = fx_root_param_indices;
     cmd_list->SetGraphicsRoot32BitConstant(idx::root_constants, gpass::main_buffer().srv().index, 0);
-    cmd_list->SetGraphicsRootDescriptorTable(idx::descriptor_table, core::srv_heap().gpu_start());
+    // cmd_list->SetGraphicsRootDescriptorTable(idx::descriptor_table, core::srv_heap().gpu_start());
 
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

@@ -40,38 +40,38 @@
 
 #ifdef L_DEBUG
     #ifndef DX_CALL
-        #define DX_CALL(x)                                                                                                  \
-            if (FAILED(x))                                                                                                  \
-            {                                                                                                               \
-                char line_number[32];                                                                                       \
-                sprintf_s(line_number, "%u", __LINE__);                                                                     \
-                OutputDebugStringA("ERROR IN: ");                                                                           \
-                OutputDebugStringA(__FILE__);                                                                               \
-                OutputDebugStringA("\nLine: ");                                                                             \
-                OutputDebugStringA(line_number);                                                                            \
-                OutputDebugStringA("\n");                                                                                   \
-                OutputDebugStringA(#x);                                                                                     \
-                OutputDebugStringA("\n");                                                                                   \
-                __debugbreak();                                                                                             \
+        #define DX_CALL(x)                                                                                                       \
+            if (FAILED(x))                                                                                                       \
+            {                                                                                                                    \
+                char line_number[32];                                                                                            \
+                sprintf_s(line_number, "%u", __LINE__);                                                                          \
+                OutputDebugStringA("ERROR IN: ");                                                                                \
+                OutputDebugStringA(__FILE__);                                                                                    \
+                OutputDebugStringA("\nLine: ");                                                                                  \
+                OutputDebugStringA(line_number);                                                                                 \
+                OutputDebugStringA("\n");                                                                                        \
+                OutputDebugStringA(#x);                                                                                          \
+                OutputDebugStringA("\n");                                                                                        \
+                __debugbreak();                                                                                                  \
             }
     #endif
 
-    #define NAME_D3D_OBJ(obj, name)                                                                                         \
-        obj->SetName(name);                                                                                                 \
-        OutputDebugString(L"================= D3D12 Object Created: ");                                                     \
-        OutputDebugString(name);                                                                                            \
+    #define NAME_D3D_OBJ(obj, name)                                                                                              \
+        obj->SetName(name);                                                                                                      \
+        OutputDebugString(L"================= D3D12 Object Created: ");                                                          \
+        OutputDebugString(name);                                                                                                 \
         OutputDebugString(L"\n")
 
-    #define NAME_D3D_OBJ_INDEXED(obj, i, name)                                                                              \
-        {                                                                                                                   \
-            wchar_t fullname[128];                                                                                          \
-            if (swprintf_s(fullname, L"%s[%u]", name, i) > 0)                                                               \
-            {                                                                                                               \
-                (obj)->SetName(name);                                                                                       \
-                OutputDebugString(L"::D3D12 Object Created: ");                                                             \
-                OutputDebugString(fullname);                                                                                \
-                OutputDebugString(L"\n");                                                                                   \
-            }                                                                                                               \
+    #define NAME_D3D_OBJ_INDEXED(obj, i, name)                                                                                   \
+        {                                                                                                                        \
+            wchar_t fullname[128];                                                                                               \
+            if (swprintf_s(fullname, L"%s[%llu]", name, (u64) i) > 0)                                                            \
+            {                                                                                                                    \
+                (obj)->SetName(name);                                                                                            \
+                OutputDebugString(L"================= D3D12 Object Created: ");                                                  \
+                OutputDebugString(fullname);                                                                                     \
+                OutputDebugString(L"\n");                                                                                        \
+            }                                                                                                                    \
         }
 
 #else

@@ -41,14 +41,17 @@ void get_platform_interface(platform_interface& pinterface)
     pinterface.surface.height = core::surface_height;
     pinterface.surface.render = core::render_surface;
 
-    pinterface.resources.add_submesh = content::submesh::add;
-    pinterface.resources.remove_submesh = content::submesh::remove;
-
-    pinterface.camera.create = camera::create;
-    pinterface.camera.remove = camera::remove;
+    pinterface.camera.create        = camera::create;
+    pinterface.camera.remove        = camera::remove;
     pinterface.camera.set_parameter = camera::set_parameter;
     pinterface.camera.get_parameter = camera::get_parameter;
 
+    pinterface.resources.add_submesh     = content::submesh::add;
+    pinterface.resources.remove_submesh  = content::submesh::remove;
+    pinterface.resources.add_material    = content::material::add;
+    pinterface.resources.remove_material = content::material::remove;
+
+
     pinterface.platform = graphics_platform::d3d12;
 }
-}
+} // namespace lotus::graphics::d3d12

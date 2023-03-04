@@ -22,6 +22,7 @@
 // ------------------------------------------------------------------------------
 #include "D3D12Core.h"
 
+#include "D3D12Content.h"
 #include "D3D12Surface.h"
 #include "D3D12Shaders.h"
 #include "D3D12GPass.h"
@@ -371,7 +372,7 @@ bool initialize()
         return failed_init();
 
     // Initialize various graphics api sub modules
-    if (!(shaders::initialize() && gpass::initialize() && fx::initialize() && upload::initialize()))
+    if (!(shaders::initialize() && gpass::initialize() && fx::initialize() && upload::initialize() && content::initialize()))
         return failed_init();
 
     NAME_D3D_OBJ(main_device, L"MAIN_DEVICE");
@@ -394,6 +395,7 @@ void shutdown()
     }
 
     // Shutdown the render submodules
+    content::shutdown();
     upload::shutdown();
     fx::shutdown();
     gpass::shutdown();
