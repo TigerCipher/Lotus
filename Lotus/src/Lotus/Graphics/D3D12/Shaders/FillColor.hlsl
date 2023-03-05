@@ -32,5 +32,8 @@ float4 FillColorPS(in noperspective float4 Position : SV_Position, in noperspect
     }
 
     return float4(color / SAMPLES, 1.0f);
+    
    // return float4(float3(color.z, color.x, 1.0f) * color.x / SAMPLES, 1.0f);
+
+    //return float4(0.4f, 0.6f, 0.3f, 1.0f);
 }

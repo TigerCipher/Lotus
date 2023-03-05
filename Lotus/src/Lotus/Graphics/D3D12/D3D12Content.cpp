@@ -183,13 +183,13 @@ constexpr D3D12_ROOT_SIGNATURE_FLAGS get_root_signature_flags(shader_flags::flag
 {
     D3D12_ROOT_SIGNATURE_FLAGS default_flags = d3dx::d3d12_root_signature_desc::default_flags;
 
-    if (flags & shader_flags::vertex) default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS;
-    if (flags & shader_flags::hull) default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS;
-    if (flags & shader_flags::domain) default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS;
-    if (flags & shader_flags::geometry) default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
-    if (flags & shader_flags::pixel) default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
-    if (flags & shader_flags::amplification) default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS;
-    if (flags & shader_flags::mesh) default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS;
+    if (flags & shader_flags::vertex)           default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS;
+    if (flags & shader_flags::hull)             default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS;
+    if (flags & shader_flags::domain)           default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS;
+    if (flags & shader_flags::geometry)         default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+    if (flags & shader_flags::pixel)            default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+    if (flags & shader_flags::amplification)    default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS;
+    if (flags & shader_flags::mesh)             default_flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS;
 
     return default_flags;
 }
@@ -245,7 +245,7 @@ id::id_type create_root_signature(material_type::type type, shader_flags::flags 
         parameters[params::srv_indices].as_srv(D3D12_SHADER_VISIBILITY_PIXEL, 2); // TODO: Make visible to any stage that needs to sample textures
         parameters[params::per_object_data].as_cbv(data_visibility, 1);
 
-        root_sig = d3dx::d3d12_root_signature_desc{&parameters[0], _countof(parameters), get_root_signature_flags(flags)}.create();
+        root_sig = d3dx::d3d12_root_signature_desc{&parameters[0], params::count, get_root_signature_flags(flags)}.create();
     }break;
     }
 

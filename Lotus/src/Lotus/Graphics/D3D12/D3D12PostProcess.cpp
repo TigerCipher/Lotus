@@ -62,7 +62,7 @@ bool create_fx_pso_root_sig()
     params[idx::root_constants].as_constants(1, D3D12_SHADER_VISIBILITY_PIXEL, 1);
     // params[idx::descriptor_table].as_descriptor_table(D3D12_SHADER_VISIBILITY_PIXEL, &range, 1);
 
-    d3dx::d3d12_root_signature_desc root_sig{ &params[0], _countof(params) };
+    d3dx::d3d12_root_signature_desc root_sig{ &params[0], idx::count };
     root_sig.Flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
     fx_root_sig = root_sig.create();
     LASSERT(fx_root_sig);

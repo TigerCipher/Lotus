@@ -84,8 +84,7 @@ public:
                                                                         : L"Command Allocator");
         }
 
-        DX_CALL(
-            hr = device->CreateCommandList(0, type, m_cmd_frames[0].cmd_allocator, nullptr, IID_PPV_ARGS(&m_cmd_list)));
+        DX_CALL(hr = device->CreateCommandList(0, type, m_cmd_frames[0].cmd_allocator, nullptr, IID_PPV_ARGS(&m_cmd_list)));
         if (FAILED(hr))
         {
             release();
@@ -107,7 +106,8 @@ public:
         m_fence_event = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
         LASSERT(m_fence_event);
 
-        if(!m_fence_event) release();
+        if (!m_fence_event)
+            release();
     }
 
     ~d3d12_command() { LASSERT(!m_cmd_queue && !m_cmd_list && !m_fence); }
@@ -231,8 +231,8 @@ IDXGIAdapter4* determine_main_adapter()
 {
     IDXGIAdapter4* adapter = nullptr;
     // Get in order of performance
-    for (u32 i = 0; dxgi_factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
-                                                             IID_PPV_ARGS(&adapter)) != DXGI_ERROR_NOT_FOUND;
+    for (u32 i = 0; dxgi_factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)) !=
+                    DXGI_ERROR_NOT_FOUND;
          ++i)
     {
         // Pick the first that features minimum feature level
@@ -311,6 +311,10 @@ bool initialize()
         if (SUCCEEDED(D3D12GetDebugInterface(L_PTR(&debug_interface))))
         {
             debug_interface->EnableDebugLayer();
+    #if 0
+        #pragma message("WARNING: GPU_based validation is enabled. This will considerably slow down the renderer!")
+        debug_interface->SetEnableGPUBasedValidation(1);
+    #endif
         } else
         {
             OutputDebugStringA("Warning: D3D12 Debug interface not available. Optional feature \"Graphics Tools\" "
@@ -320,10 +324,6 @@ bool initialize()
         dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
     }
 
-    #if 0
-        #pragma message("WARNING: GPU_based validation is enabled. This will considerably slow down the renderer!")
-    debug_interface->SetEnableGPUBasedValidation(1);
-    #endif
 
 #endif
 
@@ -428,8 +428,7 @@ void shutdown()
         cptr<ID3D12DebugDevice2> debug_device;
         DX_CALL(main_device->QueryInterface(L_PTR(&debug_device)));
         release(main_device);
-        DX_CALL(
-            debug_device->ReportLiveDeviceObjects(D3D12_RLDO_SUMMARY | D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL));
+        DX_CALL(debug_device->ReportLiveDeviceObjects(D3D12_RLDO_SUMMARY | D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL));
     }
 #endif
 
@@ -552,8 +551,7 @@ void render_surface(surface_id id)
     fx::post_process(cmd_list, surface.rtv());
 
     // After post processing
-    d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_RENDER_TARGET,
-                              D3D12_RESOURCE_STATE_PRESENT);
+    d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
     // End of commands
 

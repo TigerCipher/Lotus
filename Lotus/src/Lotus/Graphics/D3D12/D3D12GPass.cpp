@@ -118,7 +118,7 @@ bool create_gpass_pso_and_rootsig()
     // root sig
     d3dx::d3d12_root_parameter params[idx::count]{};
     params[idx::root_constants].as_constants(3, D3D12_SHADER_VISIBILITY_PIXEL, 1);
-    d3dx::d3d12_root_signature_desc root_sig{ &params[0], _countof(params) };
+    d3dx::d3d12_root_signature_desc root_sig{ &params[0], idx::count };
     root_sig.Flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
     gpass_root_sig = root_sig.create();
     LASSERT(gpass_root_sig);

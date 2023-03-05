@@ -36,15 +36,15 @@ constexpr const char* engine_shader_paths[]{
     R"(.\shaders\d3d12\shaders.bin)",
 };
 
-bool set_platform_interface(graphics_platform platform, platform_interface& pi)
+bool set_platform_interface(graphics_platform platform, platform_interface& pinterface)
 {
     switch (platform)
     {
-    case graphics_platform::d3d12: d3d12::get_platform_interface(pi); break;
+    case graphics_platform::d3d12: d3d12::get_platform_interface(pinterface); break;
     default: return false;
     }
 
-    LASSERT(pi.platform == platform);
+    LASSERT(pinterface.platform == platform);
     return true;
 }
 
