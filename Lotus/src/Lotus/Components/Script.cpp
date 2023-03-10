@@ -42,13 +42,13 @@ script_registry& registry()
 }
 
 
-bool exists(const script_id scriptId)
+bool exists(const script_id id)
 {
-    LASSERT(id::is_valid(scriptId));
-    const id::id_type index = id::index(scriptId);
+    LASSERT(id::is_valid(id));
+    const id::id_type index = id::index(id);
     LASSERT((index < generations.size() && id_mapping[index] < entity_scripts.size()) &&
-            generations[index] == id::generation(scriptId));
-    return (generations[index] == id::generation(scriptId)) && entity_scripts[id_mapping[index]] &&
+            generations[index] == id::generation(id));
+    return (generations[index] == id::generation(id)) && entity_scripts[id_mapping[index]] &&
            entity_scripts[id_mapping[index]]->is_valid();
 }
 
@@ -93,29 +93,29 @@ u8 add_script_name(const char* name)
 component create(const create_info& info, const game_entity::entity entity)
 {
     LASSERT(entity.is_valid() && info.script_creator);
-    script_id scriptId;
+    script_id id;
 
     if (free_ids.size() > id::min_deleted_elements)
     {
-        scriptId = free_ids.front();
-        LASSERT(!exists(scriptId));
+        id = free_ids.front();
+        LASSERT(!exists(id));
         free_ids.pop_front();
-        scriptId = script_id{ id::new_generation(scriptId) };
-        ++generations[id::index(scriptId)];
+        id = script_id{ id::new_generation(id) };
+        ++generations[id::index(id)];
     } else
     {
-        scriptId = script_id{ (id::id_type) id_mapping.size() };
+        id = script_id{ (id::id_type) id_mapping.size() };
         id_mapping.emplace_back();
         generations.push_back(0);
     }
 
-    LASSERT(id::is_valid(scriptId));
-    const id::id_type index = (id::id_type) entity_scripts.size();
+    LASSERT(id::is_valid(id));
+    const auto index = (id::id_type) entity_scripts.size();
     entity_scripts.emplace_back(info.script_creator(entity));
     LASSERT(entity_scripts.back()->get_id() == entity.get_id());
 
-    id_mapping[id::index(scriptId)] = index;
-    return component(scriptId);
+    id_mapping[id::index(id)] = index;
+    return component(id);
 }
 
 void remove(const component comp)
@@ -123,9 +123,9 @@ void remove(const component comp)
     assert(comp.is_valid() && exists(comp.get_id()));
     const script_id   id     = comp.get_id();
     const id::id_type index  = id_mapping[id::index(id)];
-    const script_id   lastId = entity_scripts.back()->script().get_id();
+    const script_id   last_id = entity_scripts.back()->script().get_id();
     utl::erase_unordered(entity_scripts, index);
-    id_mapping[id::index(lastId)] = index;
+    id_mapping[id::index(last_id)] = index;
     id_mapping[id::index(id)]     = id::invalid_id;
 }
 

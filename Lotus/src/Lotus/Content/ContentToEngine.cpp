@@ -336,9 +336,9 @@ void destroy_resource(id::id_type id, asset_type::type type)
 
 id::id_type add_shader(const u8* data)
 {
-    const compiled_shader_ptr shader_ptr = (const compiled_shader_ptr) data;
-    const u64                 size       = sizeof(u64) + compiled_shader::hash_length + shader_ptr->byte_code_size();
-    scope<u8[]>               shader     = create_scope<u8[]>(size);
+    const auto  shader_ptr = (const compiled_shader_ptr) data;
+    const u64   size       = sizeof(u64) + compiled_shader::hash_length + shader_ptr->byte_code_size();
+    scope<u8[]> shader     = create_scope<u8[]>(size);
     memcpy(shader.get(), data, size);
 
     std::lock_guard lock(shader_mutex);

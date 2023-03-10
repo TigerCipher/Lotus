@@ -59,11 +59,11 @@ entity create(const create_info& info)
         scripts.emplace_back();
     }
 
-    const entity      newEnt(ident);
+    const entity      new_ent(ident);
     const id::id_type index = id::index(ident);
 
     LASSERT(!transforms[index].is_valid());
-    transforms[index] = transform::create(*info.transform, newEnt);
+    transforms[index] = transform::create(*info.transform, new_ent);
     if (!transforms[index].is_valid())
         return {};
 
@@ -71,11 +71,11 @@ entity create(const create_info& info)
     if (info.script && info.script->script_creator)
     {
         LASSERT(!scripts[index].is_valid());
-        scripts[index] = script::create(*info.script, newEnt);
+        scripts[index] = script::create(*info.script, new_ent);
         LASSERT(scripts[index].is_valid());
     }
 
-    return newEnt;
+    return new_ent;
 }
 
 void remove(const entity_id id)

@@ -34,9 +34,9 @@ utl::vector<vec3> scales;
 
 vec3 calculate_orientation(vec4 rotation)
 {
-    vec rotation_quat = math::load_float4(&rotation);
-    vec front = math::set_vector(0.0f, 0.0f, 1.0f, 0.0f);
-    vec3 orientation;
+    const vec rotation_quat = math::load_float4(&rotation);
+    const vec front         = math::set_vector(0.0f, 0.0f, 1.0f, 0.0f);
+    vec3      orientation;
     math::store_float3(&orientation, math::rotate_vec3(front, rotation_quat));
 
     return orientation;
@@ -47,11 +47,10 @@ vec3 calculate_orientation(vec4 rotation)
 component create(const create_info& info, game_entity::entity entity)
 {
     LASSERT(entity.is_valid());
-    const id::id_type ent_index = id::index(entity.get_id());
 
-    if (positions.size() > ent_index)
+    if (const id::id_type ent_index = id::index(entity.get_id()); positions.size() > ent_index)
     {
-        vec4 rotation {info.rotation};
+        const vec4 rotation {info.rotation};
         rotations[ent_index] = rotation;
         orientations[ent_index] = calculate_orientation(rotation);
         positions[ent_index] = vec3{info.position};

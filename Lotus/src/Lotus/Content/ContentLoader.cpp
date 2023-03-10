@@ -45,7 +45,6 @@ enum component_type
     count
 };
 
-using comp_type = bool (*)(const u8*&, game_entity::create_info&);
 
 utl::vector<game_entity::entity> entities;
 transform::create_info      transform_info;
@@ -86,13 +85,13 @@ bool read_script(const u8*& data, game_entity::create_info& info)
         return false;
 
     LASSERT(name_length < 256);
-    char scriptName[256];
-    memcpy(&scriptName[0], data, name_length);
+    char script_name[256];
+    memcpy(&script_name[0], data, name_length);
     data += name_length;
 
-    scriptName[name_length] = 0; // Null terminate the script name
+    script_name[name_length] = 0; // Null terminate the script name
 
-    script_info.script_creator = script::detail::get_script_creator(string_hash()(scriptName));
+    script_info.script_creator = script::detail::get_script_creator(string_hash()(script_name));
 
     info.script = &script_info;
     return script_info.script_creator != nullptr;
@@ -186,7 +185,7 @@ void unload_game()
 
 bool load_engine_shaders(scope<u8[]>& shaders_blob, u64& size)
 {
-    auto path = graphics::get_engine_shaders_path();
+    const auto path = graphics::get_engine_shaders_path();
     return read_file(path, shaders_blob, size);
 }
 
