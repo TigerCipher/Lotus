@@ -100,7 +100,7 @@ id::id_type create_render_item(id::id_type entity_id)
     _2.join();
 
     // add render item and its materials
-    create_material();
+    //create_material();
 
     id::id_type item_id      = 0; // temp
     render_item_map[item_id] = entity_id;

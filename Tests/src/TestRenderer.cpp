@@ -251,6 +251,7 @@ bool test_initialize()
         { &winproc, nullptr, L"Test Window 4", 400, 400, 800, 600 },
     };
 
+
     static_assert(_countof(info) == _countof(surfaces));
 
     for (u32 i = 0; i < numWindows; ++i)

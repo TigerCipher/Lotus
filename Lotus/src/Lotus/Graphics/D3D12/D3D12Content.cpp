@@ -199,9 +199,8 @@ id::id_type create_root_signature(material_type::type type, shader_flags::flags 
     LASSERT(type < material_type::count);
     static_assert(sizeof(type) == sizeof(u32) && sizeof(flags) == sizeof(u32));
 
-    const u64 key = ((u64)type << 32) | flags;
-    auto pair = mtl_rs_map.find(key);
-    if(pair != mtl_rs_map.end())
+    const u64  key  = ((u64)type << 32) | flags;
+    if(const auto pair = mtl_rs_map.find(key); pair != mtl_rs_map.end())
     {
         LASSERT(pair->first == key);
         return pair->second;

@@ -96,7 +96,7 @@ void d3d12_surface::resize()
     {
         core::release(m_render_target_data[i].resource);
     }
-
+    
     const u32 flags = m_allow_tearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0ul;
     DX_CALL(m_swap_chan->ResizeBuffers(buffer_count, 0, 0, DXGI_FORMAT_UNKNOWN, flags));
     m_current_backbuffer_index = m_swap_chan->GetCurrentBackBufferIndex();

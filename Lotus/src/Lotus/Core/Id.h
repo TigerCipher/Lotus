@@ -30,6 +30,7 @@ namespace lotus::id
 {
 
 using id_type = u32;
+constexpr size_t size = sizeof(id_type);
 
 namespace detail
 {

@@ -25,12 +25,13 @@ ___
  + [ ] Textures
  + [ ] Forward Lighting
  + [X] HLSL shaders
+   + With shader model 6.6, Dynamic Resources are currently bugged for recent drivers for RTX 3000 series and 4090
  + [X] Models and Meshes
  + [ ] Animation
  + [ ] Shadows
  + [ ] Physics
  + [ ] User input
- + [ ] Cameras
+ + [X] Cameras
  + [X] Forward+ rendering
  + [ ] Material system
  + [ ] Physically Based Rendering - PBR
@@ -55,7 +56,7 @@ ___
 + [X] Project open/create dialog
 + [X] Win32 window hosting
 + [X] Content/asset browser
-+ [ ] Model importer
++ [X] Model importer
 + [ ] Texture editor
 + [ ] Material editor
 + [ ] Lights

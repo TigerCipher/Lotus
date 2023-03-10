@@ -139,9 +139,9 @@ public:
         }
     }
 
-    constexpr ID3D12CommandQueue* const           command_queue() const { return m_cmd_queue; }
-    constexpr id3d12_graphics_command_list* const command_list() const { return m_cmd_list; }
-    constexpr u32                                 frame_index() const { return m_frame_index; }
+    [[nodiscard]] constexpr ID3D12CommandQueue* const           command_queue() const { return m_cmd_queue; }
+    [[nodiscard]] constexpr id3d12_graphics_command_list* const command_list() const { return m_cmd_list; }
+    [[nodiscard]] constexpr u32                                 frame_index() const { return m_frame_index; }
 
     void begin_frame()
     {
@@ -181,7 +181,7 @@ private:
             fence_value = 0;
         }
 
-        void wait(HANDLE fence_event, ID3D12Fence1* fence)
+        void wait(HANDLE fence_event, ID3D12Fence1* fence) const
         {
             LASSERT(fence && fence_event);
             if (fence->GetCompletedValue() < fence_value)
@@ -311,9 +311,10 @@ bool initialize()
         if (SUCCEEDED(D3D12GetDebugInterface(L_PTR(&debug_interface))))
         {
             debug_interface->EnableDebugLayer();
-    #if 0
+    #if 1
         #pragma message("WARNING: GPU_based validation is enabled. This will considerably slow down the renderer!")
-        debug_interface->SetEnableGPUBasedValidation(1);
+            OutputDebugStringA("WARNING: GPU validation is enabled, this will considerably slow down the renderer!\n");
+            debug_interface->SetEnableGPUBasedValidation(1);
     #endif
         } else
         {
