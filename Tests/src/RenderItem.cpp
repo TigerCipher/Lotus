@@ -39,7 +39,7 @@ namespace
 id::id_type model_id = id::invalid_id;
 id::id_type vs_id    = id::invalid_id;
 id::id_type ps_id    = id::invalid_id;
-id::id_type mtl_id    = id::invalid_id;
+id::id_type mtl_id   = id::invalid_id;
 
 std::unordered_map<id::id_type, id::id_type> render_item_map;
 
@@ -77,8 +77,8 @@ void create_material()
 {
     graphics::material_init_info info{};
     info.shader_ids[graphics::shader_type::vertex] = vs_id;
-    info.shader_ids[graphics::shader_type::pixel] = ps_id;
-    info.type = graphics::material_type::opaque;
+    info.shader_ids[graphics::shader_type::pixel]  = ps_id;
+    info.type                                      = graphics::material_type::opaque;
 
     mtl_id = content::create_resource(&info, content::asset_type::material);
 }
@@ -121,7 +121,7 @@ void destroy_render_item(id::id_type id)
     }
     // remove material
 
-    if(id::is_valid(mtl_id))
+    if (id::is_valid(mtl_id))
     {
         content::destroy_resource(mtl_id, content::asset_type::material);
     }

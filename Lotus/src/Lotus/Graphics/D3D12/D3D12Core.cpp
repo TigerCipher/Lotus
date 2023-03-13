@@ -53,7 +53,7 @@ public:
 
     explicit d3d12_command(id3d12_device* const device, D3D12_COMMAND_LIST_TYPE type)
     {
-        HRESULT                  hr = S_OK;
+        L_HRES(hr);
         D3D12_COMMAND_QUEUE_DESC desc;
         desc.Flags    = D3D12_COMMAND_QUEUE_FLAG_NONE;
         desc.NodeMask = 0;
@@ -143,9 +143,9 @@ public:
     [[nodiscard]] constexpr id3d12_graphics_command_list* const command_list() const { return m_cmd_list; }
     [[nodiscard]] constexpr u32                                 frame_index() const { return m_frame_index; }
 
-    void begin_frame()
+    void begin_frame() const
     {
-        command_frame& frame = m_cmd_frames[m_frame_index];
+        const command_frame& frame = m_cmd_frames[m_frame_index];
         frame.wait(m_fence_event, m_fence);
         DX_CALL(frame.cmd_allocator->Reset());
         DX_CALL(m_cmd_list->Reset(frame.cmd_allocator, nullptr));
@@ -230,10 +230,9 @@ bool failed_init()
 IDXGIAdapter4* determine_main_adapter()
 {
     IDXGIAdapter4* adapter = nullptr;
+    // clang-format off
     // Get in order of performance
-    for (u32 i = 0; dxgi_factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)) !=
-                    DXGI_ERROR_NOT_FOUND;
-         ++i)
+    for (u32 i = 0; dxgi_factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, L_PTR(&adapter)) != DXGI_ERROR_NOT_FOUND; ++i)
     {
         // Pick the first that features minimum feature level
         if (SUCCEEDED(D3D12CreateDevice(adapter, min_feature_level, __uuidof(ID3D12Device), nullptr)))
@@ -243,6 +242,7 @@ IDXGIAdapter4* determine_main_adapter()
 
         release(adapter);
     }
+    // clang-format on
 
     return nullptr;
 }
@@ -250,17 +250,17 @@ IDXGIAdapter4* determine_main_adapter()
 D3D_FEATURE_LEVEL get_max_feature_level(IDXGIAdapter4* adapter)
 {
     constexpr D3D_FEATURE_LEVEL feat_levels[4] = {
-        D3D_FEATURE_LEVEL_11_0, //
-        D3D_FEATURE_LEVEL_11_1, //
-        D3D_FEATURE_LEVEL_12_0, //
-        D3D_FEATURE_LEVEL_12_1, //
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL_12_0,
+        D3D_FEATURE_LEVEL_12_1,
     };
 
     D3D12_FEATURE_DATA_FEATURE_LEVELS feat_level_info;
     feat_level_info.NumFeatureLevels        = _countof(feat_levels);
     feat_level_info.pFeatureLevelsRequested = feat_levels;
 
-    cptr<ID3D12Device> device;
+    comptr<ID3D12Device> device;
     DX_CALL(D3D12CreateDevice(adapter, min_feature_level, L_PTR(&device)));
     DX_CALL(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &feat_level_info, sizeof(feat_level_info)));
     return feat_level_info.MaxSupportedFeatureLevel;
@@ -307,7 +307,7 @@ bool initialize()
     u32 dxgi_factory_flags = 0;
 #ifdef L_DEBUG
     {
-        cptr<ID3D12Debug3> debug_interface;
+        comptr<ID3D12Debug3> debug_interface;
         if (SUCCEEDED(D3D12GetDebugInterface(L_PTR(&debug_interface))))
         {
             debug_interface->EnableDebugLayer();
@@ -334,7 +334,7 @@ bool initialize()
         return failed_init();
 
     // Determine which adapter/gpu to use
-    cptr<IDXGIAdapter4> main_adapter;
+    comptr<IDXGIAdapter4> main_adapter;
     main_adapter.Attach(determine_main_adapter());
     if (!main_adapter)
         return failed_init();
@@ -352,7 +352,7 @@ bool initialize()
 
 #ifdef L_DEBUG
     {
-        cptr<ID3D12InfoQueue> info_queue;
+        comptr<ID3D12InfoQueue> info_queue;
         DX_CALL(main_device->QueryInterface(IID_PPV_ARGS(&info_queue)));
         info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
         info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
@@ -419,14 +419,14 @@ void shutdown()
 #ifdef L_DEBUG
     {
         {
-            cptr<ID3D12InfoQueue> info_queue;
+            comptr<ID3D12InfoQueue> info_queue;
             DX_CALL(main_device->QueryInterface(IID_PPV_ARGS(&info_queue)));
             info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, false);
             info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, false);
             info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, false);
         }
 
-        cptr<ID3D12DebugDevice2> debug_device;
+        comptr<ID3D12DebugDevice2> debug_device;
         DX_CALL(main_device->QueryInterface(L_PTR(&debug_device)));
         release(main_device);
         DX_CALL(debug_device->ReportLiveDeviceObjects(D3D12_RLDO_SUMMARY | D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL));

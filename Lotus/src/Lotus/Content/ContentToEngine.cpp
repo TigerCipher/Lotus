@@ -35,12 +35,6 @@ namespace
 class geometry_hiearchy_stream
 {
 public:
-    struct lod_offset
-    {
-        u16 offset;
-        u16 count;
-    };
-
     DISABLE_COPY_AND_MOVE(geometry_hiearchy_stream);
 
     geometry_hiearchy_stream(u8* const buffer, u32 lods = invalid_id_u32) : m_buffer(buffer)
@@ -67,6 +61,7 @@ public:
     u32 lod_from_threshold(f32 threshold) const
     {
         LASSERT(threshold > 0);
+        if(m_lod_count == 1) return 0;
 
         for (u32 i = m_lod_count - 1; i > 0; --i)
         {
@@ -107,7 +102,7 @@ u32 get_geometry_hierarchy_size(const void* const data)
 
     const u32 lod_count = blob.read<u32>();
     LASSERT(lod_count);
-    u32 size = sizeof(u32) + sizeof(f32) + sizeof(geometry_hiearchy_stream::lod_offset) * lod_count;
+    u32 size = sizeof(u32) + sizeof(f32) + sizeof(lod_offset) * lod_count;
 
     for (u32 i = 0; i < lod_count; ++i)
     {
@@ -289,7 +284,7 @@ void destroy_geometry_resource(id::id_type id)
 id::id_type create_material_resource(const void* const data)
 {
     LASSERT(data);
-    return graphics::add_material(*(const graphics::material_init_info* const)data);
+    return graphics::add_material(*(const graphics::material_init_info* const) data);
 }
 
 void destroy_material_resource(id::id_type id)
@@ -357,6 +352,53 @@ compiled_shader_ptr get_shader(id::id_type id)
     std::lock_guard lock(shader_mutex);
     LASSERT(id::is_valid(id));
     return (const compiled_shader_ptr) shaders[id].get();
+}
+
+void get_submesh_gpu_ids(id::id_type geometry_content_id, u32 id_count, id::id_type* const gpu_ids)
+{
+    std::lock_guard lock(geometry_mutex);
+
+    u8* const ptr = geometry_hierarchies[geometry_content_id];
+    if ((uintptr_t) ptr & single_mesh_marker)
+    {
+        LASSERT(id_count == 1);
+        *gpu_ids = gpu_id_from_fake_pointer(ptr);
+    } else
+    {
+        geometry_hiearchy_stream stream(ptr);
+
+        LASSERT([&] {
+            const u32        lod_count = stream.lod_count();
+            const lod_offset lodoffset{ stream.lod_offsets()[lod_count - 1] };
+            const u32        gpu_id_count = (u32) lodoffset.offset + (u32) lodoffset.count;
+            return gpu_id_count == id_count;
+        }());
+
+        memcpy(gpu_ids, stream.gpu_ids(), id::size * id_count);
+    }
+}
+
+void get_lod_offsets(const id::id_type* const geometry_ids, const f32* const thresholds, u32 id_count,
+                    utl::vector<lod_offset>& offsets)
+{
+    LASSERT(geometry_ids && thresholds && id_count);
+    LASSERT(offsets.empty());
+
+    std::lock_guard lock(geometry_mutex);
+    for (u32 i = 0; i < id_count; ++i)
+    {
+        u8* const ptr = geometry_hierarchies[geometry_ids[i]];
+        if ((uintptr_t) ptr & single_mesh_marker)
+        {
+            LASSERT(id_count == 1);
+            offsets.emplace_back(lod_offset{0, 1});
+        } else
+        {
+            geometry_hiearchy_stream stream(ptr);
+            const u32 lod = stream.lod_from_threshold(thresholds[i]);
+            offsets.emplace_back(stream.lod_offsets()[lod]);
+        }
+    }
 }
 
 } // namespace lotus::content

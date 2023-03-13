@@ -83,20 +83,20 @@
 #endif
 
 
-/**
- * \brief Obtains the interface pointer. Short hand for IID_PPV_ARGS
- * \param x Address of the pointer to retrieve
- */
+// shorthands for some common things I use that I'm too lazy to keep rewriting, or I think look ugly
+
 #define L_PTR(x) IID_PPV_ARGS((x))
+
+#define L_HRES(hr) HRESULT hr = S_OK
+
+// microsoft smart pointer
 
 template<typename T>
 using comptr = Microsoft::WRL::ComPtr<T>;
 
-template<typename T>
-using cptr = Microsoft::WRL::ComPtr<T>;
 
 template<typename T, typename... Args>
-constexpr cptr<T> create_com(Args&&... args)
+constexpr comptr<T> create_com(Args&&... args)
 {
     return Microsoft::WRL::Make<T>(std::forward<Args>(args)...);
 }

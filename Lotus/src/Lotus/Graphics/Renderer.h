@@ -29,6 +29,14 @@
 namespace lotus::graphics
 {
 
+struct frame_info
+{
+    id::id_type* render_item_ids   = nullptr;
+    f32*         thresholds        = nullptr;
+    u32          render_item_count = 0;
+    camera_id    cam_id{ id::invalid_id };
+};
+
 L_TYPED_ID(surface_id)
 
 class surface

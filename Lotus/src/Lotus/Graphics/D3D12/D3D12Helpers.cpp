@@ -39,7 +39,7 @@ ID3D12RootSignature* create_root_signature(const D3D12_ROOT_SIGNATURE_DESC1& des
     comptr<ID3DBlob> signature_blob{ nullptr };
     comptr<ID3DBlob> err_blob{ nullptr };
 
-    HRESULT hr{ S_OK };
+    L_HRES(hr);
     if (FAILED(hr = D3D12SerializeVersionedRootSignature(&versioned_desc, &signature_blob, &err_blob)))
     {
         L_DBG(const char* errmsg = err_blob ? (const char*) err_blob->GetBufferPointer() : "");
