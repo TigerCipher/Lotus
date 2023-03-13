@@ -155,7 +155,27 @@ constexpr u64 align_size_down(u64 size)
     return size & ~mask;
 }
 
+
+[[nodiscard]] constexpr u64 calculate_crc32_u64(const u8* const data, u64 size)
+{
+    LASSERT(size >= sizeof(u64));
+
+    u64 crc = 0;
+    const u8* at = data;
+    const u8* const end = data + align_size_down<sizeof(u64)>(size);
+
+    while(at < end)
+    {
+        crc = _mm_crc32_u64(crc, *(const u64*)at);
+        at+= sizeof(u64);
+    }
+
+    return crc;
+}
+
+
 // clang-format off
+// TODO: Might just get rid of these... even if I do support Vulkan at some point, I'll probably still use DX math anyway
 
 inline vec load_float(const f32* src) { return DirectX::XMLoadFloat(src); }
 inline vec load_float2(const vec2* src) { return DirectX::XMLoadFloat2(src); }

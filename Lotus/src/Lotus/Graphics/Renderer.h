@@ -45,14 +45,14 @@ public:
     constexpr surface() = default;
     constexpr explicit surface(const surface_id id) : m_id(id) {}
 
-    constexpr surface_id get_id() const { return m_id; }
+    [[nodiscard]] constexpr surface_id get_id() const { return m_id; }
 
-    constexpr bool is_valid() const { return id::is_valid(m_id); }
+    [[nodiscard]] constexpr bool is_valid() const { return id::is_valid(m_id); }
 
     void resize(u32 width, u32 height) const;
 
-    u32 width() const;
-    u32 height() const;
+    [[nodiscard]] u32 width() const;
+    [[nodiscard]] u32 height() const;
 
     void render() const;
 
@@ -66,11 +66,11 @@ struct render_surface
     surface          surface{};
 };
 
-struct camera_init_info
+struct camera_init_info  // NOLINT(cppcoreguidelines-pro-type-member-init)
 {
     id::id_type  entity_id{ id::invalid_id };
     camera::type type{};
-    vec3         up;
+    vec3         up{};
 
     // FoV and aspect ratio is only used with perspective cameras
     // Width and height are for ortho cameras. A union makes sense in this case
@@ -86,8 +86,8 @@ struct camera_init_info
         f32 view_height;
     };
 
-    f32 near_z;
-    f32 far_z;
+    f32 near_z{};
+    f32 far_z{};
 };
 
 struct camera_parameter
@@ -236,6 +236,11 @@ void        remove_submesh(id::id_type id);
 
 id::id_type add_material(material_init_info info);
 void        remove_material(id::id_type id);
+
+id::id_type add_render_item(id::id_type entity_id, id::id_type geometry_content_id, u32 material_count,
+                            const id::id_type* const material_ids);
+
+void remove_render_item(id::id_type id);
 
 
 } // namespace lotus::graphics

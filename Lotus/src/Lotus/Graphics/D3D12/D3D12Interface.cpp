@@ -46,10 +46,12 @@ void get_platform_interface(platform_interface& pinterface)
     pinterface.camera.set_parameter = camera::set_parameter;
     pinterface.camera.get_parameter = camera::get_parameter;
 
-    pinterface.resources.add_submesh     = content::submesh::add;
-    pinterface.resources.remove_submesh  = content::submesh::remove;
-    pinterface.resources.add_material    = content::material::add;
-    pinterface.resources.remove_material = content::material::remove;
+    pinterface.resources.add_submesh        = content::submesh::add;
+    pinterface.resources.remove_submesh     = content::submesh::remove;
+    pinterface.resources.add_material       = content::material::add;
+    pinterface.resources.remove_material    = content::material::remove;
+    pinterface.resources.add_render_item    = content::render_item::add;
+    pinterface.resources.remove_render_item = content::render_item::remove;
 
 
     pinterface.platform = graphics_platform::d3d12;
