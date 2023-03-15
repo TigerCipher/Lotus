@@ -178,106 +178,87 @@ constexpr struct
 
 constexpr struct
 {
-    const D3D12_BLEND_DESC disabled{ 0, // AlphaToCoverageEnable
-                                     0, // IndependentBlendEnable
-                                     {
-                                         {
-                                             0,                            // BlendEnable
-                                             0,                            // LogicOpEnable
-                                             D3D12_BLEND_SRC_ALPHA,        // SrcBlend
-                                             D3D12_BLEND_INV_SRC_ALPHA,    // DestBlend
-                                             D3D12_BLEND_OP_ADD,           // BlendOp
-                                             D3D12_BLEND_ONE,              // SrcBlendAlpha
-                                             D3D12_BLEND_ONE,              // DestBlendAlpha
-                                             D3D12_BLEND_OP_ADD,           // BlendOpAlpha
-                                             D3D12_LOGIC_OP_NOOP,          // LogicOp
-                                             D3D12_COLOR_WRITE_ENABLE_ALL, // RenderTargetWriteMask
+    // clang-format off
+    const D3D12_BLEND_DESC disabled{
+        0, // AlphaToCoverageEnable
+        0, // IndependentBlendEnable
+        {
+            {
+                0,                            // BlendEnable
+                0,                            // LogicOpEnable
+                D3D12_BLEND_SRC_ALPHA,        // SrcBlend
+                D3D12_BLEND_INV_SRC_ALPHA,    // DestBlend
+                D3D12_BLEND_OP_ADD,           // BlendOp
+                D3D12_BLEND_ONE,              // SrcBlendAlpha
+                D3D12_BLEND_ONE,              // DestBlendAlpha
+                D3D12_BLEND_OP_ADD,           // BlendOpAlpha
+                D3D12_LOGIC_OP_NOOP,          // LogicOp
+                D3D12_COLOR_WRITE_ENABLE_ALL, // RenderTargetWriteMask
+            },
+            {},{},{},{},{},{},{},
+        }   // D3D12_RENDER_TARGET_BLEND_DESC
+    };
 
-                                         },
-                                         {},
-                                         {},
-                                         {},
-                                         {},
-                                         {},
-                                         {},
-                                         {},
-                                     } };
+    const D3D12_BLEND_DESC alpha_blend{
+        0, // AlphaToCoverageEnable
+        0, // IndependentBlendEnable
+        {
+            {
+                1,                            // BlendEnable
+                0,                            // LogicOpEnable
+                D3D12_BLEND_SRC_ALPHA,        // SrcBlend
+                D3D12_BLEND_INV_SRC_ALPHA,    // DestBlend
+                D3D12_BLEND_OP_ADD,           // BlendOp
+                D3D12_BLEND_ONE,              // SrcBlendAlpha
+                D3D12_BLEND_ONE,              // DestBlendAlpha
+                D3D12_BLEND_OP_ADD,           // BlendOpAlpha
+                D3D12_LOGIC_OP_NOOP,          // LogicOp
+                D3D12_COLOR_WRITE_ENABLE_ALL, // RenderTargetWriteMask
+            },
+            {},{},{},{},{},{},{},
+        }   // D3D12_RENDER_TARGET_BLEND_DESC
+    };
 
-    const D3D12_BLEND_DESC alpha_blend{ 0, // AlphaToCoverageEnable
-                                        0, // IndependentBlendEnable
-                                        {
-                                            {
-                                                1,                            // BlendEnable
-                                                0,                            // LogicOpEnable
-                                                D3D12_BLEND_SRC_ALPHA,        // SrcBlend
-                                                D3D12_BLEND_INV_SRC_ALPHA,    // DestBlend
-                                                D3D12_BLEND_OP_ADD,           // BlendOp
-                                                D3D12_BLEND_ONE,              // SrcBlendAlpha
-                                                D3D12_BLEND_ONE,              // DestBlendAlpha
-                                                D3D12_BLEND_OP_ADD,           // BlendOpAlpha
-                                                D3D12_LOGIC_OP_NOOP,          // LogicOp
-                                                D3D12_COLOR_WRITE_ENABLE_ALL, // RenderTargetWriteMask
+    const D3D12_BLEND_DESC additive{
+        0, // AlphaToCoverageEnable
+        0, // IndependentBlendEnable
+        {
+            {
+                1,                            // BlendEnable
+                0,                            // LogicOpEnable
+                D3D12_BLEND_ONE,              // SrcBlend
+                D3D12_BLEND_ONE,              // DestBlend
+                D3D12_BLEND_OP_ADD,           // BlendOp
+                D3D12_BLEND_ONE,              // SrcBlendAlpha
+                D3D12_BLEND_ONE,              // DestBlendAlpha
+                D3D12_BLEND_OP_ADD,           // BlendOpAlpha
+                D3D12_LOGIC_OP_NOOP,          // LogicOp
+                D3D12_COLOR_WRITE_ENABLE_ALL, // RenderTargetWriteMask
+            },
+            {},{},{},{},{},{},{},
+        }   // D3D12_RENDER_TARGET_BLEND_DESC
+    };
 
-                                            },
-                                            {},
-                                            {},
-                                            {},
-                                            {},
-                                            {},
-                                            {},
-                                            {},
-                                        } };
-
-    const D3D12_BLEND_DESC additive{ 0, // AlphaToCoverageEnable
-                                     0, // IndependentBlendEnable
-                                     {
-                                         {
-                                             1,                            // BlendEnable
-                                             0,                            // LogicOpEnable
-                                             D3D12_BLEND_ONE,              // SrcBlend
-                                             D3D12_BLEND_ONE,              // DestBlend
-                                             D3D12_BLEND_OP_ADD,           // BlendOp
-                                             D3D12_BLEND_ONE,              // SrcBlendAlpha
-                                             D3D12_BLEND_ONE,              // DestBlendAlpha
-                                             D3D12_BLEND_OP_ADD,           // BlendOpAlpha
-                                             D3D12_LOGIC_OP_NOOP,          // LogicOp
-                                             D3D12_COLOR_WRITE_ENABLE_ALL, // RenderTargetWriteMask
-
-                                         },
-                                         {},
-                                         {},
-                                         {},
-                                         {},
-                                         {},
-                                         {},
-                                         {},
-                                     } };
-
-    const D3D12_BLEND_DESC premultiplied{ 0, // AlphaToCoverageEnable
-                                          0, // IndependentBlendEnable
-                                          {
-                                              {
-                                                  0,                            // BlendEnable
-                                                  0,                            // LogicOpEnable
-                                                  D3D12_BLEND_ONE,              // SrcBlend
-                                                  D3D12_BLEND_INV_SRC_ALPHA,    // DestBlend
-                                                  D3D12_BLEND_OP_ADD,           // BlendOp
-                                                  D3D12_BLEND_ONE,              // SrcBlendAlpha
-                                                  D3D12_BLEND_ONE,              // DestBlendAlpha
-                                                  D3D12_BLEND_OP_ADD,           // BlendOpAlpha
-                                                  D3D12_LOGIC_OP_NOOP,          // LogicOp
-                                                  D3D12_COLOR_WRITE_ENABLE_ALL, // RenderTargetWriteMask
-
-                                              },
-                                              {},
-                                              {},
-                                              {},
-                                              {},
-                                              {},
-                                              {},
-                                              {},
-                                          } };
+    const D3D12_BLEND_DESC premultiplied{
+        0, // AlphaToCoverageEnable
+        0, // IndependentBlendEnable
+        {
+            {
+                0,                            // BlendEnable
+                0,                            // LogicOpEnable
+                D3D12_BLEND_ONE,              // SrcBlend
+                D3D12_BLEND_INV_SRC_ALPHA,    // DestBlend
+                D3D12_BLEND_OP_ADD,           // BlendOp
+                D3D12_BLEND_ONE,              // SrcBlendAlpha
+                D3D12_BLEND_ONE,              // DestBlendAlpha
+                D3D12_BLEND_OP_ADD,           // BlendOpAlpha
+                D3D12_LOGIC_OP_NOOP,          // LogicOp
+                D3D12_COLOR_WRITE_ENABLE_ALL, // RenderTargetWriteMask
+            },{},{},{},{},{},{},{},
+        }   // D3D12_RENDER_TARGET_BLEND_DESC
+    };
 } blend_state;
+// clang-format on
 
 class d3d12_resource_barrier
 {

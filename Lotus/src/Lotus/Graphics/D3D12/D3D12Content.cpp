@@ -206,9 +206,8 @@ constexpr D3D12_PRIMITIVE_TOPOLOGY_TYPE get_d3d_primitive_topology_type(D3D_PRIM
     case D3D_PRIMITIVE_TOPOLOGY_LINESTRIP: return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
     case D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST:
     case D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP: return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    default: return D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED;
     }
-
-    return D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED;
 }
 
 constexpr D3D12_ROOT_SIGNATURE_FLAGS get_root_signature_flags(shader_flags::flags flags)
@@ -301,10 +300,9 @@ id::id_type create_root_signature(material_type::type type, shader_flags::flags 
 
 id::id_type create_pso_if_needed(const u8* const stream_ptr, u64 aligned_stream_size, bool is_depth)
 {
-    const u64  key  = math::calculate_crc32_u64(stream_ptr, aligned_stream_size);
-    const auto pair = pso_map.find(key);
+    const u64 key = math::calculate_crc32_u64(stream_ptr, aligned_stream_size);
 
-    if (pair != pso_map.end())
+    if (const auto pair = pso_map.find(key); pair != pso_map.end())
     {
         LASSERT(pair->first == key);
         return pair->second;
@@ -327,7 +325,7 @@ pso_id create_pso(id::id_type material_id, D3D12_PRIMITIVE_TOPOLOGY primitive_to
 
     const d3d12_material_stream material(materials[material_id].get());
     constexpr u64 aligned_stream_size = math::align_size_up<sizeof(u64)>(sizeof(d3dx::d3d12_pipeline_state_subobject_stream));
-    u8* const     stream_ptr          = (u8* const) alloca(aligned_stream_size);
+    auto const    stream_ptr          = (u8* const) alloca(aligned_stream_size);
     ZeroMemory(stream_ptr, aligned_stream_size);
     new (stream_ptr) d3dx::d3d12_pipeline_state_subobject_stream{};
 
@@ -352,7 +350,7 @@ pso_id create_pso(id::id_type material_id, D3D12_PRIMITIVE_TOPOLOGY primitive_to
     {
         if (flags & (1 << i))
         {
-            lotus::content::compiled_shader_ptr shader = lotus::content::get_shader(material.shader_ids()[shader_idx]);
+            const lotus::content::compiled_shader_ptr shader{ lotus::content::get_shader(material.shader_ids()[shader_idx]) };
             LASSERT(shader);
             shaders[i].pShaderBytecode = shader->byte_code();
             shaders[i].BytecodeLength  = shader->byte_code_size();
@@ -691,12 +689,13 @@ void get_items(const id::id_type* const d3d12_render_item_ids, u32 id_count, con
 
     for (u32 i = 0; i < id_count; ++i)
     {
-        const d3d12_render_item& item = render_items[d3d12_render_item_ids[i]];
-        cache.entity_ids[i]           = item.entity_id;
-        cache.submesh_gpu_ids[i]      = item.submesh_gpu_id;
-        cache.material_ids[i]         = item.material_id;
-        cache.psos[i]                 = pipeline_states[item.pso_id];
-        cache.depth_psos[i]           = pipeline_states[item.depth_pso_id];
+        const auto& [entity_id, submesh_gpu_id, material_id, pso_id, depth_pso_id] = render_items[d3d12_render_item_ids[i]];
+
+        cache.entity_ids[i]      = entity_id;
+        cache.submesh_gpu_ids[i] = submesh_gpu_id;
+        cache.material_ids[i]    = material_id;
+        cache.psos[i]            = pipeline_states[pso_id];
+        cache.depth_psos[i]      = pipeline_states[depth_pso_id];
     }
 }
 

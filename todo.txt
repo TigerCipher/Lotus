@@ -1,0 +1,8 @@
+This file contains a growing list of items todo at some unspecified point
+
+Ensure conventions are consistent, in particular to initilizations, i.e `int a = 3;` vs `int a{3};` and `some_class obj(a, b);` vs `some_class obj{a, b};`
+    - Switch to { }
+
+Rename DebugDll and ReleaseDll configurations to [Debug|Release]Editor. Lotus project templates will need to be modified as well
+
+Clean up lotus envioronment path set up

@@ -61,7 +61,8 @@ public:
     u32 lod_from_threshold(f32 threshold) const
     {
         LASSERT(threshold > 0);
-        if(m_lod_count == 1) return 0;
+        if (m_lod_count == 1)
+            return 0;
 
         for (u32 i = m_lod_count - 1; i > 0; --i)
         {
@@ -118,12 +119,12 @@ id::id_type create_mesh_hierarchy(const void* const data)
 {
     LASSERT(data);
     const u32  size             = get_geometry_hierarchy_size(data);
-    auto const hierarchy_buffer = (u8* const) malloc(size);
+    const auto hierarchy_buffer = (u8* const) malloc(size);
 
     utl::blob_stream_reader blob((const u8*) data);
     const u32               lod_count = blob.read<u32>();
     LASSERT(lod_count);
-    geometry_hiearchy_stream stream(hierarchy_buffer, lod_count);
+    const geometry_hiearchy_stream stream{ hierarchy_buffer, lod_count };
 
     u32                submesh_index = 0;
     id::id_type* const gpu_ids       = stream.gpu_ids();
@@ -256,8 +257,8 @@ void destroy_geometry_resource(id::id_type id)
         graphics::remove_submesh(gpu_id_from_fake_pointer(pointer));
     } else
     {
-        geometry_hiearchy_stream stream(pointer);
-        const u32                lod_count = stream.lod_count();
+        const geometry_hiearchy_stream stream{ pointer };
+        const u32                      lod_count = stream.lod_count();
 
         u32 id_idx = 0;
         for (u32 lod = 0; lod < lod_count; ++lod)
@@ -365,7 +366,7 @@ void get_submesh_gpu_ids(id::id_type geometry_content_id, u32 id_count, id::id_t
         *gpu_ids = gpu_id_from_fake_pointer(ptr);
     } else
     {
-        geometry_hiearchy_stream stream(ptr);
+        const geometry_hiearchy_stream stream{ ptr };
 
         LASSERT([&] {
             const u32        lod_count = stream.lod_count();
@@ -379,7 +380,7 @@ void get_submesh_gpu_ids(id::id_type geometry_content_id, u32 id_count, id::id_t
 }
 
 void get_lod_offsets(const id::id_type* const geometry_ids, const f32* const thresholds, u32 id_count,
-                    utl::vector<lod_offset>& offsets)
+                     utl::vector<lod_offset>& offsets)
 {
     LASSERT(geometry_ids && thresholds && id_count);
     LASSERT(offsets.empty());
@@ -391,11 +392,11 @@ void get_lod_offsets(const id::id_type* const geometry_ids, const f32* const thr
         if ((uintptr_t) ptr & single_mesh_marker)
         {
             LASSERT(id_count == 1);
-            offsets.emplace_back(lod_offset{0, 1});
+            offsets.emplace_back(lod_offset{ 0, 1 });
         } else
         {
-            geometry_hiearchy_stream stream(ptr);
-            const u32 lod = stream.lod_from_threshold(thresholds[i]);
+            geometry_hiearchy_stream stream{ ptr };
+            const u32                lod = stream.lod_from_threshold(thresholds[i]);
             offsets.emplace_back(stream.lod_offsets()[lod]);
         }
     }

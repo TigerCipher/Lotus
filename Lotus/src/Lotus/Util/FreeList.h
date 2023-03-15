@@ -25,6 +25,9 @@
 
 #include "../Common.h"
 
+template<typename T>
+concept min_u32 = sizeof(T) >= sizeof(u32);
+
 namespace lotus::utl
 {
 #if USE_STL_VECTOR
@@ -32,10 +35,10 @@ namespace lotus::utl
 #endif
 
 
-template<typename T>
+template<min_u32 T>
 class free_list
 {
-    static_assert(sizeof(T) >= sizeof(u32));
+    //static_assert(sizeof(T) >= sizeof(u32));
 
 public:
     free_list() = default;
@@ -80,18 +83,10 @@ public:
         --m_size;
     }
 
-    constexpr u32 size() const
-    {
-        return m_size;
-    }
-    constexpr u32 capacity() const
-    {
-        return m_array.size();
-    }
-    constexpr bool empty() const
-    {
-        return m_size == 0;
-    }
+    [[nodiscard]] constexpr u32 size() const { return m_size; }
+    [[nodiscard]] constexpr u32 capacity() const { return m_array.size(); }
+
+    [[nodiscard]] constexpr bool empty() const { return m_size == 0; }
 
     constexpr T& operator[](u32 id)
     {
@@ -130,4 +125,4 @@ private:
     u32 m_size{ 0 };
 };
 
-}
+} // namespace lotus::utl

@@ -66,7 +66,7 @@ struct render_surface
     surface          surface{};
 };
 
-struct camera_init_info  // NOLINT(cppcoreguidelines-pro-type-member-init)
+struct camera_init_info
 {
     id::id_type  entity_id{ id::invalid_id };
     camera::type type{};
@@ -76,13 +76,13 @@ struct camera_init_info  // NOLINT(cppcoreguidelines-pro-type-member-init)
     // Width and height are for ortho cameras. A union makes sense in this case
     union
     {
-        f32 field_of_view;
+        f32 field_of_view{};
         f32 view_width;
     };
 
     union
     {
-        f32 aspect_ratio;
+        f32 aspect_ratio{};
         f32 view_height;
     };
 
