@@ -104,13 +104,13 @@ public:
         NAME_D3D_OBJ(m_fence, L"D3D12 Fence");
 
         m_fence_event = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
-        LASSERT(m_fence_event);
+        assert(m_fence_event);
 
         if (!m_fence_event)
             release();
     }
 
-    ~d3d12_command() { LASSERT(!m_cmd_queue && !m_cmd_list && !m_fence); }
+    ~d3d12_command() { assert(!m_cmd_queue && !m_cmd_list && !m_fence); }
 
     void flush()
     {
@@ -183,7 +183,7 @@ private:
 
         void wait(HANDLE fence_event, ID3D12Fence1* fence) const
         {
-            LASSERT(fence && fence_event);
+            assert(fence && fence_event);
             if (fence->GetCompletedValue() < fence_value)
             {
                 DX_CALL(fence->SetEventOnCompletion(fence_value, fence_event));
@@ -210,6 +210,7 @@ IDXGIFactory7*               dxgi_factory = nullptr;
 d3d12_command                gfx_command;
 surface_collection           surfaces;
 d3dx::d3d12_resource_barrier resource_barriers{};
+constant_buffer              constant_buffers[frame_buffer_count];
 
 descriptor_heap rtv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);         // render targets
 descriptor_heap dsv_desc_heap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);         // depth stencils
@@ -341,7 +342,7 @@ bool initialize()
 
     // Determine maximum feature level
     const D3D_FEATURE_LEVEL max_feature_level = get_max_feature_level(main_adapter.Get());
-    LASSERT(max_feature_level >= min_feature_level);
+    assert(max_feature_level >= min_feature_level);
     if (max_feature_level < min_feature_level)
         return false;
 
@@ -367,6 +368,12 @@ bool initialize()
     res &= uav_desc_heap.initialize(512, false);
     if (!res)
         return failed_init();
+
+    for (u32 i{ 0 }; i < frame_buffer_count; ++i)
+    {
+        new (&constant_buffers[i]) constant_buffer{ constant_buffer::get_default_init_info(1_MB) };
+        NAME_D3D_OBJ_INDEXED(constant_buffers[i].buffer(), i, L"Global Constant Buffer");
+    }
 
     new (&gfx_command) d3d12_command(main_device, D3D12_COMMAND_LIST_TYPE_DIRECT);
     if (!gfx_command.command_queue())
@@ -403,6 +410,11 @@ void shutdown()
     shaders::shutdown();
 
     release(dxgi_factory);
+
+    for (u32 i{ 0 }; i < frame_buffer_count; ++i)
+    {
+        constant_buffers[i].release();
+    }
 
     rtv_desc_heap.process_deferred_free(0);
     dsv_desc_heap.process_deferred_free(0);
@@ -472,10 +484,15 @@ descriptor_heap& uav_heap()
     return uav_desc_heap;
 }
 
+constant_buffer& cbuffer()
+{
+    return constant_buffers[current_frame_index()];
+}
+
 
 surface create_surface(platform::window window)
 {
-    surface_id id{ surfaces.add(window) };
+    const surface_id id{ surfaces.add(window) };
     surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue());
     return surface{ id };
 }
@@ -508,6 +525,11 @@ void render_surface(surface_id id)
     id3d12_graphics_command_list* cmd_list = gfx_command.command_list();
 
     const u32 frame_index = current_frame_index();
+
+    // Clear the global constant buffer for the current frame
+    constant_buffer& cbuffer {constant_buffers[frame_index]};
+    cbuffer.clear();
+
     if (deferred_releases_flag[frame_index])
     {
         process_deferred_releases(frame_index);

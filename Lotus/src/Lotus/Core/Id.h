@@ -57,7 +57,7 @@ constexpr bool is_valid(const id_type id)
 
 constexpr id_type index(const id_type id)
 {
-    LASSERT((id & detail::index_mask) != detail::index_mask);
+    assert((id & detail::index_mask) != detail::index_mask);
     return id & detail::index_mask;
 }
 
@@ -69,7 +69,7 @@ constexpr id_type generation(const id_type id)
 constexpr id_type new_generation(const id_type id)
 {
     const id_type gen = generation(id) + 1;
-    LASSERT(gen < ((u64) 1 << detail::generation_bits) - 1);
+    assert(gen < ((u64) 1 << detail::generation_bits) - 1);
     return index(id) | (gen << detail::index_bits);
 }
 

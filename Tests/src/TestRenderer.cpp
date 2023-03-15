@@ -209,7 +209,7 @@ game_entity::entity create_one_entity()
     game_entity::create_info entity_info{};
     entity_info.transform = &transform_info;
     game_entity::entity ent(game_entity::create(entity_info));
-    LASSERT(ent.is_valid());
+    assert(ent.is_valid());
     return ent;
 }
 
@@ -218,7 +218,7 @@ bool read_file(std::filesystem::path path, scope<u8[]>& data, u64& size)
     if (!std::filesystem::exists(path))
         return false;
     size = std::filesystem::file_size(path);
-    LASSERT(size);
+    assert(size);
     if (!size)
         return false;
     data = create_scope<u8[]>(size);
@@ -269,7 +269,7 @@ bool test_initialize()
 
     test_entity = create_one_entity();
     camera = graphics::create_camera(graphics::perspective_camera_init_info(test_entity.get_id()));
-    LASSERT(camera.is_valid());
+    assert(camera.is_valid());
 
     item_id = create_render_item(create_one_entity().get_id());
 

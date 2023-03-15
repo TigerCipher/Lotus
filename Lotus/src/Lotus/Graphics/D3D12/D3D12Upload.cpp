@@ -61,7 +61,7 @@ std::mutex          queue_mutex{};
 
 void upload_frame::wait_and_release()
 {
-    LASSERT(upload_fence && fence_event);
+    assert(upload_fence && fence_event);
     if (upload_fence->GetCompletedValue() < fence_value)
     {
         DX_CALL(upload_fence->SetEventOnCompletion(fence_value, fence_event));
@@ -115,12 +115,12 @@ u32 get_available_upload_frame()
 
 d3d12_upload_context::d3d12_upload_context(u32 aligned_size)
 {
-    LASSERT(upload_cmd_queue);
+    assert(upload_cmd_queue);
 
     {
         std::lock_guard lock(frame_mutex);
         m_frame_index = get_available_upload_frame();
-        LASSERT(m_frame_index != invalid_id_u32);
+        assert(m_frame_index != invalid_id_u32);
         // Prevent other threads from picking this frame - make is_ready false
         upload_frames[m_frame_index].upload_buffer = (ID3D12Resource*)1;
     }
@@ -131,12 +131,12 @@ d3d12_upload_context::d3d12_upload_context(u32 aligned_size)
 
     const D3D12_RANGE range{};
     DX_CALL(frame.upload_buffer->Map(0, &range, &frame.cpu_address));
-    LASSERT(frame.cpu_address);
+    assert(frame.cpu_address);
 
     m_cmd_list = frame.cmd_list;
     m_upload_buffer = frame.upload_buffer;
     m_cpu_address = frame.cpu_address;
-    LASSERT(m_cmd_list && m_upload_buffer && m_cpu_address);
+    assert(m_cmd_list && m_upload_buffer && m_cpu_address);
 
     DX_CALL(frame.cmd_allocator->Reset());
     DX_CALL(frame.cmd_list->Reset(frame.cmd_allocator, nullptr));
@@ -145,7 +145,7 @@ d3d12_upload_context::d3d12_upload_context(u32 aligned_size)
 
 void d3d12_upload_context::end_upload()
 {
-    LASSERT(m_frame_index != invalid_id_u32);
+    assert(m_frame_index != invalid_id_u32);
     upload_frame& frame = upload_frames[m_frame_index];
     id3d12_graphics_command_list* const cmd_list = frame.cmd_list;
     DX_CALL(cmd_list->Close());
@@ -167,7 +167,7 @@ void d3d12_upload_context::end_upload()
 bool initialize()
 {
     id3d12_device* const device = core::device();
-    LASSERT(device && !upload_cmd_queue);
+    assert(device && !upload_cmd_queue);
 
     HRESULT hr{ S_OK };
 
@@ -207,7 +207,7 @@ bool initialize()
     NAME_D3D_OBJ(upload_fence, L"Upload Fence");
 
     fence_event = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
-    LASSERT(fence_event);
+    assert(fence_event);
     if (!fence_event)
         return init_failed();
 

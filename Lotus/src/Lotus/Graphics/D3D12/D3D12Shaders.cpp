@@ -37,19 +37,19 @@ scope<byte[]> engine_shaders_blob{};
 
 bool load_engine_shaders()
 {
-    LASSERT(!engine_shaders_blob);
+    assert(!engine_shaders_blob);
     u64 size = 0;
 
     bool result = content::load_engine_shaders(engine_shaders_blob, size);
-    LASSERT(engine_shaders_blob && size);
+    assert(engine_shaders_blob && size);
 
     u64 offset = 0;
     u32 idx    = 0;
     while (offset < size && result)
     {
-        LASSERT(idx < engine_shader::count);
+        assert(idx < engine_shader::count);
         content::compiled_shader_ptr& shader = engine_shaders[idx];
-        LASSERT(!shader);
+        assert(!shader);
         result &= idx < engine_shader::count && !shader;
         if (!result)
             break;
@@ -58,7 +58,7 @@ bool load_engine_shaders()
         ++idx;
     }
 
-    LASSERT(offset == size && idx == engine_shader::count);
+    assert(offset == size && idx == engine_shader::count);
 
     return result;
 }
@@ -81,9 +81,9 @@ void shutdown()
 
 D3D12_SHADER_BYTECODE get_engine_shader(engine_shader::id id)
 {
-    LASSERT(id < engine_shader::count);
+    assert(id < engine_shader::count);
     const content::compiled_shader_ptr& shader = engine_shaders[id];
-    LASSERT(shader && shader->byte_code_size());
+    assert(shader && shader->byte_code_size());
     return { shader->byte_code(), shader->byte_code_size() };
 }
 

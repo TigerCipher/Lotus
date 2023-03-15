@@ -46,7 +46,7 @@ public:
 
     ~free_list()
     {
-        LASSERT(!m_size);
+        assert(!m_size);
 #if USE_STL_VECTOR
         memset(m_array.data(), 0, m_array.size() * sizeof(T));
 #endif
@@ -63,7 +63,7 @@ public:
         } else
         {
             id = m_next_free_index;
-            LASSERT(id < m_array.size() && already_removed(id));
+            assert(id < m_array.size() && already_removed(id));
             m_next_free_index = *(const u32* const) std::addressof(m_array[id]);
             new (std::addressof(m_array[id])) T(std::forward<Params>(p)...);
         }
@@ -73,7 +73,7 @@ public:
 
     constexpr void remove(u32 id)
     {
-        LASSERT(id < m_array.size() && !already_removed(id));
+        assert(id < m_array.size() && !already_removed(id));
         T& item = m_array[id];
         item.~T();
         L_DBG(memset(std::addressof(m_array[id]), 0xcc, sizeof(T)));
@@ -90,13 +90,13 @@ public:
 
     constexpr T& operator[](u32 id)
     {
-        LASSERT(id < m_array.size() && !already_removed(id));
+        assert(id < m_array.size() && !already_removed(id));
         return m_array[id];
     }
 
     constexpr const T& operator[](u32 id) const
     {
-        LASSERT(id < m_array.size() && !already_removed(id));
+        assert(id < m_array.size() && !already_removed(id));
         return m_array[id];
     }
 

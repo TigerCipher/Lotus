@@ -61,16 +61,16 @@ ID3D12RootSignature* create_root_signature(const D3D12_ROOT_SIGNATURE_DESC1& des
 
 ID3D12PipelineState* create_pipeline_state(D3D12_PIPELINE_STATE_STREAM_DESC desc)
 {
-    LASSERT(desc.pPipelineStateSubobjectStream && desc.SizeInBytes);
+    assert(desc.pPipelineStateSubobjectStream && desc.SizeInBytes);
     ID3D12PipelineState* pso{ nullptr };
     DX_CALL(core::device()->CreatePipelineState(&desc, L_PTR(&pso)));
-    LASSERT(pso);
+    assert(pso);
     return pso;
 }
 
 ID3D12PipelineState* create_pipeline_state(void* stream, u64 stream_size)
 {
-    LASSERT(stream && stream_size);
+    assert(stream && stream_size);
     D3D12_PIPELINE_STATE_STREAM_DESC desc{};
     desc.SizeInBytes                   = stream_size;
     desc.pPipelineStateSubobjectStream = stream;
@@ -81,7 +81,7 @@ ID3D12PipelineState* create_pipeline_state(void* stream, u64 stream_size)
 ID3D12Resource* create_buffer(const void* data, u32 buffer_size, bool is_cpu_accessible, D3D12_RESOURCE_STATES state,
                               D3D12_RESOURCE_FLAGS flags, ID3D12Heap* heap, u64 heap_offset)
 {
-    LASSERT(buffer_size);
+    assert(buffer_size);
 
     D3D12_RESOURCE_DESC desc{};
     desc.Dimension        = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -95,7 +95,7 @@ ID3D12Resource* create_buffer(const void* data, u32 buffer_size, bool is_cpu_acc
     desc.Layout           = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
     desc.Flags            = is_cpu_accessible ? D3D12_RESOURCE_FLAG_NONE : flags;
 
-    LASSERT(desc.Flags == D3D12_RESOURCE_FLAG_NONE || desc.Flags == D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    assert(desc.Flags == D3D12_RESOURCE_FLAG_NONE || desc.Flags == D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
     ID3D12Resource*             res       = nullptr;
     const D3D12_RESOURCE_STATES res_state = is_cpu_accessible ? D3D12_RESOURCE_STATE_GENERIC_READ : state;
@@ -118,7 +118,7 @@ ID3D12Resource* create_buffer(const void* data, u32 buffer_size, bool is_cpu_acc
             D3D12_RANGE range{};
             void*       cpu_address = nullptr;
             DX_CALL(res->Map(0, &range, &cpu_address));
-            LASSERT(cpu_address);
+            assert(cpu_address);
             memcpy(cpu_address, data, buffer_size);
             res->Unmap(0, nullptr);
         } else
@@ -131,7 +131,7 @@ ID3D12Resource* create_buffer(const void* data, u32 buffer_size, bool is_cpu_acc
         }
     }
 
-    LASSERT(res);
+    assert(res);
     return res;
 }
 

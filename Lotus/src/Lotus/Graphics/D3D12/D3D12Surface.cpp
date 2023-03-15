@@ -40,7 +40,7 @@ constexpr DXGI_FORMAT to_non_srgb(DXGI_FORMAT format)
 
 void d3d12_surface::create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue* cmd_queue, DXGI_FORMAT format)
 {
-    LASSERT(factory && cmd_queue);
+    assert(factory && cmd_queue);
     release();
 
     if (SUCCEEDED(factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &m_allow_tearing, sizeof(u32))) &&
@@ -84,14 +84,14 @@ void d3d12_surface::create_swap_chain(IDXGIFactory7* factory, ID3D12CommandQueue
 
 void d3d12_surface::present() const
 {
-    LASSERT(m_swap_chan);
+    assert(m_swap_chan);
     DX_CALL(m_swap_chan->Present(0, m_present_flags));
     m_current_backbuffer_index = m_swap_chan->GetCurrentBackBufferIndex();
 }
 
 void d3d12_surface::resize()
 {
-    LASSERT(m_swap_chan);
+    assert(m_swap_chan);
     for (u32 i = 0; i < buffer_count; ++i)
     {
         core::release(m_render_target_data[i].resource);
@@ -122,7 +122,7 @@ void d3d12_surface::finalize()
     for (u32 i = 0; i < buffer_count; ++i)
     {
         render_target_data& data = m_render_target_data[i];
-        LASSERT(!data.resource);
+        assert(!data.resource);
         DX_CALL(m_swap_chan->GetBuffer(i, IID_PPV_ARGS(&data.resource)));
         D3D12_RENDER_TARGET_VIEW_DESC desc{};
         desc.Format        = m_format;
@@ -134,7 +134,7 @@ void d3d12_surface::finalize()
     DX_CALL(m_swap_chan->GetDesc(&desc));
     const u32 width  = desc.BufferDesc.Width;
     const u32 height = desc.BufferDesc.Height;
-    LASSERT(m_window.width() == width && m_window.height() == height);
+    assert(m_window.width() == width && m_window.height() == height);
 
     m_viewport.TopLeftX = 0.0f;
     m_viewport.TopLeftY = 0.0f;

@@ -51,6 +51,15 @@ struct submesh_view
     u32                      element_type{};
 };
 
+struct d3d12_render_item
+{
+    id::id_type entity_id;
+    id::id_type submesh_gpu_id;
+    id::id_type material_id;
+    id::id_type pso_id;
+    id::id_type depth_pso_id;
+};
+
 utl::free_list<ID3D12Resource*> submesh_buffers{};
 utl::free_list<submesh_view>    submesh_views{};
 std::mutex                      submesh_mutex{};
@@ -63,11 +72,11 @@ std::unordered_map<u64, id::id_type> mtl_rs_map{}; // maps material type and sha
 utl::free_list<scope<u8[]>>          materials{};
 std::mutex                           material_mutex{};
 
-utl::free_list<render_item::d3d12_render_item> render_items{};
-utl::free_list<scope<id::id_type[]>>           render_item_ids{};
-utl::vector<ID3D12PipelineState*>              pipeline_states;
-std::unordered_map<u64, id::id_type>           pso_map;
-std::mutex                                     render_item_mutex{};
+utl::free_list<d3d12_render_item>    render_items{};
+utl::free_list<scope<id::id_type[]>> render_item_ids{};
+utl::vector<ID3D12PipelineState*>    pipeline_states;
+std::unordered_map<u64, id::id_type> pso_map;
+std::mutex                           render_item_mutex{};
 
 struct
 {
@@ -84,7 +93,7 @@ public:
 
     explicit d3d12_material_stream(scope<u8[]>& material_buffer, material_init_info info)
     {
-        LASSERT(!material_buffer);
+        assert(!material_buffer);
 
         u32 shader_count = 0;
         u32 flags        = 0;
@@ -98,7 +107,7 @@ public:
             }
         }
 
-        LASSERT(shader_count && flags);
+        assert(shader_count && flags);
 
         const u32 buffer_size = sizeof(material_type::type) +                             // material type
                                 sizeof(shader_flags::flags) +                             // shader flags
@@ -134,7 +143,7 @@ public:
             }
         }
 
-        LASSERT(shader_idx == (u32) _mm_popcnt_u32(m_shader_flags));
+        assert(shader_idx == (u32) _mm_popcnt_u32(m_shader_flags));
     }
 
     DISABLE_COPY_AND_MOVE(d3d12_material_stream);
@@ -150,7 +159,7 @@ public:
 private:
     void initialize()
     {
-        LASSERT(m_buffer);
+        assert(m_buffer);
         u8* const buffer = m_buffer;
 
         m_type              = *(material_type::type*) buffer;
@@ -185,7 +194,7 @@ private:
 constexpr D3D_PRIMITIVE_TOPOLOGY get_d3d_primitive_topology(const primitive_topology::type type)
 {
     using namespace lotus::content;
-    LASSERT(type < primitive_topology::count);
+    assert(type < primitive_topology::count);
     switch (type)
     {
     case primitive_topology::point_list: return D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
@@ -234,13 +243,13 @@ constexpr D3D12_ROOT_SIGNATURE_FLAGS get_root_signature_flags(shader_flags::flag
 
 id::id_type create_root_signature(material_type::type type, shader_flags::flags flags)
 {
-    LASSERT(type < material_type::count);
+    assert(type < material_type::count);
     static_assert(sizeof(type) == sizeof(u32) && sizeof(flags) == sizeof(u32));
 
     const u64 key = ((u64) type << 32) | flags;
     if (const auto pair = mtl_rs_map.find(key); pair != mtl_rs_map.end())
     {
-        LASSERT(pair->first == key);
+        assert(pair->first == key);
         return pair->second;
     }
 
@@ -288,7 +297,7 @@ id::id_type create_root_signature(material_type::type type, shader_flags::flags 
     break;
     }
 
-    LASSERT(root_sig);
+    assert(root_sig);
 
     const auto id = (id::id_type) root_signatures.size();
     root_signatures.emplace_back(root_sig);
@@ -304,7 +313,7 @@ id::id_type create_pso_if_needed(const u8* const stream_ptr, u64 aligned_stream_
 
     if (const auto pair = pso_map.find(key); pair != pso_map.end())
     {
-        LASSERT(pair->first == key);
+        assert(pair->first == key);
         return pair->second;
     }
 
@@ -314,7 +323,7 @@ id::id_type create_pso_if_needed(const u8* const stream_ptr, u64 aligned_stream_
     NAME_D3D_OBJ_INDEXED(pipeline_states.back(), key,
                          is_depth ? L"Depth-Only Pipeline State Object - Key" : L"GPass Pipeline State Object - Key");
 
-    LASSERT(id::is_valid(id));
+    assert(id::is_valid(id));
     pso_map[key] = id;
     return id;
 }
@@ -351,7 +360,7 @@ pso_id create_pso(id::id_type material_id, D3D12_PRIMITIVE_TOPOLOGY primitive_to
         if (flags & (1 << i))
         {
             const lotus::content::compiled_shader_ptr shader{ lotus::content::get_shader(material.shader_ids()[shader_idx]) };
-            LASSERT(shader);
+            assert(shader);
             shaders[i].pShaderBytecode = shader->byte_code();
             shaders[i].BytecodeLength  = shader->byte_code_size();
             ++shader_idx;
@@ -491,8 +500,8 @@ void remove(id::id_type id)
 
 void get_views(const id::id_type* const gpu_ids, u32 id_count, const views_cache& cache)
 {
-    LASSERT(gpu_ids && id_count);
-    LASSERT(cache.position_buffers && cache.element_buffers && cache.index_buffer_views && cache.primitive_topologies &&
+    assert(gpu_ids && id_count);
+    assert(cache.position_buffers && cache.element_buffers && cache.index_buffer_views && cache.primitive_topologies &&
             cache.elements_types);
 
     std::lock_guard lock(submesh_mutex);
@@ -515,7 +524,7 @@ namespace texture
 {
 void get_descriptor_indices(const id::id_type* const texture_ids, u32 id_count, u32* const indices)
 {
-    LASSERT(texture_ids && id_count && indices);
+    assert(texture_ids && id_count && indices);
 
     std::lock_guard lock(texture_mutex);
 
@@ -546,7 +555,7 @@ id::id_type add(material_init_info info)
     std::lock_guard lock(material_mutex);
 
     d3d12_material_stream stream(buffer, info);
-    LASSERT(buffer);
+    assert(buffer);
     return materials.add(std::move(buffer));
 }
 
@@ -558,8 +567,8 @@ void remove(id::id_type id)
 
 void get_materials(const id::id_type* const material_ids, u32 material_count, const materials_cache& cache)
 {
-    LASSERT(material_ids && material_count);
-    LASSERT(cache.root_signatures && cache.material_types);
+    assert(material_ids && material_count);
+    assert(cache.root_signatures && cache.material_types);
     std::lock_guard lock(material_mutex);
 
     for (u32 i = 0; i < material_count; ++i)
@@ -578,12 +587,12 @@ namespace render_item
 
 // Format:
 // buffer[0] = geometry_content_id
-// buffer[1 .. n] = d3d12_render_item_id -> n = number of submeshes == material ids count
+// buffer[1 .. n] = d3d12_render_item_ids -> n = number of low level render item ids which must == the number of submeshes/material ids
 // buffer[n+1] = id::invalid_id
 id::id_type add(id::id_type entity_id, id::id_type geometry_content_id, u32 material_count, const id::id_type* const material_ids)
 {
-    LASSERT(id::is_valid(entity_id) && id::is_valid(geometry_content_id));
-    LASSERT(material_count && material_ids);
+    assert(id::is_valid(entity_id) && id::is_valid(geometry_content_id));
+    assert(material_count && material_ids);
     const auto gpu_ids = (id::id_type* const) alloca(material_count * id::size);
     lotus::content::get_submesh_gpu_ids(geometry_content_id, material_count, gpu_ids);
 
@@ -614,7 +623,7 @@ id::id_type add(id::id_type entity_id, id::id_type geometry_content_id, u32 mate
         item.pso_id         = gpass;
         item.depth_pso_id   = depth;
 
-        LASSERT(id::is_valid(item.submesh_gpu_id) && id::is_valid(item.material_id));
+        assert(id::is_valid(item.submesh_gpu_id) && id::is_valid(item.material_id));
         item_ids[i] = render_items.add(item);
     }
 
@@ -639,8 +648,8 @@ void remove(id::id_type id)
 
 void get_d3d12_render_item_ids(const frame_info& info, utl::vector<id::id_type>& d3d12_render_item_ids)
 {
-    LASSERT(info.render_item_ids && info.thresholds && info.render_item_count);
-    LASSERT(d3d12_render_item_ids.empty());
+    assert(info.render_item_ids && info.thresholds && info.render_item_count);
+    assert(d3d12_render_item_ids.empty());
 
     frame_cache.lod_offsets.clear();
     frame_cache.geometry_ids.clear();
@@ -655,7 +664,7 @@ void get_d3d12_render_item_ids(const frame_info& info, utl::vector<id::id_type>&
     }
 
     lotus::content::get_lod_offsets(frame_cache.geometry_ids.data(), info.thresholds, count, frame_cache.lod_offsets);
-    LASSERT(frame_cache.lod_offsets.size() == count);
+    assert(frame_cache.lod_offsets.size() == count);
 
     u32 d3d12_render_item_count = 0;
     for (u32 i = 0; i < count; ++i)
@@ -663,7 +672,7 @@ void get_d3d12_render_item_ids(const frame_info& info, utl::vector<id::id_type>&
         d3d12_render_item_count += frame_cache.lod_offsets[i].count;
     }
 
-    LASSERT(d3d12_render_item_count);
+    assert(d3d12_render_item_count);
     d3d12_render_item_ids.resize(d3d12_render_item_count);
 
     u32 item_idx = 0;
@@ -673,16 +682,16 @@ void get_d3d12_render_item_ids(const frame_info& info, utl::vector<id::id_type>&
         const lotus::content::lod_offset& lod_offset{ frame_cache.lod_offsets[i] };
         memcpy(&d3d12_render_item_ids[item_idx], &item_ids[lod_offset.offset], id::size * lod_offset.count);
         item_idx += lod_offset.count;
-        LASSERT(item_idx <= d3d12_render_item_count);
+        assert(item_idx <= d3d12_render_item_count);
     }
 
-    LASSERT(item_idx <= d3d12_render_item_count);
+    assert(item_idx <= d3d12_render_item_count);
 }
 
 void get_items(const id::id_type* const d3d12_render_item_ids, u32 id_count, const items_cache& cache)
 {
-    LASSERT(d3d12_render_item_ids && id_count);
-    LASSERT(cache.entity_ids && cache.submesh_gpu_ids && cache.material_ids && cache.psos && cache.depth_psos);
+    assert(d3d12_render_item_ids && id_count);
+    assert(cache.entity_ids && cache.submesh_gpu_ids && cache.material_ids && cache.psos && cache.depth_psos);
 
 
     std::lock_guard lock(render_item_mutex);

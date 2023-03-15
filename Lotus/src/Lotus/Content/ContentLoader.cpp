@@ -52,7 +52,7 @@ script::create_info         script_info;
 
 bool read_transform(const u8*& data, game_entity::create_info& info)
 {
-    LASSERT(!info.transform);
+    assert(!info.transform);
 
     f32 rotation[3];
 
@@ -77,14 +77,14 @@ bool read_transform(const u8*& data, game_entity::create_info& info)
 
 bool read_script(const u8*& data, game_entity::create_info& info)
 {
-    LASSERT(!info.script);
+    assert(!info.script);
     const u32 name_length = *data;
     data += sizeof(u32);
 
     if (!name_length)
         return false;
 
-    LASSERT(name_length < 256);
+    assert(name_length < 256);
     char script_name[256];
     memcpy(&script_name[0], data, name_length);
     data += name_length;
@@ -108,7 +108,7 @@ bool read_file(std::filesystem::path path, scope<u8[]>& data, u64& size)
     if (!std::filesystem::exists(path))
         return false;
     size = std::filesystem::file_size(path);
-    LASSERT(size);
+    assert(size);
     if (!size)
         return false;
     data = create_scope<u8[]>(size);
@@ -132,7 +132,7 @@ bool load_game()
     {
         return false;
     }
-    LASSERT(game_data.get());
+    assert(game_data.get());
     const u8*     at     = game_data.get();
     constexpr u32 size32 = sizeof(u32);
 
@@ -157,21 +157,21 @@ bool load_game()
         {
             const u32 comp_type = *at;
             at += size32;
-            LASSERT(comp_index == 0 || comp_index == 1);
-            LASSERT(comp_type < component_type::count);
+            assert(comp_index == 0 || comp_index == 1);
+            assert(comp_type < component_type::count);
 
             if (!comp_readers[comp_type](at, info))
                 return false;
         }
 
-        LASSERT(info.transform);
+        assert(info.transform);
         game_entity::entity ent(game_entity::create(info));
         if (!ent.is_valid())
             return false;
         entities.emplace_back(ent);
     }
 
-    LASSERT(at == game_data.get() + size);
+    assert(at == game_data.get() + size);
     return true;
 }
 

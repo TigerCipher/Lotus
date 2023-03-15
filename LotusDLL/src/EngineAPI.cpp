@@ -55,7 +55,7 @@ EDITOR_INTERFACE u32 LoadGameDll(const char* dllPath)
     if (gameDll)
         return FALSE;
     gameDll = LoadLibraryA(dllPath);
-    LASSERT(gameDll);
+    assert(gameDll);
 
     get_script_names   = (script_names_func) GetProcAddress(gameDll, "get_script_names");
     get_script_creator = (script_creator_func) GetProcAddress(gameDll, "get_script_creator");
@@ -66,9 +66,9 @@ EDITOR_INTERFACE u32 UnloadGameDll()
 {
     if (!gameDll)
         return FALSE;
-    LASSERT(gameDll);
+    assert(gameDll);
     int res = FreeLibrary(gameDll);
-    LASSERT(res);
+    assert(res);
     gameDll = nullptr;
     return TRUE;
 }
@@ -87,7 +87,7 @@ EDITOR_INTERFACE u32 CreateRenderSurface(HWND host, i32 width, i32 height)
 {
     const platform::window_create_info info{ nullptr, host, nullptr, 0, 0, width, height };
     graphics::render_surface           surface{ platform::create_window(&info), {} };
-    LASSERT(surface.window.is_valid());
+    assert(surface.window.is_valid());
     surfaces.emplace_back(surface);
 
     return (u32) surfaces.size() - 1;
@@ -95,18 +95,18 @@ EDITOR_INTERFACE u32 CreateRenderSurface(HWND host, i32 width, i32 height)
 
 EDITOR_INTERFACE void RemoveRenderSurface(u32 id)
 {
-    LASSERT(id < surfaces.size());
+    assert(id < surfaces.size());
     platform::remove_window(surfaces[id].window.get_id());
 }
 
 EDITOR_INTERFACE HWND GetWindowHandle(u32 id)
 {
-    LASSERT(id < surfaces.size());
+    assert(id < surfaces.size());
     return (HWND) surfaces[id].window.handle();
 }
 
 EDITOR_INTERFACE void ResizeRenderSurface(u32 id)
 {
-    LASSERT(id < surfaces.size());
+    assert(id < surfaces.size());
     surfaces[id].window.resize(0, 0);
 }

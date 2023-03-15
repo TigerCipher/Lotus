@@ -58,7 +58,7 @@ public:
 
     constexpr vector& operator=(const vector& o)
     {
-        LASSERT(this != std::addressof(o));
+        assert(this != std::addressof(o));
         if (this != std::addressof(o))
         {
             clear();
@@ -67,7 +67,7 @@ public:
             {
                 emplace_back(item);
             }
-            LASSERT(m_size == o.m_size);
+            assert(m_size == o.m_size);
         }
 
         return *this;
@@ -75,7 +75,7 @@ public:
 
     constexpr vector& operator=(vector&& o)
     {
-        LASSERT(this != std::addressof(o));
+        assert(this != std::addressof(o));
         if (this != std::addressof(o))
         {
             destroy();
@@ -97,7 +97,7 @@ public:
         {
             reserve((m_capacity + 1) * 3 >> 1); // increases capacity by 50%
         }
-        LASSERT(m_size < m_capacity);
+        assert(m_size < m_capacity);
 
         T* const item = new (std::addressof(m_data[m_size])) T(std::forward<Params>(p)...);
         ++m_size;
@@ -125,7 +125,7 @@ public:
             m_size = new_size;
         }
 
-        LASSERT(new_size == m_size);
+        assert(new_size == m_size);
     }
 
     constexpr void resize(u64 new_size, const T& value)
@@ -149,7 +149,7 @@ public:
             m_size = new_size;
         }
 
-        LASSERT(new_size == m_size);
+        assert(new_size == m_size);
     }
 
     constexpr void reserve(u64 new_capacity)
@@ -158,7 +158,7 @@ public:
             return;
 
         void* new_buffer = realloc(m_data, new_capacity * sizeof(T));
-        LASSERT(new_buffer);
+        assert(new_buffer);
         if (new_buffer)
         {
             m_data     = static_cast<T*>(new_buffer);
@@ -168,13 +168,13 @@ public:
 
     constexpr T* const erase(u64 index)
     {
-        LASSERT(m_data && index < m_size);
+        assert(m_data && index < m_size);
         return erase(std::addressof(m_data[index]));
     }
 
     constexpr T* const erase(T* const item)
     {
-        LASSERT(m_data && item >= std::addressof(m_data[0]) && item < std::addressof(m_data[m_size]));
+        assert(m_data && item >= std::addressof(m_data[0]) && item < std::addressof(m_data[m_size]));
 
         if constexpr (destruct)
             item->~T();
@@ -189,13 +189,13 @@ public:
 
     constexpr T* const erase_unordered(u64 index)
     {
-        LASSERT(m_data && index < m_size);
+        assert(m_data && index < m_size);
         return erase_unordered(std::addressof(m_data[index]));
     }
 
     constexpr T* const erase_unordered(T* const item)
     {
-        LASSERT(m_data && item >= std::addressof(m_data[0]) && item < std::addressof(m_data[m_size]));
+        assert(m_data && item >= std::addressof(m_data[0]) && item < std::addressof(m_data[m_size]));
 
         if constexpr (destruct)
             item->~T();
@@ -238,37 +238,37 @@ public:
 
     constexpr T& operator[](u64 index)
     {
-        LASSERT(m_data && index < m_size);
+        assert(m_data && index < m_size);
         return m_data[index];
     }
 
     constexpr const T& operator[](u64 index) const
     {
-        LASSERT(m_data && index < m_size);
+        assert(m_data && index < m_size);
         return m_data[index];
     }
 
     constexpr T& front()
     {
-        LASSERT(m_data && m_size);
+        assert(m_data && m_size);
         return m_data[0];
     }
 
     constexpr const T& front() const
     {
-        LASSERT(m_data && m_size);
+        assert(m_data && m_size);
         return m_data[0];
     }
 
     constexpr T& back()
     {
-        LASSERT(m_data && m_size);
+        assert(m_data && m_size);
         return m_data[m_size - 1];
     }
 
     constexpr const T& back() const
     {
-        LASSERT(m_data && m_size);
+        assert(m_data && m_size);
         return m_data[m_size - 1];
     }
 
@@ -284,13 +284,13 @@ public:
 
     constexpr T* end()
     {
-        LASSERT(!(m_data == nullptr && m_size > 0));
+        assert(!(m_data == nullptr && m_size > 0));
         return std::addressof(m_data[m_size]);
     }
 
     constexpr const T* end() const
     {
-        LASSERT(!(m_data == nullptr && m_size > 0));
+        assert(!(m_data == nullptr && m_size > 0));
         return std::addressof(m_data[m_size]);
     }
 
@@ -312,8 +312,8 @@ private:
 
     constexpr void destruct_range(u64 first, u64 last)
     {
-        LASSERT(destruct);
-        LASSERT(first <= m_size && last <= m_size && first <= last);
+        assert(destruct);
+        assert(first <= m_size && last <= m_size && first <= last);
         if (!m_data)
             return;
 
@@ -325,7 +325,7 @@ private:
 
     constexpr void destroy()
     {
-        LASSERT([&] { return m_capacity ? m_data != nullptr : m_data == nullptr; }());
+        assert([&] { return m_capacity ? m_data != nullptr : m_data == nullptr; }());
         clear();
         m_capacity = 0;
         if (m_data)

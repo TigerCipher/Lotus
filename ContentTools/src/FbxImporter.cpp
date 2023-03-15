@@ -45,7 +45,7 @@ std::mutex fbx_mutex;
 
 void fbx_context::get_scene(FbxNode* root) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
 
     if (!root)
     {
@@ -73,13 +73,13 @@ void fbx_context::get_scene(FbxNode* root) const
 
 bool fbx_context::initialize_fbx()
 {
-    LASSERT(!is_valid());
+    assert(!is_valid());
     m_fbx_manager = FbxManager::Create();
     if (!m_fbx_manager)
         return false;
 
     FbxIOSettings* ios{ FbxIOSettings::Create(m_fbx_manager, IOSROOT) };
-    LASSERT(ios);
+    assert(ios);
     m_fbx_manager->SetIOSettings(ios);
 
     return true;
@@ -87,7 +87,7 @@ bool fbx_context::initialize_fbx()
 
 void fbx_context::load_fbx_file(const char* file)
 {
-    LASSERT(m_fbx_manager && !m_fbx_scene);
+    assert(m_fbx_manager && !m_fbx_scene);
     m_fbx_scene = FbxScene::Create(m_fbx_manager, "Importer Scene");
 
     if (!m_fbx_scene)
@@ -105,7 +105,7 @@ void fbx_context::load_fbx_file(const char* file)
 
 bool fbx_context::get_mesh_data(FbxMesh* fbx_mesh, mesh& mesh) const
 {
-    LASSERT(fbx_mesh);
+    assert(fbx_mesh);
     FbxNode* const node = fbx_mesh->GetNode();
     FbxAMatrix     geometric_transform;
     geometric_transform.SetT(node->GetGeometricTranslation(FbxNode::eSourcePivot));
@@ -125,7 +125,7 @@ bool fbx_context::get_mesh_data(FbxMesh* fbx_mesh, mesh& mesh) const
     const i32  num_indices = fbx_mesh->GetPolygonVertexCount();
     const i32* indices     = fbx_mesh->GetPolygonVertices();
 
-    LASSERT(num_verts > 0 && num_indices > 0 && verts && indices);
+    assert(num_verts > 0 && num_indices > 0 && verts && indices);
 
     if (!(num_verts > 0 && num_indices > 0 && verts && indices))
         return false;
@@ -149,10 +149,10 @@ bool fbx_context::get_mesh_data(FbxMesh* fbx_mesh, mesh& mesh) const
         }
     }
 
-    LASSERT(mesh.raw_indices.size() % 3 == 0);
+    assert(mesh.raw_indices.size() % 3 == 0);
 
     // Get materials per polygon
-    LASSERT(num_polys > 0);
+    assert(num_polys > 0);
     FbxLayerElementArrayTemplate<i32>* mtl_indices;
     if (fbx_mesh->GetMaterialIndices(&mtl_indices))
     {
@@ -240,7 +240,7 @@ bool fbx_context::get_mesh_data(FbxMesh* fbx_mesh, mesh& mesh) const
 }
 void fbx_context::get_meshes(FbxNode* node, utl::vector<mesh>& meshes, u32 lod_id, f32 lod_threshold) const
 {
-    LASSERT(node && lod_id != invalid_id_u32);
+    assert(node && lod_id != invalid_id_u32);
     bool is_lodgroup = false;
 
     if (const i32 num_attribs = node->GetNodeAttributeCount())
@@ -274,7 +274,7 @@ void fbx_context::get_meshes(FbxNode* node, utl::vector<mesh>& meshes, u32 lod_i
 
 void fbx_context::get_mesh(FbxNodeAttribute* attrib, utl::vector<mesh>& meshes, u32 lod_id, f32 lod_threshold) const
 {
-    LASSERT(attrib);
+    assert(attrib);
 
     FbxMesh* fbx_mesh = (FbxMesh*) attrib;
     if (fbx_mesh->RemoveBadPolygons() < 0)
@@ -299,7 +299,7 @@ void fbx_context::get_mesh(FbxNodeAttribute* attrib, utl::vector<mesh>& meshes, 
 
 void fbx_context::get_lod_group(FbxNodeAttribute* attrib) const
 {
-    LASSERT(attrib);
+    assert(attrib);
 
     const auto*    lodgrp = (FbxLODGroup*) attrib;
     FbxNode* const node   = lodgrp->GetNode();
@@ -308,7 +308,7 @@ void fbx_context::get_lod_group(FbxNodeAttribute* attrib) const
 
     const i32 num_nodes = node->GetChildCount();
 
-    LASSERT(num_nodes > 0 && lodgrp->GetNumThresholds() == (num_nodes - 1));
+    assert(num_nodes > 0 && lodgrp->GetNumThresholds() == (num_nodes - 1));
 
     for (i32 i = 0; i < num_nodes; ++i)
     {
@@ -332,7 +332,7 @@ void fbx_context::get_lod_group(FbxNodeAttribute* attrib) const
 // ReSharper disable once CppInconsistentNaming
 EDITOR_INTERFACE void ImportFbx(const char* file, scene_data* data)
 {
-    LASSERT(file && data);
+    assert(file && data);
     scene scene{};
 
     // FBX Can only be done on a single thread

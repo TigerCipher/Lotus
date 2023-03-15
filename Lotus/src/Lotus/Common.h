@@ -55,11 +55,8 @@
     (x) = nullptr;
 
 #ifdef L_DEBUG
-    // May very well end up using custom asserts with better logging
-    #define LASSERT(condition) assert(condition)
-    #define L_DBG(x)           x
+    #define L_DBG(x) x
 #else
-    #define LASSERT(condition) (void(0))
     #define L_DBG(x)
 #endif
 

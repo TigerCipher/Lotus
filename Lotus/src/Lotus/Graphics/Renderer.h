@@ -117,7 +117,7 @@ struct perspective_camera_init_info : camera_init_info
 {
     explicit perspective_camera_init_info(id::id_type id)
     {
-        LASSERT(id::is_valid(id));
+        assert(id::is_valid(id));
         entity_id     = id;
         type          = camera::perspective;
         up            = { 0.0f, 1.0f, 0.0f };
@@ -132,7 +132,7 @@ struct orthographic_camera_init_info : camera_init_info
 {
     explicit orthographic_camera_init_info(id::id_type id)
     {
-        LASSERT(id::is_valid(id));
+        assert(id::is_valid(id));
         entity_id   = id;
         type        = camera::orthographic;
         up          = { 0.0f, 1.0f, 0.0f };

@@ -46,7 +46,7 @@ ID3D12PipelineState* fx_pso{ nullptr };
 
 bool create_fx_pso_root_sig()
 {
-    LASSERT(!fx_root_sig && !fx_pso);
+    assert(!fx_root_sig && !fx_pso);
 
     // d3dx::d3d12_descriptor_range range{
     //     D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
@@ -65,7 +65,7 @@ bool create_fx_pso_root_sig()
     d3dx::d3d12_root_signature_desc root_sig{ &params[0], idx::count };
     root_sig.Flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
     fx_root_sig = root_sig.create();
-    LASSERT(fx_root_sig);
+    assert(fx_root_sig);
 
     NAME_D3D_OBJ(fx_root_sig, L"Post-Process FX Root Signature");
 

@@ -77,7 +77,7 @@ L_EXPORT script_creator get_script_creator(size_t tag);
 template<class T>
 script_ptr create_script(game_entity::entity entity)
 {
-    LASSERT(entity.is_valid());
+    assert(entity.is_valid());
     return create_scope<T>(entity);
 }
 

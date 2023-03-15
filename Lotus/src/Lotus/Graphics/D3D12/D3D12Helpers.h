@@ -260,6 +260,16 @@ constexpr struct
 } blend_state;
 // clang-format on
 
+constexpr u64 align_size_for_constant_buffer(u64 size)
+{
+    return math::align_size_up<D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT>(size);
+}
+
+constexpr u64 align_size_for_texture(u64 size)
+{
+    return math::align_size_up<D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT>(size);
+}
+
 class d3d12_resource_barrier
 {
 public:
@@ -270,8 +280,8 @@ public:
                        D3D12_RESOURCE_BARRIER_FLAGS flags       = D3D12_RESOURCE_BARRIER_FLAG_NONE,
                        u32                          subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
     {
-        LASSERT(resource);
-        LASSERT(m_offset < max_resource_barriers);
+        assert(resource);
+        assert(m_offset < max_resource_barriers);
         D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
         barrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Flags                  = flags;
@@ -286,8 +296,8 @@ public:
     // Adds a UAV barrier
     constexpr void add(ID3D12Resource* resource, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE)
     {
-        LASSERT(resource);
-        LASSERT(m_offset < max_resource_barriers);
+        assert(resource);
+        assert(m_offset < max_resource_barriers);
         D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
         barrier.Type          = D3D12_RESOURCE_BARRIER_TYPE_UAV;
         barrier.Flags         = flags;
@@ -300,8 +310,8 @@ public:
     constexpr void add(ID3D12Resource* resource_before, ID3D12Resource* resource_after,
                        D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE)
     {
-        LASSERT(resource_before && resource_after);
-        LASSERT(m_offset < max_resource_barriers);
+        assert(resource_before && resource_after);
+        assert(m_offset < max_resource_barriers);
         D3D12_RESOURCE_BARRIER& barrier{ m_barriers[m_offset] };
         barrier.Type                     = D3D12_RESOURCE_BARRIER_TYPE_ALIASING;
         barrier.Flags                    = flags;
@@ -313,7 +323,7 @@ public:
 
     void apply(id3d12_graphics_command_list* cmd_list)
     {
-        LASSERT(m_offset);
+        assert(m_offset);
         cmd_list->ResourceBarrier(m_offset, m_barriers);
         m_offset = 0;
     }

@@ -70,9 +70,9 @@ private:
         {
             ++mAdded;
             game_entity::entity ent = create(entityDesc);
-            LASSERT(ent.is_valid());
+            assert(ent.is_valid());
             mEntities.push_back(ent);
-            LASSERT(is_alive(ent.get_id()));
+            assert(is_alive(ent.get_id()));
             --count;
         }
     }
@@ -85,12 +85,12 @@ private:
         {
             const uint32         index = (uint32) rand() % (uint32) mEntities.size();
             const game_entity::entity ent   = mEntities [ index ];
-            LASSERT(ent.is_valid());
+            assert(ent.is_valid());
             if (ent.is_valid())
             {
                 game_entity::remove(ent.get_id());
                 mEntities.erase(mEntities.begin() + index);
-                LASSERT(!is_alive(ent.get_id()));
+                assert(!is_alive(ent.get_id()));
                 ++mRemoved;
             }
             --count;

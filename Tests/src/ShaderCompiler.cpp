@@ -110,7 +110,7 @@ public:
 
     dxc_compiled_shader compile(shader_file_info info, std::filesystem::path full_path)
     {
-        LASSERT(m_compiler && m_utils && m_include_handler);
+        assert(m_compiler && m_utils && m_include_handler);
         HRESULT hr{ S_OK };
 
         comptr<IDxcBlobEncoding> src_blob{ nullptr };
@@ -119,7 +119,7 @@ public:
 
         if (FAILED(hr))
             return {};
-        LASSERT(src_blob && src_blob->GetBufferSize());
+        assert(src_blob && src_blob->GetBufferSize());
 
         std::wstring file = utl::to_wstring(info.file_name);
         std::wstring func = utl::to_wstring(info.function);
@@ -191,7 +191,7 @@ public:
         comptr<IDxcBlob> hash {nullptr};
         DX_CALL(hr = results->GetOutput(DXC_OUT_SHADER_HASH, L_PTR(&hash), nullptr));
         DxcShaderHash* const hash_buffer = (DxcShaderHash* const) hash->GetBufferPointer();
-        LASSERT(!(hash_buffer->Flags & DXC_HASHFLAG_INCLUDES_SOURCE));
+        assert(!(hash_buffer->Flags & DXC_HASHFLAG_INCLUDES_SOURCE));
         OutputDebugStringA("==== Shader Hash: ");
         for (u32 i = 0; i < _countof(hash_buffer->HashDigest); ++i)
         {
@@ -313,7 +313,7 @@ scope<u8[]> compile_shader(shader_file_info info, const char* file_path)
         blob.write(compiled_shader.hash.HashDigest, content::compiled_shader::hash_length);
         blob.write((u8*)compiled_shader.byte_code->GetBufferPointer(), compiled_shader.byte_code->GetBufferSize());
 
-        LASSERT(blob.offset() == buffer_size);
+        assert(blob.offset() == buffer_size);
         return buffer;
     }
 

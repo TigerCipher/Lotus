@@ -44,9 +44,9 @@ script_registry& registry()
 
 bool exists(const script_id id)
 {
-    LASSERT(id::is_valid(id));
+    assert(id::is_valid(id));
     const id::id_type index = id::index(id);
-    LASSERT((index < generations.size() && id_mapping[index] < entity_scripts.size()) &&
+    assert((index < generations.size() && id_mapping[index] < entity_scripts.size()) &&
             generations[index] == id::generation(id));
     return (generations[index] == id::generation(id)) && entity_scripts[id_mapping[index]] &&
            entity_scripts[id_mapping[index]]->is_valid();
@@ -67,14 +67,14 @@ namespace detail
 u8 register_script(size_t tag, script_creator func)
 {
     const bool res = registry().insert(script_registry::value_type{ tag, func }).second;
-    LASSERT(res);
+    assert(res);
     return res;
 }
 
 script_creator get_script_creator(const size_t tag)
 {
     const auto script = registry().find(tag);
-    LASSERT(script != registry().end() && script->first == tag);
+    assert(script != registry().end() && script->first == tag);
     return script->second;
 }
 
@@ -92,13 +92,13 @@ u8 add_script_name(const char* name)
 
 component create(const create_info& info, const game_entity::entity entity)
 {
-    LASSERT(entity.is_valid() && info.script_creator);
+    assert(entity.is_valid() && info.script_creator);
     script_id id;
 
     if (free_ids.size() > id::min_deleted_elements)
     {
         id = free_ids.front();
-        LASSERT(!exists(id));
+        assert(!exists(id));
         free_ids.pop_front();
         id = script_id{ id::new_generation(id) };
         ++generations[id::index(id)];
@@ -109,10 +109,10 @@ component create(const create_info& info, const game_entity::entity entity)
         generations.push_back(0);
     }
 
-    LASSERT(id::is_valid(id));
+    assert(id::is_valid(id));
     const auto index = (id::id_type) entity_scripts.size();
     entity_scripts.emplace_back(info.script_creator(entity));
-    LASSERT(entity_scripts.back()->get_id() == entity.get_id());
+    assert(entity_scripts.back()->get_id() == entity.get_id());
 
     id_mapping[id::index(id)] = index;
     return component(id);

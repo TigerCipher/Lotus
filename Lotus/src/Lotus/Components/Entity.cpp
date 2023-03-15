@@ -37,7 +37,7 @@ utl::vector<script::component>    scripts;
 
 entity create(const create_info& info)
 {
-    LASSERT(info.transform);
+    assert(info.transform);
     if (!info.transform)
         return {};
 
@@ -45,7 +45,7 @@ entity create(const create_info& info)
     if (free_ids.size() > id::min_deleted_elements)
     {
         ident = free_ids.front();
-        LASSERT(!is_alive(ident));
+        assert(!is_alive(ident));
         free_ids.pop_front();
         ident = entity_id{ id::new_generation(ident) };
         ++generations[id::index(ident)];
@@ -62,7 +62,7 @@ entity create(const create_info& info)
     const entity      new_ent(ident);
     const id::id_type index = id::index(ident);
 
-    LASSERT(!transforms[index].is_valid());
+    assert(!transforms[index].is_valid());
     transforms[index] = transform::create(*info.transform, new_ent);
     if (!transforms[index].is_valid())
         return {};
@@ -70,9 +70,9 @@ entity create(const create_info& info)
     // Script
     if (info.script && info.script->script_creator)
     {
-        LASSERT(!scripts[index].is_valid());
+        assert(!scripts[index].is_valid());
         scripts[index] = script::create(*info.script, new_ent);
-        LASSERT(scripts[index].is_valid());
+        assert(scripts[index].is_valid());
     }
 
     return new_ent;
@@ -81,7 +81,7 @@ entity create(const create_info& info)
 void remove(const entity_id id)
 {
     const id::id_type index = id::index(id);
-    LASSERT(is_alive(id));
+    assert(is_alive(id));
 
     if (scripts[index].is_valid())
     {
@@ -96,9 +96,9 @@ void remove(const entity_id id)
 
 bool is_alive(const entity_id id)
 {
-    LASSERT(id::is_valid(id));
+    assert(id::is_valid(id));
     const id::id_type index = id::index(id);
-    LASSERT(index < generations.size());
+    assert(index < generations.size());
     return generations[index] == id::generation(id) && transforms[index].is_valid();
 }
 
@@ -110,7 +110,7 @@ bool is_alive(const entity_id id)
 
 transform::component entity::transform() const
 {
-    LASSERT(is_alive(m_id));
+    assert(is_alive(m_id));
     const id::id_type index = id::index(m_id);
     return transforms[index];
 }
@@ -118,7 +118,7 @@ transform::component entity::transform() const
 
 script::component entity::script() const
 {
-    LASSERT(is_alive(m_id));
+    assert(is_alive(m_id));
     const id::id_type index = id::index(m_id);
     return scripts[index];
 }

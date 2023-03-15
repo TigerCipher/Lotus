@@ -58,7 +58,7 @@ mesh create_plane(const primitive_create_info& info, const u32 horizontal_index 
                   const vec3 offset = { -0.5f, 0.0f, -0.5f }, const vec2 u_range = { 0.0f, 1.0f },
                   const vec2 v_range = { 0.0f, 1.0f })
 {
-    LASSERT(horizontal_index < 3 && vertical_index < 3 && horizontal_index != vertical_index);
+    assert(horizontal_index < 3 && vertical_index < 3 && horizontal_index != vertical_index);
     const u32 horiz_count = math::clamp(info.segments[horizontal_index], 1u, 10u);
     const u32 vert_count  = math::clamp(info.segments[vertical_index], 1u, 10u);
     const f32 horiz_step  = 1.0f / horiz_count;
@@ -90,7 +90,7 @@ mesh create_plane(const primitive_create_info& info, const u32 horizontal_index 
         }
     }
 
-    LASSERT(m.positions.size() == ((u64) horiz_count + 1) * ((u64) vert_count + 1));
+    assert(m.positions.size() == ((u64) horiz_count + 1) * ((u64) vert_count + 1));
 
     const u32 row_len = horiz_count + 1;
 
@@ -116,7 +116,7 @@ mesh create_plane(const primitive_create_info& info, const u32 horizontal_index 
     }
 
     const u32 num_indices = 3 * 2 * horiz_count * vert_count;
-    LASSERT(m.raw_indices.size() == num_indices);
+    assert(m.raw_indices.size() == num_indices);
 
     m.uv_sets.resize(1);
     for (u32 i = 0; i < num_indices; ++i)
@@ -160,7 +160,7 @@ mesh create_uv_sphere(const primitive_create_info& info)
     // Bottom vertex
     m.positions[c++] = { 0.0f, -info.size.y, 0.0f };
 
-    LASSERT(c == num_verts);
+    assert(c == num_verts);
 
     c = 0;
 
@@ -254,7 +254,7 @@ mesh create_uv_sphere(const primitive_create_info& info)
     uvs[c]             = { 1.0f - inv_phi_count, inv_theta_count };
     m.raw_indices[c++] = south_index - 1;
 
-    LASSERT(c == num_indices);
+    assert(c == num_indices);
 
     m.uv_sets.emplace_back(uvs);
 
@@ -284,8 +284,8 @@ void create_capsule([[maybe_unused]] scene& scene, [[maybe_unused]] const primit
 
 EDITOR_INTERFACE void CreatePrimitiveMesh(scene_data* data, primitive_create_info* info)
 {
-    LASSERT(data && info);
-    LASSERT(info->type < primitive_mesh_type::MESH_COUNT);
+    assert(data && info);
+    assert(info->type < primitive_mesh_type::MESH_COUNT);
 
     scene scene;
     creators[info->type](scene, *info);

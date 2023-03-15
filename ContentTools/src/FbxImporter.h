@@ -38,12 +38,12 @@ class fbx_context
 public:
     fbx_context(const char* file, scene* scene, scene_data* data) : m_scene(scene), m_scene_data(data)
     {
-        LASSERT(file && m_scene && m_scene_data);
+        assert(file && m_scene && m_scene_data);
 
         if (initialize_fbx())
         {
             load_fbx_file(file);
-            LASSERT(is_valid());
+            assert(is_valid());
         }
     }
 

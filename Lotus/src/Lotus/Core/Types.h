@@ -83,3 +83,16 @@ constexpr ref<T> create_ref(Args&&... args)
 {
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
+
+inline auto operator""_KB(const size_t x)
+{
+    return x * 1024;
+}
+inline auto operator""_MB(const size_t x)
+{
+    return x * 1024 * 1024;
+}
+inline auto operator""_GB(const size_t x)
+{
+    return x * 1024 * 1024 * 1024;
+}

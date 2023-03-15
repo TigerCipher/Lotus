@@ -49,7 +49,7 @@ void load_model()
     u64         size = 0;
     read_file(R"(..\..\Tests\model.model)", model, size);
     model_id = content::create_resource(model.get(), content::asset_type::mesh);
-    LASSERT(id::is_valid(model_id));
+    assert(id::is_valid(model_id));
 }
 
 void load_shaders()
@@ -61,13 +61,13 @@ void load_shaders()
 
     const char* path          = "..\\..\\Tests\\";
     auto        vertex_shader = compile_shader(info, path);
-    LASSERT(vertex_shader.get());
+    assert(vertex_shader.get());
 
     info.function = "TestShaderPS";
     info.type     = shader_type::pixel;
 
     auto pixel_shader = compile_shader(info, path);
-    LASSERT(pixel_shader.get());
+    assert(pixel_shader.get());
 
     vs_id = content::add_shader(vertex_shader.get());
     ps_id = content::add_shader(pixel_shader.get());

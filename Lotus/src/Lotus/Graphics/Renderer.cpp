@@ -44,7 +44,7 @@ bool set_platform_interface(graphics_platform platform, platform_interface& pint
     default: return false;
     }
 
-    LASSERT(pinterface.platform == platform);
+    assert(pinterface.platform == platform);
     return true;
 }
 
@@ -78,31 +78,31 @@ surface create_surface(platform::window window)
 
 void remove_surface(surface_id id)
 {
-    LASSERT(id::is_valid(id));
+    assert(id::is_valid(id));
     gfx.surface.remove(id);
 }
 
 void surface::resize(u32 width, u32 height) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     gfx.surface.resize(m_id, width, height);
 }
 
 u32 surface::width() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return gfx.surface.width(m_id);
 }
 
 u32 surface::height() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return gfx.surface.height(m_id);
 }
 
 void surface::render() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     gfx.surface.render(m_id);
 }
 
@@ -155,44 +155,44 @@ void remove_render_item(id::id_type id)
 
 void camera::up(vec3 up) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     gfx.camera.set_parameter(m_id, camera_parameter::up_vector, &up, sizeof(up));
 }
 
 void camera::field_of_view(f32 fov) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     gfx.camera.set_parameter(m_id, camera_parameter::field_of_view, &fov, sizeof(fov));
 }
 
 void camera::aspect_ratio(f32 ratio) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     gfx.camera.set_parameter(m_id, camera_parameter::aspect_ratio, &ratio, sizeof(ratio));
 }
 
 void camera::view_width(f32 width) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     gfx.camera.set_parameter(m_id, camera_parameter::view_width, &width, sizeof(width));
 }
 
 void camera::view_height(f32 height) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     gfx.camera.set_parameter(m_id, camera_parameter::view_height, &height, sizeof(height));
 }
 
 void camera::range(f32 near_z, f32 far_z) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     gfx.camera.set_parameter(m_id, camera_parameter::near_z, &near_z, sizeof(near_z));
     gfx.camera.set_parameter(m_id, camera_parameter::far_z, &far_z, sizeof(far_z));
 }
 
 mat4 camera::view() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     mat4 matrix;
     gfx.camera.get_parameter(m_id, camera_parameter::view, &matrix, sizeof(matrix));
     return matrix;
@@ -200,7 +200,7 @@ mat4 camera::view() const
 
 mat4 camera::projection() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     mat4 matrix;
     gfx.camera.get_parameter(m_id, camera_parameter::projection, &matrix, sizeof(matrix));
     return matrix;
@@ -208,7 +208,7 @@ mat4 camera::projection() const
 
 mat4 camera::inverse_projection() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     mat4 matrix;
     gfx.camera.get_parameter(m_id, camera_parameter::inverse_projection, &matrix, sizeof(matrix));
     return matrix;
@@ -216,7 +216,7 @@ mat4 camera::inverse_projection() const
 
 mat4 camera::view_projection() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     mat4 matrix;
     gfx.camera.get_parameter(m_id, camera_parameter::view_projection, &matrix, sizeof(matrix));
     return matrix;
@@ -224,7 +224,7 @@ mat4 camera::view_projection() const
 
 mat4 camera::inverse_view_projection() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     mat4 matrix;
     gfx.camera.get_parameter(m_id, camera_parameter::inverse_view_projection, &matrix, sizeof(matrix));
     return matrix;
@@ -232,7 +232,7 @@ mat4 camera::inverse_view_projection() const
 
 vec3 camera::up() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     vec3 v;
     gfx.camera.get_parameter(m_id, camera_parameter::up_vector, &v, sizeof(v));
     return v;
@@ -240,7 +240,7 @@ vec3 camera::up() const
 
 f32 camera::field_of_view() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     f32 f;
     gfx.camera.get_parameter(m_id, camera_parameter::field_of_view, &f, sizeof(f));
     return f;
@@ -248,7 +248,7 @@ f32 camera::field_of_view() const
 
 f32 camera::aspect_ratio() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     f32 f;
     gfx.camera.get_parameter(m_id, camera_parameter::aspect_ratio, &f, sizeof(f));
     return f;
@@ -256,7 +256,7 @@ f32 camera::aspect_ratio() const
 
 f32 camera::view_width() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     f32 f;
     gfx.camera.get_parameter(m_id, camera_parameter::view_width, &f, sizeof(f));
     return f;
@@ -264,7 +264,7 @@ f32 camera::view_width() const
 
 f32 camera::view_height() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     f32 f;
     gfx.camera.get_parameter(m_id, camera_parameter::view_height, &f, sizeof(f));
     return f;
@@ -272,7 +272,7 @@ f32 camera::view_height() const
 
 f32 camera::near_z() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     f32 f;
     gfx.camera.get_parameter(m_id, camera_parameter::near_z, &f, sizeof(f));
     return f;
@@ -280,7 +280,7 @@ f32 camera::near_z() const
 
 f32 camera::far_z() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     f32 f;
     gfx.camera.get_parameter(m_id, camera_parameter::far_z, &f, sizeof(f));
     return f;
@@ -288,7 +288,7 @@ f32 camera::far_z() const
 
 camera::type camera::projection_type() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     type t;
     gfx.camera.get_parameter(m_id, camera_parameter::type, &t, sizeof(t));
     return t;
@@ -296,7 +296,7 @@ camera::type camera::projection_type() const
 
 id::id_type camera::entity_id() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     id::id_type id;
     gfx.camera.get_parameter(m_id, camera_parameter::entity_id, &id, sizeof(id));
     return id;

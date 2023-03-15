@@ -81,7 +81,7 @@ game_entity::entity EntityFromId(id::id_type id) { return game_entity::entity { 
 
 EDITOR_INTERFACE id::id_type CreateEntity(EntityDesc* e)
 {
-    LASSERT(e);
+    assert(e);
     EntityDesc&            desc { *e };
     transform::create_info transform = desc.transform.to_create_info();
     script::create_info    scriptInfo = desc.script.to_create_info();
@@ -92,6 +92,6 @@ EDITOR_INTERFACE id::id_type CreateEntity(EntityDesc* e)
 
 EDITOR_INTERFACE void RemoveEntity(id::id_type id)
 {
-    LASSERT(id::is_valid(id));
+    assert(id::is_valid(id));
     game_entity::remove(game_entity::entity_id { id });
 }

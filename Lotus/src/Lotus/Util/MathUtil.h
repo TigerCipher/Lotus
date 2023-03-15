@@ -83,43 +83,43 @@ namespace lotus::math
 {
 
 template<typename T>
-constexpr T clamp(T value, T min, T max)
+[[nodiscard]] constexpr T clamp(T value, T min, T max)
 {
     return value < min ? min : value > max ? max : value;
 }
 
 
 template<u32 Bits>
-constexpr u32 pack_unit_float(f32 f)
+[[nodiscard]] constexpr u32 pack_unit_float(f32 f)
 {
     static_assert(Bits <= sizeof(u32) * 8);
-    LASSERT(f >= 0.0f && f <= 1.0f);
+    assert(f >= 0.0f && f <= 1.0f);
     constexpr f32 intervals = (f32) ((1ui32 << Bits) - 1);
     return (u32) (intervals * f + 0.5f);
 }
 
 template<u32 Bits>
-constexpr f32 unpack_to_unit_float(u32 i)
+[[nodiscard]] constexpr f32 unpack_to_unit_float(u32 i)
 {
     static_assert(Bits <= sizeof(u32) * 8);
-    LASSERT(i < 1ui32 << Bits);
+    assert(i < 1ui32 << Bits);
     constexpr f32 intervals = (f32) ((1ui32 << Bits) - 1);
     return (f32) i / intervals;
 }
 
 template<u32 Bits>
-constexpr u32 pack_float(f32 f, f32 min, f32 max)
+[[nodiscard]] constexpr u32 pack_float(f32 f, f32 min, f32 max)
 {
-    LASSERT(min < max);
-    LASSERT(f >= min && f <= max);
+    assert(min < max);
+    assert(f >= min && f <= max);
     const f32 distance = (f - min) / (max - min);
     return pack_unit_float<Bits>(distance);
 }
 
 template<u32 Bits>
-constexpr f32 unpack_to_float(u32 i, f32 min, f32 max)
+[[nodiscard]] constexpr f32 unpack_to_float(u32 i, f32 min, f32 max)
 {
-    LASSERT(min < max);
+    assert(min < max);
     return unpack_to_unit_float<Bits>(i) * (max - min) + min;
 }
 
@@ -130,7 +130,7 @@ constexpr f32 unpack_to_float(u32 i, f32 min, f32 max)
  * \return The aligned size
  */
 template<u64 Alignment>
-constexpr u64 align_size_up(u64 size)
+[[nodiscard]] constexpr u64 align_size_up(u64 size)
 {
     static_assert(Alignment, "Alignment must be non-zero");
     constexpr u64 mask = Alignment - 1;
@@ -146,7 +146,7 @@ constexpr u64 align_size_up(u64 size)
  * \return The aligned size
  */
 template<u64 Alignment>
-constexpr u64 align_size_down(u64 size)
+[[nodiscard]] constexpr u64 align_size_down(u64 size)
 {
     static_assert(Alignment, "Alignment must be non-zero");
     constexpr u64 mask = Alignment - 1;
@@ -155,10 +155,28 @@ constexpr u64 align_size_down(u64 size)
     return size & ~mask;
 }
 
+[[nodiscard]] constexpr u64 align_size_up(u64 size, u64 alignment)
+{
+    assert(alignment && "Alignment must be non-zero");
+    const u64 mask = alignment - 1;
+    assert(!(alignment & mask) && "Alignment must be a power of 2");
+
+    return (size + mask) & ~mask;
+}
+
+[[nodiscard]] constexpr u64 align_size_down(u64 size, u64 alignment)
+{
+    assert(alignment && "Alignment must be non-zero");
+    const u64 mask = alignment - 1;
+    assert(!(alignment & mask) && "Alignment must be a power of 2");
+
+    return size & ~mask;
+}
+
 
 [[nodiscard]] constexpr u64 calculate_crc32_u64(const u8* const data, u64 size)
 {
-    LASSERT(size >= sizeof(u64));
+    assert(size >= sizeof(u64));
 
     u64 crc = 0;
     const u8* at = data;

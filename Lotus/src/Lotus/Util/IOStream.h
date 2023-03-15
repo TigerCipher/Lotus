@@ -35,7 +35,7 @@ namespace lotus::utl
 class blob_stream_reader
 {
 public:
-    explicit blob_stream_reader(const u8* buffer) : m_buffer(buffer), m_position(buffer) { LASSERT(buffer); }
+    explicit blob_stream_reader(const u8* buffer) : m_buffer(buffer), m_position(buffer) { assert(buffer); }
 
     DISABLE_COPY_AND_MOVE(blob_stream_reader);
 
@@ -72,7 +72,7 @@ public:
     explicit blob_stream_writer(u8* buffer, const size_t buffer_size) :
         m_buffer(buffer), m_position(buffer), m_buffer_size(buffer_size)
     {
-        LASSERT(buffer && buffer_size);
+        assert(buffer && buffer_size);
     }
 
     DISABLE_COPY_AND_MOVE(blob_stream_writer);
@@ -81,28 +81,28 @@ public:
     void write(T value)
     {
         //static_assert(std::is_arithmetic_v<T>, "Template argument should be a primitive type");
-        LASSERT(&m_position[sizeof(T)] <= &m_buffer[m_buffer_size]);
+        assert(&m_position[sizeof(T)] <= &m_buffer[m_buffer_size]);
         *(T*) m_position = value;
         m_position += sizeof(T);
     }
 
     void write(const u8* buffer, const size_t length)
     {
-        LASSERT(&m_position[length] <= &m_buffer[m_buffer_size]);
+        assert(&m_position[length] <= &m_buffer[m_buffer_size]);
         memcpy(m_position, buffer, length);
         m_position += length;
     }
 
     void write(const char* buffer, const size_t length)
     {
-        LASSERT(&m_position[length] <= &m_buffer[m_buffer_size]);
+        assert(&m_position[length] <= &m_buffer[m_buffer_size]);
         memcpy(m_position, buffer, length);
         m_position += length;
     }
 
     void skip(const size_t offset)
     {
-        LASSERT(&m_position[offset] <= &m_buffer[m_buffer_size]);
+        assert(&m_position[offset] <= &m_buffer[m_buffer_size]);
         m_position += offset;
     }
 

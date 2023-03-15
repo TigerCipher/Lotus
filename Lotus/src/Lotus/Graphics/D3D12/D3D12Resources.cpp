@@ -31,18 +31,18 @@ namespace lotus::graphics::d3d12
 bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
 {
     std::lock_guard lock(m_mutex);
-    LASSERT(capacity && capacity < D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_2);
-    LASSERT(!(m_type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER && capacity > D3D12_MAX_SHADER_VISIBLE_SAMPLER_HEAP_SIZE));
+    assert(capacity && capacity < D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_2);
+    assert(!(m_type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER && capacity > D3D12_MAX_SHADER_VISIBLE_SAMPLER_HEAP_SIZE));
     if (m_type == D3D12_DESCRIPTOR_HEAP_TYPE_DSV || m_type == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
         is_shader_visible = false;
 
     release();
 
     auto* const device = core::device();
-    LASSERT(device);
+    assert(device);
 
     D3D12_DESCRIPTOR_HEAP_DESC desc{};
-    desc.Flags = is_shader_visible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    desc.Flags          = is_shader_visible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     desc.NumDescriptors = capacity;
     desc.Type           = m_type;
     desc.NodeMask       = 0;
@@ -64,13 +64,13 @@ bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
 #ifdef L_DEBUG
     for (u32 i = 0; i < frame_buffer_count; ++i)
     {
-        LASSERT(m_deferred_free_indices[i].empty());
+        assert(m_deferred_free_indices[i].empty());
     }
 #endif
 
     m_descriptor_size = device->GetDescriptorHandleIncrementSize(m_type);
     m_cpu_start       = m_heap->GetCPUDescriptorHandleForHeapStart();
-    m_gpu_start = is_shader_visible ? m_heap->GetGPUDescriptorHandleForHeapStart() : D3D12_GPU_DESCRIPTOR_HANDLE{ 0 };
+    m_gpu_start       = is_shader_visible ? m_heap->GetGPUDescriptorHandleForHeapStart() : D3D12_GPU_DESCRIPTOR_HANDLE{ 0 };
 
     return true;
 }
@@ -78,7 +78,7 @@ bool descriptor_heap::initialize(u32 capacity, bool is_shader_visible)
 void descriptor_heap::process_deferred_free(u32 frame_index)
 {
     std::lock_guard lock(m_mutex);
-    LASSERT(frame_index < frame_buffer_count);
+    assert(frame_index < frame_buffer_count);
 
     utl::vector<u32>& indices = m_deferred_free_indices[frame_index];
     if (!indices.empty())
@@ -94,15 +94,15 @@ void descriptor_heap::process_deferred_free(u32 frame_index)
 
 void descriptor_heap::release()
 {
-    LASSERT(!m_size);
+    assert(!m_size);
     core::deferred_release(m_heap);
 }
 
 descriptor_handle descriptor_heap::allocate()
 {
     std::lock_guard lock(m_mutex);
-    LASSERT(m_heap);
-    LASSERT(m_size < m_capacity);
+    assert(m_heap);
+    assert(m_size < m_capacity);
 
     const u32 index  = m_free_handles[m_size];
     const u32 offset = index * m_descriptor_size;
@@ -123,13 +123,13 @@ void descriptor_heap::free(descriptor_handle& handle)
     if (!handle.is_valid())
         return;
     std::lock_guard lock(m_mutex);
-    LASSERT(m_heap && m_size);
-    LASSERT(handle.container == this);
-    LASSERT(handle.cpu.ptr >= m_cpu_start.ptr);
-    LASSERT((handle.cpu.ptr - m_cpu_start.ptr) % m_descriptor_size == 0);
-    LASSERT(handle.index < m_capacity);
+    assert(m_heap && m_size);
+    assert(handle.container == this);
+    assert(handle.cpu.ptr >= m_cpu_start.ptr);
+    assert((handle.cpu.ptr - m_cpu_start.ptr) % m_descriptor_size == 0);
+    assert(handle.index < m_capacity);
     const u32 index = (u32) (handle.cpu.ptr - m_cpu_start.ptr) / m_descriptor_size;
-    LASSERT(handle.index == index);
+    assert(handle.index == index);
 
     const u32 frame_index = core::current_frame_index();
     m_deferred_free_indices[frame_index].push_back(index);
@@ -139,38 +139,84 @@ void descriptor_heap::free(descriptor_handle& handle)
 }
 
 
+// BUFFER //////////////
+
+d3d12_buffer::d3d12_buffer(d3d12_buffer_init_info info, bool is_cpu_accessible)
+{
+    assert(info.size && info.alignment);
+    m_size        = (u32) math::align_size_up(info.size, info.alignment);
+    m_buffer      = d3dx::create_buffer(info.data, m_size, is_cpu_accessible, info.initial_state, info.flags, info.heap,
+                                        info.allocation_info.Offset);
+    m_gpu_address = m_buffer->GetGPUVirtualAddress();
+    NAME_D3D_OBJ_INDEXED(m_buffer, m_size, L"D3D12 Buffer - Size");
+}
+
+void d3d12_buffer::release()
+{
+    core::deferred_release(m_buffer);
+    m_gpu_address = 0;
+    m_size        = 0;
+}
+
+// CONSTANT_BUFFER //////////////
+
+constant_buffer::constant_buffer(d3d12_buffer_init_info info) : m_buffer{ info, true }
+{
+    NAME_D3D_OBJ_INDEXED(buffer(), size(), L"Constant Buffer - Size");
+
+    const D3D12_RANGE range{};
+    DX_CALL(buffer()->Map(0, &range, (void**) &m_cpu_address));
+    assert(m_cpu_address);
+}
+
+u8* constant_buffer::allocate(u32 size)
+{
+    std::lock_guard lock{ m_mutex };
+
+    const u32 aligned_size{ (u32) d3dx::align_size_for_constant_buffer(size) };
+    assert(m_cpu_offset + aligned_size <= m_buffer.size());
+    if (m_cpu_offset + aligned_size <= m_buffer.size())
+    {
+        u8* const address{ m_cpu_address + m_cpu_offset };
+        m_cpu_offset += aligned_size;
+        return address;
+    }
+
+    return nullptr;
+}
+
+
 // TEXTURE //////////////
 
 d3d12_texture::d3d12_texture(d3d12_texture_init_info info)
 {
-    auto* const device = core::device();
-    LASSERT(device);
+    auto const device = core::device();
+    assert(device);
 
-    const D3D12_CLEAR_VALUE* const clear_value =
-        info.desc && (info.desc->Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET ||
-                      info.desc->Flags & D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL)
-            ? &info.clear_value
-            : nullptr;
+    const D3D12_CLEAR_VALUE* const clear_value = info.desc && (info.desc->Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET ||
+                                                               info.desc->Flags & D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL)
+                                                   ? &info.clear_value
+                                                   : nullptr;
 
     if (info.resource)
     {
-        LASSERT(!info.heap);
+        assert(!info.heap);
         m_resource = info.resource;
     } else if (info.heap && info.desc)
     {
-        LASSERT(!info.resource);
-        DX_CALL(device->CreatePlacedResource(info.heap, info.allocation_info.Offset, info.desc, info.initial_state,
-                                             clear_value, L_PTR(&m_resource)));
+        assert(!info.resource);
+        DX_CALL(device->CreatePlacedResource(info.heap, info.allocation_info.Offset, info.desc, info.initial_state, clear_value,
+                                             L_PTR(&m_resource)));
     } else if (info.desc)
     {
-        LASSERT(!info.heap && !info.resource);
+        assert(!info.heap && !info.resource);
 
 
         DX_CALL(device->CreateCommittedResource(&d3dx::heap_properties.default_heap, D3D12_HEAP_FLAG_NONE, info.desc,
                                                 info.initial_state, clear_value, L_PTR(&m_resource)));
     }
 
-    LASSERT(m_resource);
+    assert(m_resource);
 
     m_srv = core::srv_heap().allocate();
     device->CreateShaderResourceView(m_resource, info.srv_desc, m_srv.cpu);
@@ -188,9 +234,9 @@ void d3d12_texture::release()
 
 d3d12_render_texture::d3d12_render_texture(d3d12_texture_init_info info) : m_texture(info)
 {
-    LASSERT(info.desc);
+    assert(info.desc);
     m_mip_count = resource()->GetDesc().MipLevels;
-    LASSERT(m_mip_count && m_mip_count <= d3d12_texture::max_mips);
+    assert(m_mip_count && m_mip_count <= d3d12_texture::max_mips);
 
     descriptor_heap&              rtvheap = core::rtv_heap();
     D3D12_RENDER_TARGET_VIEW_DESC desc{};
@@ -199,7 +245,7 @@ d3d12_render_texture::d3d12_render_texture(d3d12_texture_init_info info) : m_tex
     desc.Texture2D.MipSlice = 0;
 
     auto* const device = core::device();
-    LASSERT(device);
+    assert(device);
 
     for (u32 i = 0; i < m_mip_count; ++i)
     {
@@ -224,7 +270,7 @@ void d3d12_render_texture::release()
 
 d3d12_depth_buffer::d3d12_depth_buffer(d3d12_texture_init_info info)
 {
-    LASSERT(info.desc);
+    assert(info.desc);
     const DXGI_FORMAT               dsv_format = info.desc->Format;
     D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc{};
     if (info.desc->Format == DXGI_FORMAT_D32_FLOAT)
@@ -240,7 +286,7 @@ d3d12_depth_buffer::d3d12_depth_buffer(d3d12_texture_init_info info)
     srv_desc.Texture2D.PlaneSlice          = 0;
     srv_desc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-    LASSERT(!info.srv_desc && !info.resource);
+    assert(!info.srv_desc && !info.resource);
     info.srv_desc = &srv_desc;
     m_texture     = d3d12_texture(info);
 
@@ -253,7 +299,7 @@ d3d12_depth_buffer::d3d12_depth_buffer(d3d12_texture_init_info info)
     m_dsv = core::dsv_heap().allocate();
 
     auto* const device = core::device();
-    LASSERT(device);
+    assert(device);
 
     device->CreateDepthStencilView(resource(), &dsv_desc, m_dsv.cpu);
 }

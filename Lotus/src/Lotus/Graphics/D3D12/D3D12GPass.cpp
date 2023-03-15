@@ -58,7 +58,7 @@ constexpr f32 clear_value[4]{};
 
 bool create_buffers(vec2u size)
 {
-    LASSERT(size.x && size.y);
+    assert(size.x && size.y);
     gpass_main_buffer.release();
     gpass_depth_buffer.release();
 
@@ -109,7 +109,7 @@ bool create_buffers(vec2u size)
 
 bool create_gpass_pso_and_rootsig()
 {
-    LASSERT(!gpass_root_sig && !gpass_pso);
+    assert(!gpass_root_sig && !gpass_pso);
 
     using idx = gpass_root_param_indices;
     // root sig
@@ -118,7 +118,7 @@ bool create_gpass_pso_and_rootsig()
     d3dx::d3d12_root_signature_desc root_sig{ &params[0], idx::count };
     root_sig.Flags &= ~D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
     gpass_root_sig = root_sig.create();
-    LASSERT(gpass_root_sig);
+    assert(gpass_root_sig);
 
     NAME_D3D_OBJ(gpass_root_sig, L"GPass Root Signature");
 

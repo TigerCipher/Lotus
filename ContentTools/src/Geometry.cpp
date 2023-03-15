@@ -67,7 +67,7 @@ void process_normals(mesh& m, f32 angle)
 
     const u32 num_indices  = (u32) m.raw_indices.size();
     const u32 num_vertices = (u32) m.positions.size();
-    LASSERT(num_indices && num_vertices);
+    assert(num_indices && num_vertices);
     m.indices.resize(num_indices);
 
     utl::vector<utl::vector<u32>> index_ref(num_vertices);
@@ -125,7 +125,7 @@ void process_uvs(mesh& m)
 
     const u32 num_verts   = (u32) old_verts.size();
     const u32 num_indices = (u32) old_indices.size();
-    LASSERT(num_verts && num_indices);
+    assert(num_verts && num_indices);
 
     utl::vector<utl::vector<u32>> index_ref(num_verts);
     for (u32 i = 0; i < num_indices; ++i)
@@ -184,7 +184,7 @@ u64 get_vertex_element_size(elements::elements_type::type elements_type)
 void pack_vertices(mesh& m)
 {
     const u32 num_verts = (u32) m.vertices.size();
-    LASSERT(num_verts);
+    assert(num_verts);
 
     m.position_buffer.resize(sizeof(vec3) * num_verts);
     vec3* const position_buffer = (vec3* const) m.position_buffer.data();
@@ -440,7 +440,7 @@ void determine_elements_type(mesh& m)
 
 void process_vertices(mesh& m, const geometry_import_settings& settings)
 {
-    LASSERT(m.raw_indices.size() % 3 == 0);
+    assert(m.raw_indices.size() % 3 == 0);
     if (settings.calculate_normals || m.normals.empty())
     {
         recalculate_normals(m);
@@ -461,9 +461,9 @@ u64 get_mesh_size(const mesh& m)
 {
     const u64 num_verts            = m.vertices.size();
     const u64 position_buffer_size = m.position_buffer.size();
-    LASSERT(position_buffer_size == sizeof(vec3) * num_verts);
+    assert(position_buffer_size == sizeof(vec3) * num_verts);
     const u64 element_buffer_size = m.element_buffer.size();
-    LASSERT(element_buffer_size == get_vertex_element_size(m.elements_type) * num_verts);
+    assert(element_buffer_size == get_vertex_element_size(m.elements_type) * num_verts);
     const u64     index_size        = num_verts < (1 << 16) ? sizeof(u16) : sizeof(u32);
     const u64     index_buffer_size = index_size * m.indices.size();
     constexpr u64 size32            = sizeof(u32);
@@ -528,10 +528,10 @@ void pack_mesh_data(const mesh& m, utl::blob_stream_writer& blob)
     // LOD threshold
     blob.write(m.lod_threshold);
     // position buffer
-    LASSERT(m.position_buffer.size() == sizeof(vec3) * num_vertices);
+    assert(m.position_buffer.size() == sizeof(vec3) * num_vertices);
     blob.write(m.position_buffer.data(), m.position_buffer.size());
     // element buffer
-    LASSERT(m.element_buffer.size() == elements_size * num_vertices);
+    assert(m.element_buffer.size() == elements_size * num_vertices);
     blob.write(m.element_buffer.data(), m.element_buffer.size());
     // index data
     const u32        index_buffer_size = index_size * num_indices;
@@ -655,7 +655,7 @@ void pack_data(const scene& scene, scene_data& data)
     const u64     scene_size = get_scene_size(scene);
     data.buffer_size         = (u32) scene_size;
     data.buffer              = (u8*) CoTaskMemAlloc(scene_size);
-    LASSERT(data.buffer);
+    assert(data.buffer);
 
     utl::blob_stream_writer blob(data.buffer, data.buffer_size);
 
@@ -679,7 +679,7 @@ void pack_data(const scene& scene, scene_data& data)
         }
     }
 
-    LASSERT(scene_size == blob.offset());
+    assert(scene_size == blob.offset());
 }
 
 } // namespace lotus::tools

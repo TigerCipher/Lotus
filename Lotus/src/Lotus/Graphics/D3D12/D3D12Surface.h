@@ -33,7 +33,7 @@ public:
     constexpr static u32         buffer_count{ 3 };
     constexpr static DXGI_FORMAT default_backbuffer_format{ DXGI_FORMAT_R8G8B8A8_UNORM_SRGB };
 
-    explicit d3d12_surface(platform::window window) : m_window(window) { LASSERT(m_window.handle()); }
+    explicit d3d12_surface(platform::window window) : m_window(window) { assert(m_window.handle()); }
 
     ~d3d12_surface() { release(); }
 
@@ -58,7 +58,7 @@ public:
 
     constexpr d3d12_surface& operator=(d3d12_surface&& o)
     {
-        LASSERT(this != &o);
+        assert(this != &o);
         if (this != &o)
         {
             release();

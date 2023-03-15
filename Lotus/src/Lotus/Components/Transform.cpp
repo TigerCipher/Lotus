@@ -46,7 +46,7 @@ vec3 calculate_orientation(vec4 rotation)
 
 component create(const create_info& info, game_entity::entity entity)
 {
-    LASSERT(entity.is_valid());
+    assert(entity.is_valid());
 
     if (const id::id_type ent_index = id::index(entity.get_id()); positions.size() > ent_index)
     {
@@ -57,7 +57,7 @@ component create(const create_info& info, game_entity::entity entity)
         scales[ent_index]    = vec3{info.scale};
     } else
     {
-        LASSERT(positions.size() == ent_index);
+        assert(positions.size() == ent_index);
         rotations.emplace_back(info.rotation);
         orientations.emplace_back(calculate_orientation(vec4{info.rotation}));
         positions.emplace_back(info.position);
@@ -69,7 +69,7 @@ component create(const create_info& info, game_entity::entity entity)
 
 void remove([[maybe_unused]] const component comp)
 {
-    LASSERT(comp.is_valid());
+    assert(comp.is_valid());
 }
 
 
@@ -82,23 +82,23 @@ void remove([[maybe_unused]] const component comp)
 
 vec3 component::position() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return positions[id::index(m_id)];
 }
 vec4 component::rotation() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return rotations[id::index(m_id)];
 }
 vec3 component::scale() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return scales[id::index(m_id)];
 }
 
 vec3 component::orientation() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return orientations[id::index(m_id)];
 }
 

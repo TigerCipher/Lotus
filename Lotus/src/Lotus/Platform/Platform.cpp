@@ -45,7 +45,7 @@ utl::free_list<window_info> windows;
 
 window_info& get_from_id(window_id id)
 {
-    LASSERT(windows[id].hwnd);
+    assert(windows[id].hwnd);
     return windows[id];
 }
 
@@ -65,7 +65,7 @@ LRESULT CALLBACK internal_window_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         const window_id id{ windows.add() };
         windows[id].hwnd = hwnd;
         SetWindowLongPtr(hwnd, GWLP_USERDATA, id);
-        LASSERT(GetLastError() == 0);
+        assert(GetLastError() == 0);
         break;
     }
     case WM_DESTROY: get_from_handle(hwnd).closed = true; break;
@@ -76,7 +76,7 @@ LRESULT CALLBACK internal_window_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
     if (resized && GetAsyncKeyState(VK_LBUTTON) >= 0)
     {
         window_info& info = get_from_handle(hwnd);
-        LASSERT(info.hwnd);
+        assert(info.hwnd);
         GetClientRect(info.hwnd, info.fullscreen ? &info.fullscreen_area : &info.client_area);
         resized = false;
     }
@@ -224,7 +224,7 @@ window create_window(const window_create_info* const info)
 
         if (callback)
             SetWindowLongPtr(winInfo.hwnd, 0, (LONG_PTR) callback);
-        LASSERT(GetLastError() == 0);
+        assert(GetLastError() == 0);
 
         ShowWindow(winInfo.hwnd, SW_SHOWNORMAL);
         UpdateWindow(winInfo.hwnd);
@@ -254,37 +254,37 @@ void remove_window(const window_id id)
 
 void window::set_fullscreen(const bool fullscreen) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     set_window_fullscreen(m_id, fullscreen);
 }
 
 bool window::is_fullscreen() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return is_window_fullscreen(m_id);
 }
 
 void window::set_caption(const wchar_t* caption) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     set_window_caption(m_id, caption);
 }
 
 vec2u window::size() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return get_window_size(m_id);
 }
 
 vec4u window::rect() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return get_window_rect(m_id);
 }
 
 void window::resize(const u32 width, const u32 height) const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     resize_window(m_id, width, height);
 }
 
@@ -300,13 +300,13 @@ u32 window::height() const
 
 bool window::is_closed() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return is_window_closed(m_id);
 }
 
 void* window::handle() const
 {
-    LASSERT(is_valid());
+    assert(is_valid());
     return get_window_handle(m_id);
 }
 
