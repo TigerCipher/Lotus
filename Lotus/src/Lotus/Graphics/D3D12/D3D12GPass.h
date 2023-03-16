@@ -40,7 +40,7 @@ struct opaque_root_parameter
 {
     enum parameter : u32
     {
-        per_frame_data,
+        global_shader_data,
         position_buffer,
         element_buffer,
         srv_indices,
@@ -54,8 +54,8 @@ bool initialize();
 void shutdown();
 
 void set_size(vec2u size);
-void depth_prepass(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info);
-void render(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& info);
+void depth_prepass(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& d3d12_info);
+void render(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& d3d12_info);
 
 void add_transitions_depth_prepass(d3dx::d3d12_resource_barrier& barriers);
 void add_transitions_gpass(d3dx::d3d12_resource_barrier& barriers);

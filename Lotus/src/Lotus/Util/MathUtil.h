@@ -39,22 +39,7 @@ using cvec = DirectX::CXMVECTOR;
 using fmat = DirectX::FXMMATRIX;
 using cmat = DirectX::CXMMATRIX;
 
-// hlsl style naming
-using float2  = DirectX::XMFLOAT2;
-using float2a = DirectX::XMFLOAT2A;
-using float3  = DirectX::XMFLOAT3;
-using float3a = DirectX::XMFLOAT3A;
-using float4  = DirectX::XMFLOAT4;
-using float4a = DirectX::XMFLOAT4A;
-using uint2v  = DirectX::XMUINT2;
-using uint3v  = DirectX::XMUINT3;
-using uint4v  = DirectX::XMUINT4;
-using int2v   = DirectX::XMINT2;
-using int3v   = DirectX::XMINT3;
-using int4v   = DirectX::XMINT4;
-using mat3x3  = DirectX::XMFLOAT3X3;
-using mat4x4  = DirectX::XMFLOAT4X4;
-using mat4x4a = DirectX::XMFLOAT4X4A;
+// hlsl style naming found in Graphics/D3D12/Shaders/SharedTypes.h
 
 // glsl style naming (usually what I prefer)
 using vec2  = DirectX::XMFLOAT2;
@@ -134,7 +119,7 @@ template<u64 Alignment>
 {
     static_assert(Alignment, "Alignment must be non-zero");
     constexpr u64 mask = Alignment - 1;
-    static_assert(!(Alignment & mask),  "Alignment must be a power of 2");
+    static_assert(!(Alignment & mask), "Alignment must be a power of 2");
 
     return (size + mask) & ~mask;
 }
@@ -178,14 +163,14 @@ template<u64 Alignment>
 {
     assert(size >= sizeof(u64));
 
-    u64 crc = 0;
-    const u8* at = data;
+    u64             crc = 0;
+    const u8*       at  = data;
     const u8* const end = data + align_size_down<sizeof(u64)>(size);
 
-    while(at < end)
+    while (at < end)
     {
-        crc = _mm_crc32_u64(crc, *(const u64*)at);
-        at+= sizeof(u64);
+        crc = _mm_crc32_u64(crc, *(const u64*) at);
+        at += sizeof(u64);
     }
 
     return crc;
@@ -214,6 +199,7 @@ inline void store_float3a(vec3a* dest, fvec v) { DirectX::XMStoreFloat3A(dest, v
 inline void store_float4a(vec4a* dest, fvec v) { DirectX::XMStoreFloat4A(dest, v); }
 
 inline void store_float4x4(mat4* dest, fmat m) { DirectX::XMStoreFloat4x4(dest, m); }
+inline void store_float4x4a(mat4a* dest, fmat m) { DirectX::XMStoreFloat4x4A(dest, m); }
 
 inline vec normalize_vec3(fvec v) { return DirectX::XMVector3Normalize(v); }
 inline vec dot_vec3(fvec v1, fvec v2) { return DirectX::XMVector3Dot(v1, v2); }

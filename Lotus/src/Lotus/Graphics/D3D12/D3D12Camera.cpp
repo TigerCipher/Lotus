@@ -228,25 +228,26 @@ d3d12_camera::d3d12_camera(camera_init_info info) :
 
 void d3d12_camera::update()
 {
-    game_entity::entity entity(game_entity::entity_id{m_entity_id});
-    vec3 pos = entity.transform().position();
-    vec3 dir = entity.transform().orientation();
+    game_entity::entity entity(game_entity::entity_id{ m_entity_id });
+    vec3                pos = entity.transform().position();
+    vec3                dir = entity.transform().orientation();
 
-    vec position = math::load_float3(&pos);
-    vec direction = math::load_float3(&dir);
-    m_view = math::look_to_rh(position, direction, m_up);
+    m_position  = math::load_float3(&pos);
+    m_direction = math::load_float3(&dir);
+    m_view      = math::look_to_rh(m_position, m_direction, m_up);
 
-    if(m_is_dirty)
+    if (m_is_dirty)
     {
-        m_projection = m_type == graphics::camera::perspective ? math::perspective_fov_rh(m_fov * dx_pi, m_aspect_ratio, m_near_z, m_far_z) :
-        math::orthographic_rh(m_view_width, m_view_height, m_near_z, m_far_z);
+        m_projection = m_type == graphics::camera::perspective
+                         ? math::perspective_fov_rh(m_fov * dx_pi, m_aspect_ratio, m_near_z, m_far_z)
+                         : math::orthographic_rh(m_view_width, m_view_height, m_near_z, m_far_z);
 
         m_inverse_projection = math::inverse_matrix(nullptr, m_projection);
 
         m_is_dirty = false;
     }
 
-    m_view_projection = math::mul_matrix(m_view, m_projection);
+    m_view_projection         = math::mul_matrix(m_view, m_projection);
     m_inverse_view_projection = math::inverse_matrix(nullptr, m_view_projection);
 }
 

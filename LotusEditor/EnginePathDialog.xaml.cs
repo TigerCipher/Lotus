@@ -40,7 +40,7 @@ namespace LotusEditor
             }else if (path.IndexOfAny(Path.GetInvalidPathChars()) != -1)
             {
                 msgTextBlock.Text = "Illegal characters used";
-            }else if (!Directory.Exists(Path.Combine(path, @"Lotus\src\Lotus\EngineApi\")))
+            }else if (!Directory.Exists(Path.Combine(path, @"Lotus\src\Lotus\API\")))
             {
                 msgTextBlock.Text = "Unable to find the Lotus Engine at the given path";
             }

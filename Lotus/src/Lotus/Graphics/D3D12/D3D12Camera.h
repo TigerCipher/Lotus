@@ -50,6 +50,8 @@ public:
     [[nodiscard]] constexpr mat inverse_view_projection() const { return m_inverse_view_projection; }
 
     [[nodiscard]] constexpr vec up() const { return m_up; }
+    [[nodiscard]] constexpr vec position() const { return m_position; }
+    [[nodiscard]] constexpr vec direction() const { return m_direction; }
     [[nodiscard]] constexpr f32 field_of_view() const { return m_fov; }
     [[nodiscard]] constexpr f32 aspect_ratio() const { return m_aspect_ratio; }
     [[nodiscard]] constexpr f32 view_width() const { return m_view_width; }
@@ -68,6 +70,8 @@ private:
     mat m_inverse_view_projection;
 
     vec m_up;
+    vec m_position;
+    vec m_direction;
 
     union
     {

@@ -100,10 +100,10 @@ u32 surface::height() const
     return gfx.surface.height(m_id);
 }
 
-void surface::render() const
+void surface::render(frame_info info) const
 {
     assert(is_valid());
-    gfx.surface.render(m_id);
+    gfx.surface.render(m_id, info);
 }
 
 

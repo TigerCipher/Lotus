@@ -22,12 +22,14 @@
 // ------------------------------------------------------------------------------
 #include "D3D12Core.h"
 
+#include "D3D12Camera.h"
 #include "D3D12Content.h"
 #include "D3D12Surface.h"
 #include "D3D12Shaders.h"
 #include "D3D12GPass.h"
 #include "D3D12PostProcess.h"
 #include "D3D12Upload.h"
+#include "Shaders/SharedTypes.h"
 
 
 extern "C" {
@@ -286,7 +288,37 @@ void NO_INLINE process_deferred_releases(u32 frame_index)
         resources.clear();
     }
 }
-} // namespace
+
+
+d3d12_frame_info get_d3d12_frame_info(const frame_info& info, constant_buffer& cbuffer, const d3d12_surface& surface,
+                                      u32 frame_index, f32 delta_time)
+{
+    camera::d3d12_camera& camera{ camera::get(info.cam_id) };
+    camera.update();
+    hlsl::GlobalShaderData data{};
+
+    math::store_float4x4a(&data.View, camera.view());
+    math::store_float4x4a(&data.Projection, camera.projection());
+    math::store_float4x4a(&data.InvProjection, camera.inverse_projection());
+    math::store_float4x4a(&data.ViewProjection, camera.view_projection());
+    math::store_float4x4a(&data.InvViewProjection, camera.inverse_view_projection());
+    math::store_float3(&data.CameraPosition, camera.position());
+    math::store_float3(&data.CameraDirection, camera.direction());
+    data.ViewWidth  = (f32) surface.width();
+    data.ViewHeight = (f32) surface.height();
+    data.DeltaTime  = delta_time;
+
+    hlsl::GlobalShaderData* const shader_data{ cbuffer.allocate<hlsl::GlobalShaderData>() };
+    // TODO: cbuffer might be full
+    memcpy(shader_data, &data, sizeof(hlsl::GlobalShaderData));
+
+    d3d12_frame_info d3d12_info{ &info,       &camera,   cbuffer.gpu_address(shader_data), surface.width(), surface.height(),
+                                 frame_index, delta_time };
+
+    return d3d12_info;
+}
+
+} // anonymous namespace
 
 namespace detail
 {
@@ -371,7 +403,7 @@ bool initialize()
 
     for (u32 i{ 0 }; i < frame_buffer_count; ++i)
     {
-        new (&constant_buffers[i]) constant_buffer{ constant_buffer::get_default_init_info(1_MB) };
+        new (&constant_buffers[i]) constant_buffer{ constant_buffer::get_default_init_info(1_MBu) };
         NAME_D3D_OBJ_INDEXED(constant_buffers[i].buffer(), i, L"Global Constant Buffer");
     }
 
@@ -519,7 +551,7 @@ u32 surface_height(surface_id id)
     return surfaces[id].height();
 }
 
-void render_surface(surface_id id)
+void render_surface(surface_id id, frame_info info)
 {
     gfx_command.begin_frame();
     id3d12_graphics_command_list* cmd_list = gfx_command.command_list();
@@ -527,7 +559,7 @@ void render_surface(surface_id id)
     const u32 frame_index = current_frame_index();
 
     // Clear the global constant buffer for the current frame
-    constant_buffer& cbuffer {constant_buffers[frame_index]};
+    constant_buffer& cbuffer{ constant_buffers[frame_index] };
     cbuffer.clear();
 
     if (deferred_releases_flag[frame_index])
@@ -539,8 +571,10 @@ void render_surface(surface_id id)
 
     ID3D12Resource* const current_back_buffer = surface.back_buffer();
 
-    d3d12_frame_info frame_info{ surface.width(), surface.height() };
-    gpass::set_size({ frame_info.surface_width, frame_info.surface_height });
+
+    const d3d12_frame_info d3d12_info{ get_d3d12_frame_info(info, cbuffer, surface, frame_index, 16.7f) };
+
+    gpass::set_size({ d3d12_info.surface_width, d3d12_info.surface_height });
     d3dx::d3d12_resource_barrier& barriers{ resource_barriers };
 
     // Commands
@@ -557,13 +591,13 @@ void render_surface(surface_id id)
     barriers.apply(cmd_list);
 
     gpass::set_render_targets_depth_prepass(cmd_list);
-    gpass::depth_prepass(cmd_list, frame_info);
+    gpass::depth_prepass(cmd_list, d3d12_info);
 
     // Geometry and lighting pass
     gpass::add_transitions_gpass(barriers);
     barriers.apply(cmd_list);
     gpass::set_render_targets_gpass(cmd_list);
-    gpass::render(cmd_list, frame_info);
+    gpass::render(cmd_list, d3d12_info);
 
     // Post processing
     barriers.add(current_back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET,
@@ -571,7 +605,7 @@ void render_surface(surface_id id)
     gpass::add_transitions_post_process(barriers);
     barriers.apply(cmd_list);
 
-    fx::post_process(cmd_list, surface.rtv());
+    fx::post_process(cmd_list, d3d12_info, surface.rtv());
 
     // After post processing
     d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);

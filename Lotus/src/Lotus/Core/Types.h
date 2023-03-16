@@ -86,13 +86,30 @@ constexpr ref<T> create_ref(Args&&... args)
 
 inline auto operator""_KB(const size_t x)
 {
-    return x * 1024;
+    return x * 1024u;
 }
 inline auto operator""_MB(const size_t x)
 {
-    return x * 1024 * 1024;
+    // x * 1024 * 1024
+    return x * 1048576u;
 }
 inline auto operator""_GB(const size_t x)
 {
-    return x * 1024 * 1024 * 1024;
+    // x * 1024 * 1024 * 1024
+    return x * 1073741824u;
+}
+
+inline u32 operator""_KBu(const size_t x)
+{
+    return (u32) x * 1024u;
+}
+inline u32 operator""_MBu(const size_t x)
+{
+    // x * 1024 * 1024
+    return (u32) x * 1048576u;
+}
+inline u32 operator""_GBu(const size_t x)
+{
+    // x * 1024 * 1024 * 1024
+    return (u32) x * 1073741824u;
 }

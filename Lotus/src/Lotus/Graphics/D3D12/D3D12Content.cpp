@@ -261,7 +261,7 @@ id::id_type create_root_signature(material_type::type type, shader_flags::flags 
     {
         using params = gpass::opaque_root_parameter;
         d3dx::d3d12_root_parameter parameters[params::count]{};
-        parameters[params::per_frame_data].as_cbv(D3D12_SHADER_VISIBILITY_ALL, 0);
+        parameters[params::global_shader_data].as_cbv(D3D12_SHADER_VISIBILITY_ALL, 0);
 
         D3D12_SHADER_VISIBILITY buffer_visibility{};
         D3D12_SHADER_VISIBILITY data_visibility{};
@@ -288,8 +288,8 @@ id::id_type create_root_signature(material_type::type type, shader_flags::flags 
 
         parameters[params::position_buffer].as_srv(buffer_visibility, 0);
         parameters[params::element_buffer].as_srv(buffer_visibility, 1);
-        parameters[params::srv_indices].as_srv(D3D12_SHADER_VISIBILITY_PIXEL,
-                                               2); // TODO: Make visible to any stage that needs to sample textures
+        // TODO: Make visible to any stage that needs to sample textures
+        parameters[params::srv_indices].as_srv(D3D12_SHADER_VISIBILITY_PIXEL, 2);
         parameters[params::per_object_data].as_cbv(data_visibility, 1);
 
         root_sig = d3dx::d3d12_root_signature_desc{ &parameters[0], params::count, get_root_signature_flags(flags) }.create();
@@ -502,7 +502,7 @@ void get_views(const id::id_type* const gpu_ids, u32 id_count, const views_cache
 {
     assert(gpu_ids && id_count);
     assert(cache.position_buffers && cache.element_buffers && cache.index_buffer_views && cache.primitive_topologies &&
-            cache.elements_types);
+           cache.elements_types);
 
     std::lock_guard lock(submesh_mutex);
 

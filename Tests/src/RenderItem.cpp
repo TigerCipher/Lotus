@@ -103,7 +103,7 @@ id::id_type create_render_item(id::id_type entity_id)
     create_material();
     id::id_type materials[]{ mtl_id, mtl_id, mtl_id, mtl_id, mtl_id };
 
-    id::id_type item_id = graphics::add_render_item(0, model_id, _countof(materials), &materials[0]);
+    id::id_type item_id = graphics::add_render_item(entity_id, model_id, _countof(materials), &materials[0]);
 
 
     render_item_map[item_id] = entity_id;

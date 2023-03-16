@@ -27,8 +27,8 @@
 
 using namespace lotus;
 
-constexpr u32    numWindows = 4;
-platform::window windows [ numWindows ];
+constexpr u32    num_windows = 4;
+platform::window windows [ num_windows ];
 
 
 LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -71,14 +71,14 @@ class EngineTest : public Test
 public:
     bool Init() override
     {
-        platform::window_create_info info [ numWindows ] {
+        platform::window_create_info info [ num_windows ] {
             { &winproc, nullptr, L"Test Window 1", 100, 100, 400, 800 },
             { &winproc, nullptr, L"Test Window 2", 200, 200, 400, 400 },
             { &winproc, nullptr, L"Test Window 3", 300, 300, 800, 400 },
             { &winproc, nullptr, L"Test Window 4", 400, 400, 800, 600 },
         };
 
-        for (u32 i = 0; i < numWindows; ++i)
+        for (u32 i = 0; i < num_windows; ++i)
         {
             windows [ i ] = platform::create_window(&info [ i ]);
             int w         = windows [ i ].width();

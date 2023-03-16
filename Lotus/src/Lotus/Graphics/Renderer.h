@@ -54,7 +54,7 @@ public:
     [[nodiscard]] u32 width() const;
     [[nodiscard]] u32 height() const;
 
-    void render() const;
+    void render(frame_info info) const;
 
 private:
     surface_id m_id{ id::invalid_id };

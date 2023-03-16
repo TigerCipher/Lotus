@@ -36,5 +36,6 @@ struct create_info
 
 component create(const create_info& info, game_entity::entity entity);
 void      remove(component comp);
+void      get_transform_matrices(const game_entity::entity_id id, mat4& world, mat4& inverse_world);
 
 } // namespace lotus::transform

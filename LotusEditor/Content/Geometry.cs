@@ -442,7 +442,7 @@ namespace LotusEditor.Content
 
                 // Testing
 
-                // PackForEngine();
+                 PackForEngine();
 
 
                 //////////////////
