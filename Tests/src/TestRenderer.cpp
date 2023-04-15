@@ -36,10 +36,37 @@
 
 #include "Lotus/Components/Entity.h"
 #include "Lotus/Components/Transform.h"
+#include "Lotus/Components/Script.h"
 
 #if TEST_RENDERER
 
 using namespace lotus;
+
+
+class rotator_script : public script::scriptable_entity
+{
+public:
+    constexpr explicit rotator_script(game_entity::entity entity) : script::scriptable_entity{ entity } {}
+
+    void on_start() override
+    {
+        
+    }
+    void update(timestep ts) override
+    {
+        m_angle += 0.25f * ts * math::two_pi;
+        if(m_angle > math::two_pi) m_angle -= math::two_pi;
+        vec3a rot{0.0f, m_angle, 0.0f};
+        vec quat{DirectX::XMQuaternionRotationRollPitchYawFromVector(DirectX::XMLoadFloat3A(&rot))};
+        vec4 rot_quat{};
+        DirectX::XMStoreFloat4(&rot_quat, quat);
+        set_rotation(rot_quat);
+    }
+
+private:
+    f32 m_angle{};
+};
+LOTUS_REGISTER_SCRIPT(rotator_script);
 
     // Multithreading
     #define ENABLE_TEST_WORKERS 0

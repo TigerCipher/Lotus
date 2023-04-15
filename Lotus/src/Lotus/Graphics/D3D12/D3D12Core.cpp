@@ -242,6 +242,17 @@ IDXGIAdapter4* determine_main_adapter()
         if (SUCCEEDED(D3D12CreateDevice(adapter, min_feature_level, __uuidof(ID3D12Device), nullptr)))
         {
             LOG_INFO("Found suitable adapter");
+            DXGI_ADAPTER_DESC3 desc;
+            DX_CALL(adapter->GetDesc3(&desc));
+            char buf[128];
+            wcstombs(buf, desc.Description, 128);
+            LOG_INFO("Device: {}", buf);
+            LOG_INFO("Vendor ID: 0x{:0>8X}", desc.VendorId);
+            LOG_INFO("Device ID: 0x{:0>8X}", desc.DeviceId);
+            //LOG_INFO("System Memory: {}", desc.DedicatedSystemMemory);
+            LOG_INFO("Video Memory: {:.2f} GB", desc.DedicatedVideoMemory / 1024.0 / 1024.0 / 1024.0);
+            LOG_INFO("Shared Memory: {:.2f} GB", desc.SharedSystemMemory / 1024.0 / 1024.0 / 1024.0);
+            
             return adapter;
         }
 

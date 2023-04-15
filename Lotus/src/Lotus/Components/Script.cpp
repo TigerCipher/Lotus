@@ -21,6 +21,10 @@
 //
 // ------------------------------------------------------------------------------
 #include "Script.h"
+#include "Entity.h"
+#include "Transform.h"
+
+#define USE_TRANSFORM_CACHE_MAP 1
 
 namespace lotus::script
 {
@@ -35,6 +39,12 @@ utl::vector<id::id_type>        id_mapping;
 utl::vector<id::gen_type>       generations;
 utl::deque<script_id>           free_ids;
 
+utl::vector<transform::component_cache> transform_cache;
+
+#if USE_TRANSFORM_CACHE_MAP
+std::unordered_map<id::id_type, u32> cache_map;
+#endif
+
 script_registry& registry()
 {
     static script_registry reg;
@@ -46,8 +56,7 @@ bool exists(const script_id id)
 {
     assert(id::is_valid(id));
     const id::id_type index = id::index(id);
-    assert((index < generations.size() && id_mapping[index] < entity_scripts.size()) &&
-            generations[index] == id::generation(id));
+    assert((index < generations.size() && id_mapping[index] < entity_scripts.size()) && generations[index] == id::generation(id));
     return (generations[index] == id::generation(id)) && entity_scripts[id_mapping[index]] &&
            entity_scripts[id_mapping[index]]->is_valid();
 }
@@ -57,6 +66,51 @@ utl::vector<std::string>& script_names()
 {
     static utl::vector<std::string> names;
     return names;
+}
+#endif
+
+#if USE_TRANSFORM_CACHE_MAP
+transform::component_cache* const get_cache_ptr(const game_entity::entity* const entity)
+{
+    assert(game_entity::is_alive(entity->get_id()));
+    const transform::transform_id id{ entity->transform().get_id() };
+
+    u32 index{ invalid_id_u32 };
+    const auto [fst, snd]{ cache_map.try_emplace(id, id::invalid_id) };
+
+    if (snd)
+    {
+        index = (u32) transform_cache.size();
+        transform_cache.emplace_back();
+        transform_cache.back().id = id;
+        cache_map[id]             = index;
+    } else
+    {
+        index = cache_map[id];
+    }
+
+    assert(index < transform_cache.size());
+
+    return &transform_cache[index];
+}
+#else
+transform::component_cache* const get_cache_ptr(const game_entity::entity* const entity)
+{
+    assert(game_entity::is_alive(entity->get_id()));
+    const transform::transform_id id{ entity->transform().get_id() };
+
+    for (auto& cache : transform_cache)
+    {
+        if (cache.id == id)
+        {
+            return &cache;
+        }
+    }
+
+    transform_cache.emplace_back();
+    transform_cache.back().id = id;
+
+    return &transform_cache.back();
 }
 #endif
 
@@ -121,12 +175,12 @@ component create(const create_info& info, const game_entity::entity entity)
 void remove(const component comp)
 {
     assert(comp.is_valid() && exists(comp.get_id()));
-    const script_id   id     = comp.get_id();
-    const id::id_type index  = id_mapping[id::index(id)];
+    const script_id   id      = comp.get_id();
+    const id::id_type index   = id_mapping[id::index(id)];
     const script_id   last_id = entity_scripts.back()->script().get_id();
     utl::erase_unordered(entity_scripts, index);
     id_mapping[id::index(last_id)] = index;
-    id_mapping[id::index(id)]     = id::invalid_id;
+    id_mapping[id::index(id)]      = id::invalid_id;
 }
 
 void update_all(timestep ts)
@@ -135,7 +189,46 @@ void update_all(timestep ts)
     {
         scr->update(ts);
     }
+
+    if (!transform_cache.empty())
+    {
+        transform::update(transform_cache.data(), (u32) transform_cache.size());
+        transform_cache.clear();
+#if USE_TRANSFORM_CACHE_MAP
+        cache_map.clear();
+#endif
+    }
 }
+
+// From API/GameEntity.h
+void scriptable_entity::set_rotation(const game_entity::entity* const entity, vec4 rotation_quaternion)
+{
+    transform::component_cache& cache{ *get_cache_ptr(entity) };
+    cache.flags |= transform::component_flags::rotation;
+    cache.rotation = rotation_quaternion;
+}
+
+void scriptable_entity::set_orientation(const game_entity::entity* const entity, vec3 orientation_vector)
+{
+    transform::component_cache& cache{ *get_cache_ptr(entity) };
+    cache.flags |= transform::component_flags::orientation;
+    cache.orientation = orientation_vector;
+}
+
+void scriptable_entity::set_position(const game_entity::entity* const entity, vec3 position)
+{
+    transform::component_cache& cache{ *get_cache_ptr(entity) };
+    cache.flags |= transform::component_flags::position;
+    cache.position = position;
+}
+
+void scriptable_entity::set_scale(const game_entity::entity* const entity, vec3 scale)
+{
+    transform::component_cache& cache{ *get_cache_ptr(entity) };
+    cache.flags |= transform::component_flags::scale;
+    cache.scale = scale;
+}
+
 } // namespace lotus::script
 
 #ifdef L_EDITOR

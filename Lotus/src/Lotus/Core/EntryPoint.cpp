@@ -43,7 +43,7 @@ std::filesystem::path set_current_directory_to_exe_path()
     if (!length || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
         return {};
 
-    std::filesystem::path p = path;
+    const std::filesystem::path p = path;
     std::filesystem::current_path(p.parent_path());
     return std::filesystem::current_path();
 }

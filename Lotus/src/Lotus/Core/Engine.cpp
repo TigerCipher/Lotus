@@ -67,15 +67,20 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 bool engine_initialize()
 {
+    LOG_INFO("Initializing Lotus engine");
+    LOG_INFO("Loading game");
     if (!content::load_game())
         return false;
 
     constexpr platform::window_create_info info{ &winproc, nullptr, L"Lotus Game" };
-
+    LOG_INFO("Setting up platform");
     game_window.window = platform::create_window(&info);
 
     if (!game_window.window.is_valid())
+    {
+        LOG_ERROR("Failed to create window");
         return false;
+    }
 
     return true;
 }
@@ -87,7 +92,9 @@ void engine_update()
 
 void engine_shutdown()
 {
+    LOG_INFO("Shutting down Lotus engine");
     platform::remove_window(game_window.window.get_id());
+    LOG_INFO("Unloading game");
     content::unload_game();
 }
 

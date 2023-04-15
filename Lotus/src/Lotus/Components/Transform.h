@@ -34,8 +34,33 @@ struct create_info
     f32 scale[3]{ 1.0f, 1.0f, 1.0f };
 };
 
+struct component_flags
+{
+    enum flags : u32
+    {
+        rotation    = 0x01,
+        orientation = 0x02,
+        position    = 0x04,
+        scale       = 0x08,
+
+        all = rotation | orientation | position | scale
+    };
+};
+
+struct component_cache
+{
+    vec4         rotation;
+    vec3         orientation;
+    vec3         position;
+    vec3         scale;
+    transform_id id;
+    u32          flags;
+};
+
 component create(const create_info& info, game_entity::entity entity);
 void      remove(component comp);
 void      get_transform_matrices(const game_entity::entity_id id, mat4& world, mat4& inverse_world);
+void      get_updated_components_flags(const game_entity::entity_id* const ids, u32 count, u8* const flags);
+void      update(const component_cache* const cache, u32 count);
 
 } // namespace lotus::transform

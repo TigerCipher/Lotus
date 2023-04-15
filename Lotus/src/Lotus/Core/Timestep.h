@@ -27,12 +27,12 @@ namespace lotus
 class timestep
 {
 public:
-    timestep(const float time = 0.0f) : m_time(time) {}
+    constexpr timestep(const float time = 0.0f) : m_time(time) {}
 
-    operator float() const { return m_time; }
+    constexpr operator float() const { return m_time; }
 
-    [[nodiscard]] float seconds() const { return m_time; }
-    [[nodiscard]] float milliseconds() const { return m_time * 1000.0f; }
+    [[nodiscard]] constexpr float seconds() const { return m_time; }
+    [[nodiscard]] constexpr float milliseconds() const { return m_time * 1000.0f; }
 
 private:
     float m_time;

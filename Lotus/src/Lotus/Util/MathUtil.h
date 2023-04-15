@@ -60,12 +60,13 @@ using mat4a = DirectX::XMFLOAT4X4A;
 
 constexpr f32 dx_pi = DirectX::XM_PI;
 
-constexpr f32 pi      = 3.1415926535897932384626433832795f;
-constexpr f32 two_pi  = 2.0f * pi;
-constexpr f32 epsilon = 1e-5f;
+
 
 namespace lotus::math
 {
+constexpr f32 pi      = 3.1415926535897932384626433832795f;
+constexpr f32 two_pi  = 2.0f * pi;
+constexpr f32 epsilon = 1e-5f;
 
 template<typename T>
 [[nodiscard]] constexpr T clamp(T value, T min, T max)

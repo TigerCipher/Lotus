@@ -34,6 +34,8 @@ utl::vector<vec3> orientations;
 utl::vector<vec3> positions;
 utl::vector<vec3> scales;
 utl::vector<u8>   has_transform;
+utl::vector<u8>   changes_from_previous_frame;
+u8                read_write_flag;
 
 vec3 calculate_orientation(vec4 rotation)
 {
@@ -68,6 +70,34 @@ void calculate_transform_matrices(id::id_type index)
     has_transform[index] = 1;
 }
 
+void set_rotation(transform_id id, const vec4& rotation_quaternion)
+{
+    const u32 index{ id::index(id) };
+    rotations[index]     = rotation_quaternion;
+    orientations[index]  = calculate_orientation(rotation_quaternion);
+    has_transform[index] = 0;
+    changes_from_previous_frame[index] |= component_flags::rotation;
+}
+
+void set_orientation(transform_id, const vec3&) {}
+
+void set_position(transform_id id, const vec3& position)
+{
+    const u32 index{ id::index(id) };
+    positions[index]     = position;
+    has_transform[index] = 0;
+    changes_from_previous_frame[index] |= component_flags::position;
+}
+
+void set_scale(transform_id id, const vec3& scale)
+{
+    const u32 index{ id::index(id) };
+    scales[index]        = scale;
+    has_transform[index] = 0;
+    changes_from_previous_frame[index] |= component_flags::scale;
+}
+
+
 } // anonymous namespace
 
 component create(const create_info& info, game_entity::entity entity)
@@ -77,11 +107,12 @@ component create(const create_info& info, game_entity::entity entity)
     if (const id::id_type ent_index = id::index(entity.get_id()); positions.size() > ent_index)
     {
         const vec4 rotation{ info.rotation };
-        rotations[ent_index]     = rotation;
-        orientations[ent_index]  = calculate_orientation(rotation);
-        positions[ent_index]     = vec3{ info.position };
-        scales[ent_index]        = vec3{ info.scale };
-        has_transform[ent_index] = 0;
+        rotations[ent_index]                   = rotation;
+        orientations[ent_index]                = calculate_orientation(rotation);
+        positions[ent_index]                   = vec3{ info.position };
+        scales[ent_index]                      = vec3{ info.scale };
+        has_transform[ent_index]               = 0;
+        changes_from_previous_frame[ent_index] = (u8) component_flags::all;
     } else
     {
         assert(positions.size() == ent_index);
@@ -92,6 +123,7 @@ component create(const create_info& info, game_entity::entity entity)
         positions.emplace_back(info.position);
         scales.emplace_back(info.scale);
         has_transform.emplace_back((u8) 0);
+        changes_from_previous_frame.emplace_back((u8) component_flags::all);
     }
 
     // returns the entity ID because since every entity has a transform component, the ids are the same
@@ -116,6 +148,53 @@ void get_transform_matrices(const game_entity::entity_id id, mat4& world, mat4& 
 
     world         = to_world[ent_idx];
     inverse_world = inv_world[ent_idx];
+}
+
+void get_updated_components_flags(const game_entity::entity_id* const ids, u32 count, u8* const flags)
+{
+    assert(ids && count && flags);
+    read_write_flag = 1;
+
+
+    for (u32 i = 0; i < count; ++i)
+    {
+        assert(game_entity::entity{ ids[i] }.is_valid());
+        flags[i] = changes_from_previous_frame[id::index(ids[i])];
+    }
+}
+
+void update(const component_cache* const cache, u32 count)
+{
+    assert(cache && count);
+    // NOTE: Clearing changes_from_previous_frame happens once each frame when there will
+    // be no reads and the caches are about to be applied by calling this function -
+    //  -- in other words, the rest of the frame will only have writes
+    if (read_write_flag)
+    {
+        memset(changes_from_previous_frame.data(), 0, changes_from_previous_frame.size());
+        read_write_flag = 0;
+    }
+
+    for (u32 i = 0; i < count; ++i)
+    {
+        const auto& [cached_rotation, cached_orientation, cached_position, cached_scale, cached_id, cached_flags]{ cache[i] };
+        if (cached_flags & component_flags::rotation)
+        {
+            set_rotation(cached_id, cached_rotation);
+        }
+        if (cached_flags & component_flags::orientation)
+        {
+            set_orientation(cached_id, cached_orientation);
+        }
+        if (cached_flags & component_flags::position)
+        {
+            set_position(cached_id, cached_position);
+        }
+        if (cached_flags & component_flags::scale)
+        {
+            set_scale(cached_id, cached_scale);
+        }
+    }
 }
 
 
