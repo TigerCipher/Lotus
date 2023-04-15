@@ -22,7 +22,6 @@
 // ------------------------------------------------------------------------------
 #pragma once
 #include "../Components/Components.h"
-#include "../Core/Timestep.h"
 #include "TransformComponent.h"
 #include "ScriptComponent.h"
 
@@ -57,16 +56,16 @@ private:
 
 namespace script
 {
-class scriptable_entity : public game_entity::entity
+class entity_script : public game_entity::entity
 {
 public:
-    virtual ~scriptable_entity() = default;
+    virtual ~entity_script() = default;
 
     virtual void on_start() {}
-    virtual void update([[maybe_unused]] timestep ts) {}
+    virtual void update([[maybe_unused]] f32 delta) {}
 
 protected:
-    constexpr explicit scriptable_entity(const entity entity) : entity(entity.get_id()) {}
+    constexpr explicit entity_script(const entity entity) : entity(entity.get_id()) {}
 
     void set_rotation(vec4 rotation_quaternion) const { set_rotation(this, rotation_quaternion); }
     void set_orientation(vec3 orientation_vector) const { set_orientation(this, orientation_vector); }
@@ -82,7 +81,7 @@ protected:
 
 namespace detail
 {
-using script_ptr     = scope<scriptable_entity>;
+using script_ptr     = scope<entity_script>;
 using script_creator = script_ptr (*)(game_entity::entity entity);
 
 u8 register_script(size_t tag, script_creator func);

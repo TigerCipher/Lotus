@@ -33,6 +33,6 @@ struct create_info
 
 component create(const create_info& info, game_entity::entity entity);
 void      remove(component comp);
-void      update_all(timestep ts);
+void      update_all(f32 delta);
 
 } // namespace lotus::script

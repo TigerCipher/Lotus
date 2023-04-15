@@ -43,18 +43,18 @@
 using namespace lotus;
 
 
-class rotator_script : public script::scriptable_entity
+class rotator_script : public script::entity_script
 {
 public:
-    constexpr explicit rotator_script(game_entity::entity entity) : script::scriptable_entity{ entity } {}
+    constexpr explicit rotator_script(game_entity::entity entity) : script::entity_script{ entity } {}
 
     void on_start() override
     {
         
     }
-    void update(timestep ts) override
+    void update(f32 delta) override
     {
-        m_angle += 0.25f * ts * math::two_pi;
+        m_angle += 0.25f * delta * math::two_pi;
         if(m_angle > math::two_pi) m_angle -= math::two_pi;
         vec3a rot{0.0f, m_angle, 0.0f};
         vec quat{DirectX::XMQuaternionRotationRollPitchYawFromVector(DirectX::XMLoadFloat3A(&rot))};

@@ -37,7 +37,7 @@ void {0}::on_start()
     // Perform initialization
 }}
 
-void {0}::update(lotus::timestep ts)
+void {0}::update(f32 delta)
 {{
     // Perform logic
 }}
@@ -52,12 +52,12 @@ void {0}::update(lotus::timestep ts)
 namespace {1}
 {{
 
-class {0} : public lotus::script::scriptable_entity
+class {0} : public lotus::script::entity_script
 {{
 public:
-    constexpr explicit {0}(lotus::entity::entity entity) : lotus::script::scriptable_entity(entity) {{}}
+    constexpr explicit {0}(lotus::entity::entity entity) : lotus::script::entity_script{entity} {{}}
     void on_start() override;
-    void update(lotus::timestep ts) override;
+    void update(f32 delta) override;
 private:
 }};
 

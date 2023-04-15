@@ -183,11 +183,11 @@ void remove(const component comp)
     id_mapping[id::index(id)]      = id::invalid_id;
 }
 
-void update_all(timestep ts)
+void update_all(f32 delta)
 {
     for (const auto& scr : entity_scripts)
     {
-        scr->update(ts);
+        scr->update(delta);
     }
 
     if (!transform_cache.empty())
@@ -201,28 +201,28 @@ void update_all(timestep ts)
 }
 
 // From API/GameEntity.h
-void scriptable_entity::set_rotation(const game_entity::entity* const entity, vec4 rotation_quaternion)
+void entity_script::set_rotation(const game_entity::entity* const entity, vec4 rotation_quaternion)
 {
     transform::component_cache& cache{ *get_cache_ptr(entity) };
     cache.flags |= transform::component_flags::rotation;
     cache.rotation = rotation_quaternion;
 }
 
-void scriptable_entity::set_orientation(const game_entity::entity* const entity, vec3 orientation_vector)
+void entity_script::set_orientation(const game_entity::entity* const entity, vec3 orientation_vector)
 {
     transform::component_cache& cache{ *get_cache_ptr(entity) };
     cache.flags |= transform::component_flags::orientation;
     cache.orientation = orientation_vector;
 }
 
-void scriptable_entity::set_position(const game_entity::entity* const entity, vec3 position)
+void entity_script::set_position(const game_entity::entity* const entity, vec3 position)
 {
     transform::component_cache& cache{ *get_cache_ptr(entity) };
     cache.flags |= transform::component_flags::position;
     cache.position = position;
 }
 
-void scriptable_entity::set_scale(const game_entity::entity* const entity, vec3 scale)
+void entity_script::set_scale(const game_entity::entity* const entity, vec3 scale)
 {
     transform::component_cache& cache{ *get_cache_ptr(entity) };
     cache.flags |= transform::component_flags::scale;
