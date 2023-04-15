@@ -30,6 +30,7 @@
 #include "D3D12PostProcess.h"
 #include "D3D12Upload.h"
 #include "Shaders/SharedTypes.h"
+#include "Util/Logger.h"
 
 
 extern "C" {
@@ -240,6 +241,7 @@ IDXGIAdapter4* determine_main_adapter()
         // Pick the first that features minimum feature level
         if (SUCCEEDED(D3D12CreateDevice(adapter, min_feature_level, __uuidof(ID3D12Device), nullptr)))
         {
+            LOG_INFO("Found suitable adapter");
             return adapter;
         }
 
@@ -266,6 +268,7 @@ D3D_FEATURE_LEVEL get_max_feature_level(IDXGIAdapter4* adapter)
     comptr<ID3D12Device> device;
     DX_CALL(D3D12CreateDevice(adapter, min_feature_level, L_PTR(&device)));
     DX_CALL(device->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &feat_level_info, sizeof(feat_level_info)));
+    LOG_INFO("Max supported feature level found");
     return feat_level_info.MaxSupportedFeatureLevel;
 }
 
@@ -312,8 +315,8 @@ d3d12_frame_info get_d3d12_frame_info(const frame_info& info, constant_buffer& c
     // TODO: cbuffer might be full
     memcpy(shader_data, &data, sizeof(hlsl::GlobalShaderData));
 
-    d3d12_frame_info d3d12_info{ &info,       &camera,   cbuffer.gpu_address(shader_data), surface.width(), surface.height(),
-                                 frame_index, delta_time };
+    const d3d12_frame_info d3d12_info{ &info,       &camera,   cbuffer.gpu_address(shader_data), surface.width(), surface.height(),
+                                       frame_index, delta_time };
 
     return d3d12_info;
 }
@@ -336,9 +339,11 @@ bool initialize()
 {
     if (main_device)
         shutdown();
+    LOG_INFO("Initializing DirectX 12 renderer");
 
     u32 dxgi_factory_flags = 0;
 #ifdef L_DEBUG
+    LOG_DEBUG("Setting up d3d12 debug interface");
     {
         comptr<ID3D12Debug3> debug_interface;
         if (SUCCEEDED(D3D12GetDebugInterface(L_PTR(&debug_interface))))
@@ -358,27 +363,31 @@ bool initialize()
         dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
     }
 
-
+    LOG_DEBUG("d3d12 debug interface created");
 #endif
 
+    LOG_TRACE("Creating DXGI factory");
     HRESULT hr = S_OK;
     DX_CALL(hr = CreateDXGIFactory2(dxgi_factory_flags, L_PTR(&dxgi_factory)));
     if (FAILED(hr))
         return failed_init();
 
     // Determine which adapter/gpu to use
+    LOG_TRACE("Finding adapter to use");
     comptr<IDXGIAdapter4> main_adapter;
     main_adapter.Attach(determine_main_adapter());
     if (!main_adapter)
         return failed_init();
 
     // Determine maximum feature level
+    LOG_TRACE("Obtaining max feature level for the chosen adapter");
     const D3D_FEATURE_LEVEL max_feature_level = get_max_feature_level(main_adapter.Get());
     assert(max_feature_level >= min_feature_level);
     if (max_feature_level < min_feature_level)
         return false;
 
     // Create d3d12 device (aka our virtual gpu)
+    LOG_INFO("Creating virtual gpu");
     DX_CALL(hr = D3D12CreateDevice(main_adapter.Get(), max_feature_level, L_PTR(&main_device)));
     if (FAILED(hr))
         return failed_init();
@@ -386,7 +395,7 @@ bool initialize()
 #ifdef L_DEBUG
     {
         comptr<ID3D12InfoQueue> info_queue;
-        DX_CALL(main_device->QueryInterface(IID_PPV_ARGS(&info_queue)));
+        DX_CALL(main_device->QueryInterface(L_PTR(&info_queue)));
         info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
         info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
         info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
@@ -421,7 +430,7 @@ bool initialize()
     NAME_D3D_OBJ(srv_desc_heap.heap(), L"SRV Descriptor Heap");
     NAME_D3D_OBJ(uav_desc_heap.heap(), L"UAV Descriptor Heap");
 
-
+    LOG_INFO("DirectX 12 renderer initialized");
     return true;
 }
 

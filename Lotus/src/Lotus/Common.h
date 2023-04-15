@@ -32,6 +32,7 @@
 // Macros
 
 // Make sure L_DEBUG is defined for debug builds
+// TODO: Really should just use _DEBUG like conventional
 #if !defined(L_DEBUG) && defined(_DEBUG)
     #define L_DEBUG
 #endif
@@ -113,3 +114,20 @@
 #include "Core/Types.h"
 #include "Util/Util.h"
 #include "Util/MathUtil.h"
+#include "Util/Logger.h"
+
+#if defined(_DEBUG) && !defined(L_EDITOR)
+    #define LOG_TRACE(msg, ...) lotus::logger::detail::output(lotus::logger::log_level::trace, std::format(msg, ##__VA_ARGS__))
+    #define LOG_DEBUG(msg, ...) lotus::logger::detail::output(lotus::logger::log_level::debug, std::format(msg, ##__VA_ARGS__))
+    #define LOG_INFO(msg, ...)  lotus::logger::detail::output(lotus::logger::log_level::info, std::format(msg, ##__VA_ARGS__))
+    #define LOG_WARN(msg, ...)  lotus::logger::detail::output(lotus::logger::log_level::warn, std::format(msg, ##__VA_ARGS__))
+    #define LOG_ERROR(msg, ...) lotus::logger::detail::output(lotus::logger::log_level::error, std::format(msg, ##__VA_ARGS__))
+    #define LOG_FATAL(msg, ...) lotus::logger::detail::output(lotus::logger::log_level::fatal, std::format(msg, ##__VA_ARGS__))
+#else
+    #define LOG_TRACE(msg)
+    #define LOG_DEBUG(msg)
+    #define LOG_INFO(msg)
+    #define LOG_WARN(msg)
+    #define LOG_ERROR(msg)
+    #define LOG_FATAL(msg)
+#endif

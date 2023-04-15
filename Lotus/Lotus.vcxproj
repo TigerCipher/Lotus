@@ -252,6 +252,7 @@
     <ClInclude Include="src\Lotus\API\TransformComponent.h" />
     <ClInclude Include="src\Lotus\Util\FreeList.h" />
     <ClInclude Include="src\Lotus\Util\IOStream.h" />
+    <ClInclude Include="src\Lotus\Util\Logger.h" />
     <ClInclude Include="src\Lotus\Util\MathUtil.h" />
     <ClInclude Include="src\Lotus\Util\Util.h" />
     <ClInclude Include="src\Lotus\Util\Vector.h" />
@@ -277,6 +278,7 @@
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Surface.cpp" />
     <ClCompile Include="src\Lotus\Graphics\Renderer.cpp" />
     <ClCompile Include="src\Lotus\Platform\Platform.cpp" />
+    <ClCompile Include="src\Lotus\Util\Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
