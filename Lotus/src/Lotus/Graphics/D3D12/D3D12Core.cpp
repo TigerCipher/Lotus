@@ -32,6 +32,8 @@
 #include "Shaders/SharedTypes.h"
 #include "Util/Logger.h"
 
+#define ENABLE_GPU_VALIDATION 1
+
 
 extern "C" {
 __declspec(dllexport) extern const UINT D3D12SDKVersion = 608;
@@ -360,7 +362,7 @@ bool initialize()
         if (SUCCEEDED(D3D12GetDebugInterface(L_PTR(&debug_interface))))
         {
             debug_interface->EnableDebugLayer();
-    #if 1
+    #if ENABLE_GPU_VALIDATION
         #pragma message("WARNING: GPU_based validation is enabled. This will considerably slow down the renderer!")
             OutputDebugStringA("WARNING: GPU validation is enabled, this will considerably slow down the renderer!\n");
             debug_interface->SetEnableGPUBasedValidation(1);
