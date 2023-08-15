@@ -358,7 +358,7 @@ bool EngineTest::Init()
 void EngineTest::Run()
 {
     timer.begin();
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(10));
     script::update_all(timer.delta_average());
     for (u32 i = 0; i < num_windows; ++i)
     {

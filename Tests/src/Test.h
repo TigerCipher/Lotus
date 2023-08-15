@@ -51,7 +51,7 @@ public:
     using clock = std::chrono::high_resolution_clock;
     using time_stamp = std::chrono::steady_clock::time_point;
 
-    constexpr f32 delta_average() const { return m_delta_average * 1e-3f; }
+    constexpr f32 delta_average() const { return m_delta_average * 1e-6f; }
 
     void begin()
     {
@@ -61,25 +61,25 @@ public:
     void end()
     {
         auto dt = clock::now() - m_start;
-        m_avg_ms += ((f32)std::chrono::duration_cast<std::chrono::milliseconds>(dt).count() - m_avg_ms) / (f32)m_counter;
+        m_avg_us += ((f32)std::chrono::duration_cast<std::chrono::microseconds>(dt).count() - m_avg_us) / (f32)m_counter;
         ++m_counter;
-        m_delta_average = m_avg_ms;
+        m_delta_average = m_avg_us;
 
         if(std::chrono::duration_cast<std::chrono::seconds>(clock::now() - m_seconds).count() >= 1)
         {
             OutputDebugStringA("Avg. Frame (ms): ");
-            OutputDebugStringA(std::to_string(m_avg_ms).c_str());
+            OutputDebugStringA(std::to_string(m_avg_us * 0.001f).c_str());
             OutputDebugStringA((" " + std::to_string(m_counter)).c_str());
             OutputDebugStringA(" fps");
             OutputDebugStringA("\n");
-            m_avg_ms = 0.0f;
+            m_avg_us = 0.0f;
             m_counter = 1;
             m_seconds = clock::now();
         }
     }
 
 private:
-    f32 m_avg_ms{0.0f};
+    f32 m_avg_us{0.0f};
     f32 m_delta_average{ 16.7f };
     i32 m_counter{1};
 
