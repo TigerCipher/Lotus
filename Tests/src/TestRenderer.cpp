@@ -55,7 +55,10 @@ public:
     void update(f32 delta) override
     {
         m_angle += 0.25f * delta * math::two_pi;
-        if(m_angle > math::two_pi) m_angle -= math::two_pi;
+        if (m_angle > math::two_pi)
+        {
+            m_angle -= math::two_pi;
+        }
         vec3a rot{0.0f, m_angle, 0.0f};
         vec quat{DirectX::XMQuaternionRotationRollPitchYawFromVector(DirectX::XMLoadFloat3A(&rot))};
         vec4 rot_quat{};
@@ -212,33 +215,41 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-game_entity::entity create_one_entity(bool is_camera = false)
+game_entity::entity create_one_entity(vec3 position, vec3 rotation, bool rotates)
 {
     transform::create_info transform_info{};
-    vec3a                  rot{ 0, is_camera ? 3.14f : 0.0f, 0 };
-    vec                    quat = math::quat_rotation_roll_pitch_yaw_from_vec(math::load_float3a(&rot));
+    vec                    quat = math::quat_rotation_roll_pitch_yaw_from_vec(math::load_float3(&rotation));
     vec4a                  rot_quat;
     math::store_float4a(&rot_quat, quat);
     memcpy(&transform_info.rotation[0], &rot_quat.x, sizeof(transform_info.rotation));
+    memcpy(&transform_info.position[0], &position.x, sizeof(transform_info.position));
 
-    if (is_camera)
+    script::create_info script_info{};
+    if (rotates)
     {
-        transform_info.position[1] = 1.0f;
-        transform_info.position[2] = 3.0f;
+        script_info.script_creator = script::detail::get_script_creator(string_hash()("rotator_script"));
+        assert(script_info.script_creator);
     }
+
 
     game_entity::create_info entity_info{};
     entity_info.transform = &transform_info;
+    entity_info.script    = &script_info;
     game_entity::entity ent(game_entity::create(entity_info));
     assert(ent.is_valid());
     return ent;
+}
+
+void remove_game_entity(game_entity::entity_id id)
+{
+    game_entity::remove(id);
 }
 
 void create_camera_surface(camera_surface& surface, platform::window_create_info info)
 {
     surface.surface.window  = platform::create_window(&info);
     surface.surface.surface = graphics::create_surface(surface.surface.window);
-    surface.entity          = create_one_entity(true);
+    surface.entity          = create_one_entity({0.0f, 1.0f, 3.0f}, {0.0f, 3.14f, 0.0f}, false);
     surface.camera          = graphics::create_camera(graphics::perspective_camera_init_info{ surface.entity.get_id() });
     surface.camera.aspect_ratio((f32) surface.surface.window.width() / (f32) surface.surface.window.height());
 }
@@ -315,7 +326,7 @@ bool test_initialize()
     init_test_workers(buffer_test_worker);
 
 
-    item_id = create_render_item(create_one_entity().get_id());
+    item_id = create_render_item(create_one_entity({}, {}, true).get_id());
 
     is_restarting = false;
     return true;
@@ -347,13 +358,21 @@ bool EngineTest::Init()
 void EngineTest::Run()
 {
     timer.begin();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    script::update_all(timer.delta_average());
     for (u32 i = 0; i < num_windows; ++i)
     {
         if (surfaces[i].surface.surface.is_valid())
         {
             f32 threshold{ 10 };
-            surfaces[i].surface.surface.render({ &item_id, &threshold, 1, surfaces[i].camera.get_id() });
+
+            graphics::frame_info info{};
+            info.render_item_ids = &item_id;
+            info.render_item_count = 1;
+            info.thresholds        = &threshold;
+            info.cam_id            = surfaces[i].camera.get_id();
+
+            surfaces[i].surface.surface.render(info);
         }
     }
     timer.end();

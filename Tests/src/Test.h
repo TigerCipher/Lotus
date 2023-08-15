@@ -51,6 +51,8 @@ public:
     using clock = std::chrono::high_resolution_clock;
     using time_stamp = std::chrono::steady_clock::time_point;
 
+    constexpr f32 delta_average() const { return m_delta_average * 1e-3f; }
+
     void begin()
     {
         m_start = clock::now();
@@ -61,6 +63,7 @@ public:
         auto dt = clock::now() - m_start;
         m_avg_ms += ((f32)std::chrono::duration_cast<std::chrono::milliseconds>(dt).count() - m_avg_ms) / (f32)m_counter;
         ++m_counter;
+        m_delta_average = m_avg_ms;
 
         if(std::chrono::duration_cast<std::chrono::seconds>(clock::now() - m_seconds).count() >= 1)
         {
@@ -77,7 +80,8 @@ public:
 
 private:
     f32 m_avg_ms{0.0f};
-    u32 m_counter{0};
+    f32 m_delta_average{ 16.7f };
+    i32 m_counter{1};
 
     time_stamp m_start;
     time_stamp m_seconds{clock::now()};
