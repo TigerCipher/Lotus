@@ -24,7 +24,7 @@
 #include "Entity.h"
 #include "Transform.h"
 
-#define USE_TRANSFORM_CACHE_MAP 1
+#define USE_TRANSFORM_CACHE_MAP 0
 
 namespace lotus::script
 {

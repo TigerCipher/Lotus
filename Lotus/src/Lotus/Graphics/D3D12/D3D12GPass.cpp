@@ -46,7 +46,7 @@ vec2u dimensions{ initial_dimensions };
 
 
 #if L_DEBUG
-constexpr f32 clear_value[4]{ 0.5f, 0.5f, 0.5f, 1.0f };
+constexpr f32 clear_value[4]{ 0.5f, 0.0f, 0.5f, 1.0f };
 #else
 constexpr f32 clear_value[4]{};
 #endif
@@ -175,7 +175,7 @@ bool create_buffers(vec2u size)
         info.initial_state = D3D12_RESOURCE_STATE_DEPTH_READ | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
                              D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
         info.clear_value.Format               = desc.Format;
-        info.clear_value.DepthStencil.Depth   = 1.0f;
+        info.clear_value.DepthStencil.Depth   = 0.0f;
         info.clear_value.DepthStencil.Stencil = 0;
         gpass_depth_buffer                    = d3d12_depth_buffer{ info };
     }
@@ -187,36 +187,14 @@ bool create_buffers(vec2u size)
     return gpass_main_buffer.resource() && gpass_depth_buffer.resource();
 }
 
-
-
-void prepare_render_frame(const d3d12_frame_info& d3d12_info)
-{
-    assert(d3d12_info.info && d3d12_info.camera);
-    assert(d3d12_info.info->render_item_ids && d3d12_info.info->render_item_count);
-    gpass_cache& cache{ frame_cache };
-    cache.clear();
-
-    using namespace content;
-
-    render_item::get_d3d12_render_item_ids(*d3d12_info.info, cache.d3d12_render_item_ids);
-    cache.resize();
-    const u32                      items_count{ cache.size() };
-    const render_item::items_cache items_cache{ cache.items_cache() };
-    render_item::get_items(cache.d3d12_render_item_ids.data(), items_count, items_cache);
-
-    const submesh::views_cache views_cache{ cache.views_cache() };
-    submesh::get_views(items_cache.submesh_gpu_ids, items_count, views_cache);
-
-    const material::materials_cache materials_cache{ cache.materials_cache() };
-    material::get_materials(items_cache.material_ids, items_count, materials_cache);
-}
-
-void fill_per_object_data(constant_buffer& cbuffer, const d3d12_frame_info& d3d12_info)
+void fill_per_object_data(const d3d12_frame_info& d3d12_info)
 {
     const gpass_cache&   cache{ frame_cache };
     const u32            render_items_count{ cache.size() };
     id::id_type          current_entity_id{ id::invalid_id };
     hlsl::PerObjectData* current_data_ptr{ nullptr };
+
+    constant_buffer& cbuffer{ core::cbuffer() };
 
     using namespace DirectX;
     for (u32 i{ 0 }; i < render_items_count; ++i)
@@ -238,6 +216,32 @@ void fill_per_object_data(constant_buffer& cbuffer, const d3d12_frame_info& d3d1
         cache.per_object_data[i] = cbuffer.gpu_address(current_data_ptr);
     }
 }
+
+void prepare_render_frame(const d3d12_frame_info& d3d12_info)
+{
+    assert(d3d12_info.info && d3d12_info.camera);
+    assert(d3d12_info.info->render_item_ids && d3d12_info.info->render_item_count);
+    gpass_cache& cache{ frame_cache };
+    cache.clear();
+
+    using namespace content;
+
+    render_item::get_d3d12_render_item_ids(*d3d12_info.info, cache.d3d12_render_item_ids);
+    cache.resize();
+    const u32                      items_count{ cache.size() };
+    const render_item::items_cache items_cache{ cache.items_cache() };
+    render_item::get_items(cache.d3d12_render_item_ids.data(), items_count, items_cache);
+
+    const submesh::views_cache views_cache{ cache.views_cache() };
+    submesh::get_views(items_cache.submesh_gpu_ids, items_count, views_cache);
+
+    const material::materials_cache materials_cache{ cache.materials_cache() };
+    material::get_materials(items_cache.material_ids, items_count, materials_cache);
+
+    fill_per_object_data(d3d12_info);
+}
+
+
 
 
 void set_root_parameters(id3d12_graphics_command_list* const cmd_list, u32 cache_index)
@@ -290,8 +294,6 @@ void set_size(vec2u size)
 void depth_prepass(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& d3d12_info)
 {
     prepare_render_frame(d3d12_info);
-    constant_buffer& cbuffer{ core::cbuffer() };
-    fill_per_object_data(cbuffer, d3d12_info);
 
     const gpass_cache& cache{ frame_cache };
     const u32          items_count{ cache.size() };
@@ -363,7 +365,7 @@ void render(id3d12_graphics_command_list* cmd_list, const d3d12_frame_info& d3d1
 void set_render_targets_depth_prepass(id3d12_graphics_command_list* cmd_list)
 {
     const D3D12_CPU_DESCRIPTOR_HANDLE dsv{ gpass_depth_buffer.dsv() };
-    cmd_list->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+    cmd_list->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 0.0f, 0, 0, nullptr);
     cmd_list->OMSetRenderTargets(0, nullptr, 0, &dsv);
 }
 

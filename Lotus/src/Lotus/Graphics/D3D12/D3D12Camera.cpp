@@ -238,9 +238,10 @@ void d3d12_camera::update()
 
     if (m_is_dirty)
     {
+        // near and far are swapped because inversed depth in d3d12 renderer
         m_projection = m_type == graphics::camera::perspective
-                         ? math::perspective_fov_rh(m_fov * dx_pi, m_aspect_ratio, m_near_z, m_far_z)
-                         : math::orthographic_rh(m_view_width, m_view_height, m_near_z, m_far_z);
+                         ? math::perspective_fov_rh(m_fov * dx_pi, m_aspect_ratio, m_far_z, m_near_z)
+                         : math::orthographic_rh(m_view_width, m_view_height, m_far_z, m_near_z);
 
         m_inverse_projection = math::inverse_matrix(nullptr, m_projection);
 
