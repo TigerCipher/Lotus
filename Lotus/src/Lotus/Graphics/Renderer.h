@@ -123,8 +123,8 @@ struct perspective_camera_init_info : camera_init_info
         up            = { 0.0f, 1.0f, 0.0f };
         field_of_view = 0.25f;        // 45 degree FOV
         aspect_ratio  = 16.0f / 9.0f; // Will be changed when window(s) are resized
-        near_z        = 0.001f;
-        far_z         = 10000.0f;
+        near_z        = 0.01f;
+        far_z         = 1000.0f;
     }
 };
 
@@ -138,8 +138,8 @@ struct orthographic_camera_init_info : camera_init_info
         up          = { 0.0f, 1.0f, 0.0f };
         view_width  = 1920.0f; // Because 1920x1080 is the more commonly used
         view_height = 1080.0f; // And is a good size for debugging on my 4k monitor
-        near_z      = 0.001f;
-        far_z       = 10000.0f;
+        near_z      = 0.01f;
+        far_z       = 1000.0f;
     }
 };
 
