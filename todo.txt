@@ -6,3 +6,5 @@ Ensure conventions are consistent, in particular to initilizations, i.e `int a =
 Rename DebugDll and ReleaseDll configurations to [Debug|Release]Editor. Lotus project templates will need to be modified as well
 
 Clean up lotus envioronment path set up
+
+Just use directx math directly, no need for those silly wrapper functions
