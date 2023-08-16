@@ -5,7 +5,7 @@
                     xmlns:util="clr-namespace:LotusEditor.Utility.Controls"
                     >
     <Style TargetType="{x:Type Control}" x:Key="LotusBaseControlStyle">
-        <Setter Property="FontSize" Value="18"/>
+        <!--<Setter Property="FontSize" Value="18"/>-->
     </Style>
 
 

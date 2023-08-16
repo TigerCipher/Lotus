@@ -124,10 +124,10 @@
     #define LOG_ERROR(msg, ...) lotus::logger::detail::output(lotus::logger::log_level::error, std::format(msg, ##__VA_ARGS__))
     #define LOG_FATAL(msg, ...) lotus::logger::detail::output(lotus::logger::log_level::fatal, std::format(msg, ##__VA_ARGS__))
 #else
-    #define LOG_TRACE(msg)
-    #define LOG_DEBUG(msg)
-    #define LOG_INFO(msg)
-    #define LOG_WARN(msg)
-    #define LOG_ERROR(msg)
-    #define LOG_FATAL(msg)
+    #define LOG_TRACE(msg, ...)
+    #define LOG_DEBUG(msg, ...)
+    #define LOG_INFO(msg, ...)
+    #define LOG_WARN(msg, ...)
+    #define LOG_ERROR(msg, ...)
+    #define LOG_FATAL(msg, ...)
 #endif

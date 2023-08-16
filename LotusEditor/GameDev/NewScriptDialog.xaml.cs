@@ -55,7 +55,7 @@ namespace {1}
 class {0} : public lotus::script::entity_script
 {{
 public:
-    constexpr explicit {0}(lotus::entity::entity entity) : lotus::script::entity_script{entity} {{}}
+    constexpr explicit {0}(lotus::entity::entity entity) : lotus::script::entity_script{{entity}} {{}}
     void on_start() override;
     void update(f32 delta) override;
 private:
@@ -145,7 +145,7 @@ private:
                 var path = Path.GetFullPath(Path.Combine(Project.Current.Path, scriptPathTextBox.Text.Trim()));
                 var solution = Project.Current.SolutionName;
                 var projName = Project.Current.Name;
-                Logger.Info($"Attemping to create script {name} at {path} for Visual Studio solution {solution} for Project {projName}");
+                Logger.Info($"Attempting to create script {name} at {path} for Visual Studio solution {solution} for Project {projName}");
                 await Task.Run(() => CreateScript(name, path, solution, projName));
             }
             catch (Exception ex)
@@ -174,10 +174,12 @@ private:
 
             using (var sw = File.CreateText(cppName))
             {
+                Debug.WriteLine(String.Format(_cppTemplate, name, _namespace));
                 sw.Write(_cppTemplate, name, _namespace);
             }
             using (var sw = File.CreateText(hName))
             {
+                Debug.WriteLine(String.Format(_hTemplate, name, _namespace));
                 sw.Write(_hTemplate, name, _namespace);
             }
 

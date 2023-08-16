@@ -61,7 +61,7 @@ void recalculate_normals(mesh& m)
 
 void process_normals(mesh& m, f32 angle)
 {
-    const f32  cos_alpha = math::scalar_cos(pi - angle * pi / 180.0f);
+    const f32  cos_alpha = math::scalar_cos(math::pi - angle * math::pi / 180.0f);
     const bool hard      = math::scalar_near_equal(angle, 180.0f);
     const bool soft      = math::scalar_near_equal(angle, 0.0f);
 

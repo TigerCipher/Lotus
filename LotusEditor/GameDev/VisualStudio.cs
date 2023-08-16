@@ -188,7 +188,7 @@ namespace LotusEditor.GameDev
 
                         foreach (EnvDTE.Project project in _vsInstance.Solution.Projects)
                         {
-                            if (!project.UniqueName.Contains(projName)) continue;
+                            if (project is null || !project.UniqueName.Contains(projName)) continue;
                             foreach (var file in files)
                             {
                                 Logger.Info($"Attempting to add {file} to {projName} in {solution}");
