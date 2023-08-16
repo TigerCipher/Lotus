@@ -172,6 +172,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Lights.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\RenderItem.cpp" />
     <ClCompile Include="src\ShaderCompiler.cpp" />

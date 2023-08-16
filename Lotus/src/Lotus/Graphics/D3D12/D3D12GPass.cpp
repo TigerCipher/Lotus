@@ -46,7 +46,8 @@ vec2u dimensions{ initial_dimensions };
 
 
 #if L_DEBUG
-constexpr f32 clear_value[4]{ 0.5f, 0.0f, 0.5f, 1.0f };
+//constexpr f32 clear_value[4]{ 0.5f, 0.0f, 0.5f, 1.0f };
+constexpr f32 clear_value[4]{ 0.5f, 0.5f, 0.5f, 1.0f };
 #else
 constexpr f32 clear_value[4]{};
 #endif

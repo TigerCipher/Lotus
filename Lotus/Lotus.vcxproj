@@ -210,6 +210,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Lotus\API\Light.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="src\Lotus\Components\Components.h" />
     <ClInclude Include="src\Lotus\Components\Entity.h" />
     <ClInclude Include="src\Lotus\Components\Script.h" />
@@ -230,6 +234,10 @@
     </ClInclude>
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Helpers.h" />
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Interface.h" />
+    <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12Light.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="src\Lotus\Graphics\D3D12\D3D12PostProcess.h">
       <SubType>
       </SubType>
@@ -266,6 +274,7 @@
     <ClCompile Include="src\Lotus\Core\EntryPoint.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Camera.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Content.cpp" />
+    <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Light.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Upload.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Core.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12GPass.cpp" />

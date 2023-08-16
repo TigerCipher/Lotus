@@ -25,6 +25,7 @@
 #include "Common.h"
 #include "Platform/Window.h"
 #include "API/Camera.h"
+#include "API/Light.h"
 
 namespace lotus::graphics
 {
@@ -64,6 +65,55 @@ struct render_surface
 {
     platform::window window{};
     surface          surface{};
+};
+
+struct directional_light_params
+{};
+
+struct point_light_params
+{
+    vec3 attenuation;
+    f32  range;
+};
+
+struct spot_light_params
+{
+    vec3 attenuation;
+    f32  range;
+    f32  umbra;    // Umbra angle in radians [0, pi)
+    f32  penumbra; // Penumbra angle in radians [umbra, pi)
+};
+
+struct light_init_info
+{
+    u64         light_set_key{ 0 };
+    id::id_type entity_id{ id::invalid_id };
+    light::type type{};
+    f32         intensity{ 1.0f };
+    vec3        color{ 1.0f, 1.0f, 1.0f };
+
+    union
+    {
+        directional_light_params directional_params;
+        point_light_params       point_params;
+        spot_light_params        spot_params;
+    };
+
+    bool is_enabled{ true };
+};
+
+struct light_parameter
+{
+    enum parameter : u32
+    {
+        is_enabled,
+        intensity,
+        color,
+        type,
+        entity_id,
+
+        count
+    };
 };
 
 struct camera_init_info
@@ -226,6 +276,9 @@ const char* get_engine_shaders_path(graphics_platform platform);
 
 surface create_surface(platform::window window);
 void    remove_surface(surface_id id);
+
+light create_light(light_init_info info);
+void  remove_light(light_id id, u64 light_set_key);
 
 camera create_camera(camera_init_info info);
 void   remove_camera(camera_id id);

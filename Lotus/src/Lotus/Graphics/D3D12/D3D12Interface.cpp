@@ -26,6 +26,7 @@
 #include "D3D12Core.h"
 #include "D3D12Content.h"
 #include "D3D12Camera.h"
+#include "D3D12Light.h"
 
 namespace lotus::graphics::d3d12
 {
@@ -40,6 +41,11 @@ void get_platform_interface(platform_interface& pinterface)
     pinterface.surface.width  = core::surface_width;
     pinterface.surface.height = core::surface_height;
     pinterface.surface.render = core::render_surface;
+
+    pinterface.light.create        = light::create;
+    pinterface.light.remove        = light::remove;
+    pinterface.light.set_parameter = light::set_parameter;
+    pinterface.light.get_parameter = light::get_parameter;
 
     pinterface.camera.create        = camera::create;
     pinterface.camera.remove        = camera::remove;

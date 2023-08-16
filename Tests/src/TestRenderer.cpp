@@ -140,6 +140,9 @@ void test_shutdown();
 id::id_type create_render_item(id::id_type entity_id);
 void        destroy_render_item(id::id_type id);
 
+void generate_lights();
+void remove_lights();
+
 LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
     bool toggle_fullscreen = false;
@@ -215,7 +218,7 @@ LRESULT winproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-game_entity::entity create_one_entity(vec3 position, vec3 rotation, bool rotates)
+game_entity::entity create_one_entity(vec3 position, vec3 rotation, const char* script_name)
 {
     transform::create_info transform_info{};
     vec                    quat = math::quat_rotation_roll_pitch_yaw_from_vec(math::load_float3(&rotation));
@@ -225,9 +228,9 @@ game_entity::entity create_one_entity(vec3 position, vec3 rotation, bool rotates
     memcpy(&transform_info.position[0], &position.x, sizeof(transform_info.position));
 
     script::create_info script_info{};
-    if (rotates)
+    if (script_name)
     {
-        script_info.script_creator = script::detail::get_script_creator(string_hash()("rotator_script"));
+        script_info.script_creator = script::detail::get_script_creator(string_hash()(script_name));
         assert(script_info.script_creator);
     }
 
@@ -249,7 +252,7 @@ void create_camera_surface(camera_surface& surface, platform::window_create_info
 {
     surface.surface.window  = platform::create_window(&info);
     surface.surface.surface = graphics::create_surface(surface.surface.window);
-    surface.entity          = create_one_entity({0.0f, 1.0f, 3.0f}, {0.0f, 3.14f, 0.0f}, false);
+    surface.entity          = create_one_entity({0.0f, 1.0f, 3.0f}, {0.0f, 3.14f, 0.0f}, nullptr);
     surface.camera          = graphics::create_camera(graphics::perspective_camera_init_info{ surface.entity.get_id() });
     surface.camera.aspect_ratio((f32) surface.surface.window.width() / (f32) surface.surface.window.height());
 }
@@ -326,14 +329,15 @@ bool test_initialize()
     init_test_workers(buffer_test_worker);
 
 
-    item_id = create_render_item(create_one_entity({}, {}, true).get_id());
-
+    item_id = create_render_item(create_one_entity({}, {}, "rotator_script").get_id());
+    generate_lights();
     is_restarting = false;
     return true;
 }
 
 void test_shutdown()
 {
+    remove_lights();
     destroy_render_item(item_id);
     join_test_workers();
 

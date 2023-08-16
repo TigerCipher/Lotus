@@ -102,7 +102,7 @@ public:
 
 
 private:
-    constexpr bool already_removed(u32 id)
+    constexpr bool already_removed(u32 id) const
     {
         if constexpr (sizeof(T) > sizeof(u32))
         {

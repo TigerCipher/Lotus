@@ -106,6 +106,14 @@ void surface::render(frame_info info) const
     gfx.surface.render(m_id, info);
 }
 
+light create_light(light_init_info info)
+{
+    return gfx.light.create(info);
+}
+void remove_light(light_id id, u64 light_set_key)
+{
+    gfx.light.remove(id, light_set_key);
+}
 
 camera create_camera(camera_init_info info)
 {
@@ -150,6 +158,69 @@ void remove_render_item(id::id_type id)
     gfx.resources.remove_render_item(id);
 }
 
+
+///////////////////////////////////////////// Light Class
+///
+void light::is_enabled(bool enabled) const
+{
+    assert(is_valid());
+    gfx.light.set_parameter(m_id, m_light_set_key, light_parameter::is_enabled, &enabled, sizeof(enabled));
+}
+
+void light::intensity(f32 intensity) const
+{
+    assert(is_valid());
+    gfx.light.set_parameter(m_id, m_light_set_key, light_parameter::intensity, &intensity, sizeof(intensity));
+}
+
+void light::color(vec3 color) const
+{
+    assert(is_valid());
+    gfx.light.set_parameter(m_id, m_light_set_key, light_parameter::color, &color, sizeof(color));
+}
+
+bool light::is_enabled() const
+{
+    assert(is_valid());
+    bool enabled;
+    gfx.light.get_parameter(m_id, m_light_set_key, light_parameter::is_enabled, &enabled, sizeof(enabled));
+    return enabled;
+}
+
+f32 light::intensity() const
+{
+    assert(is_valid());
+    f32 intensity;
+    gfx.light.get_parameter(m_id, m_light_set_key, light_parameter::intensity, &intensity, sizeof(intensity));
+    return intensity;
+}
+
+vec3 light::color() const
+{
+    assert(is_valid());
+    vec3 color;
+    gfx.light.get_parameter(m_id, m_light_set_key, light_parameter::color, &color, sizeof(color));
+    return color;
+}
+
+
+light::type light::light_type() const
+{
+    assert(is_valid());
+    type type;
+    gfx.light.get_parameter(m_id, m_light_set_key, light_parameter::type, &type, sizeof(type));
+    return type;
+}
+
+id::id_type light::entity_id() const
+{
+    assert(is_valid());
+    id::id_type entity_id;
+    gfx.light.get_parameter(m_id, m_light_set_key, light_parameter::entity_id, &entity_id, sizeof(entity_id));
+    return entity_id;
+}
+
+///////////////////////////////////////////// End of Light Class
 
 ///////////////////////////////////////////// Camera Class
 
