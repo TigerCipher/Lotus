@@ -61,24 +61,21 @@ struct engine_shader_info
 constexpr engine_shader_info engine_shader_files[]{
     engine_shader::fullscreen_triangle_vs,
     {
-        "FullscreenTriangle.hlsl",
-        "FullscreenTriangleVS",
-        shader_type::vertex,
-    },
+                              "FullscreenTriangle.hlsl", "FullscreenTriangleVS",
+                              shader_type::vertex,
+                              },
 
     engine_shader::fillcolor_ps,
     {
-        "FillColor.hlsl",
-        "FillColorPS",
-        shader_type::pixel,
-    },
+                              "FillColor.hlsl",          "FillColorPS",
+                              shader_type::pixel,
+                              },
 
     engine_shader::post_process_ps,
     {
-        "PostProcess.hlsl",
-        "PostProcessPS",
-        shader_type::pixel,
-    },
+                              "PostProcess.hlsl",        "PostProcessPS",
+                              shader_type::pixel,
+                              },
 };
 
 static_assert(_countof(engine_shader_files) == engine_shader::count);
@@ -108,7 +105,8 @@ public:
 
     DISABLE_COPY_AND_MOVE(shader_compiler);
 
-    dxc_compiled_shader compile(shader_file_info info, std::filesystem::path full_path)
+    dxc_compiled_shader compile(const shader_file_info& info, const std::filesystem::path& full_path,
+                                lotus::utl::vector<std::wstring>& extra_args)
     {
         assert(m_compiler && m_utils && m_include_handler);
         HRESULT hr{ S_OK };
@@ -121,28 +119,6 @@ public:
             return {};
         assert(src_blob && src_blob->GetBufferSize());
 
-        std::wstring file = utl::to_wstring(info.file_name);
-        std::wstring func = utl::to_wstring(info.function);
-        std::wstring prof = utl::to_wstring(m_profiles[info.type]);
-        std::wstring inc  = utl::to_wstring(shaders_src_path);
-
-        LPCWSTR args[]
-        {
-            file.c_str(),               // shader file name used for error reporting
-                L"-E", func.c_str(),    // Entrypoint function
-                L"-T", prof.c_str(),    // hlsl profile (i.e, vs_6_5)
-                L"-I", inc.c_str(),     // include path
-                L"-enable-16bit-types", // 16 bit integer support
-                DXC_ARG_ALL_RESOURCES_BOUND,
-#if L_DEBUG
-                DXC_ARG_DEBUG, DXC_ARG_SKIP_OPTIMIZATIONS,
-#else
-                DXC_ARG_OPTIMIZATION_LEVEL3,
-#endif
-                DXC_ARG_WARNINGS_ARE_ERRORS,
-                L"-Qstrip_reflect", // reflections go in separate blob
-                L"-Qstrip_debug",   // debug info goes in separate blob
-        };
 
         OutputDebugStringA("======== Compiling ");
         OutputDebugStringA(info.file_name);
@@ -150,19 +126,25 @@ public:
         OutputDebugStringA(info.function);
         OutputDebugStringA("\n");
 
-        return compile(src_blob.Get(), args, _countof(args));
+        return compile(src_blob.Get(), get_args(info, extra_args));
     }
 
-    dxc_compiled_shader compile(IDxcBlobEncoding* src_blob, LPCWSTR* args, u32 num_args)
+    dxc_compiled_shader compile(IDxcBlobEncoding* src_blob, lotus::utl::vector<std::wstring> compiler_args)
     {
         DxcBuffer buffer{};
         buffer.Encoding = DXC_CP_ACP;
         buffer.Ptr      = src_blob->GetBufferPointer();
         buffer.Size     = src_blob->GetBufferSize();
 
+        utl::vector<LPCWSTR> args;
+        for (const auto& arg : compiler_args)
+        {
+            args.emplace_back(arg.c_str());
+        }
+
         HRESULT            hr{ S_OK };
         comptr<IDxcResult> results{ nullptr };
-        DX_CALL(hr = m_compiler->Compile(&buffer, args, num_args, m_include_handler.Get(), L_PTR(&results)));
+        DX_CALL(hr = m_compiler->Compile(&buffer, args.data(), (u32) args.size(), m_include_handler.Get(), L_PTR(&results)));
         if (FAILED(hr))
             return {};
 
@@ -188,7 +170,7 @@ public:
         if (FAILED(hr) || FAILED(status))
             return {};
 
-        comptr<IDxcBlob> hash {nullptr};
+        comptr<IDxcBlob> hash{ nullptr };
         DX_CALL(hr = results->GetOutput(DXC_OUT_SHADER_HASH, L_PTR(&hash), nullptr));
         DxcShaderHash* const hash_buffer = (DxcShaderHash* const) hash->GetBufferPointer();
         assert(!(hash_buffer->Flags & DXC_HASHFLAG_INCLUDES_SOURCE));
@@ -196,7 +178,7 @@ public:
         for (u32 i = 0; i < _countof(hash_buffer->HashDigest); ++i)
         {
             char hash_bytes[3]{};
-            sprintf_s(hash_bytes, "%02x", (u32)hash_buffer->HashDigest[i]);
+            sprintf_s(hash_bytes, "%02x", (u32) hash_buffer->HashDigest[i]);
             OutputDebugStringA(hash_bytes);
             OutputDebugStringA(" ");
         }
@@ -207,7 +189,7 @@ public:
         if (FAILED(hr))
             return {};
 
-        buffer.Ptr = shader->GetBufferPointer();
+        buffer.Ptr  = shader->GetBufferPointer();
         buffer.Size = shader->GetBufferSize();
 
         comptr<IDxcResult> disasm_results{ nullptr };
@@ -216,7 +198,7 @@ public:
         comptr<IDxcBlobUtf8> disassembly{ nullptr };
         DX_CALL(hr = disasm_results->GetOutput(DXC_OUT_DISASSEMBLY, L_PTR(&disassembly), nullptr));
 
-        dxc_compiled_shader result{shader.Detach(), disassembly.Detach()};
+        dxc_compiled_shader result{ shader.Detach(), disassembly.Detach() };
         memcpy(&result.hash.HashDigest[0], &hash_buffer->HashDigest[0], _countof(hash_buffer->HashDigest));
 
         return result;
@@ -227,10 +209,38 @@ private:
     comptr<IDxcUtils>          m_utils{ nullptr };
     comptr<IDxcIncludeHandler> m_include_handler{ nullptr };
 
-    constexpr static const char* m_profiles[]{
-        "vs_6_6", "hs_6_6", "ds_6_6", "gs_6_6", "ps_6_6", "cs_6_6", "as_6_6", "ms_6_6"
-    };
+    constexpr static const char* m_profiles[]{ "vs_6_6", "hs_6_6", "ds_6_6", "gs_6_6", "ps_6_6", "cs_6_6", "as_6_6", "ms_6_6" };
     static_assert(_countof(m_profiles) == shader_type::count);
+
+    utl::vector<std::wstring> get_args(const shader_file_info& info, utl::vector<std::wstring>& extra_args)
+    {
+        utl::vector<std::wstring> args{};
+        args.emplace_back(utl::to_wstring(info.file_name)); // Optional source file name for error reporting
+        args.emplace_back(L"-E");
+        args.emplace_back(utl::to_wstring(info.function)); // Shader's entry function
+        args.emplace_back(L"-T");
+        args.emplace_back(utl::to_wstring(m_profiles[(u32) info.type])); // Target profile
+        args.emplace_back(L"-I");
+        args.emplace_back(utl::to_wstring(shaders_src_path)); // Include path
+        args.emplace_back(L"-enable-16bit-types");            // 16 bit integer support
+        args.emplace_back(DXC_ARG_ALL_RESOURCES_BOUND);
+#if L_DEBUG
+        args.emplace_back(DXC_ARG_DEBUG);
+        args.emplace_back(DXC_ARG_SKIP_OPTIMIZATIONS);
+#else
+        args.emplace_back(DXC_ARG_OPTIMIZATION_LEVEL3);
+#endif
+        args.emplace_back(DXC_ARG_WARNINGS_ARE_ERRORS);
+        args.emplace_back(L"-Qstrip_reflect"); // reflections go in separate blob
+        args.emplace_back(L"-Qstrip_debug");   // debug info goes in separate blob
+
+        for (const auto& arg : extra_args)
+        {
+            args.emplace_back(arg.c_str());
+        }
+
+        return args;
+    }
 };
 
 decltype(auto) get_engine_shaders_path()
@@ -249,7 +259,7 @@ bool compiled_shaders_are_updated()
     for (u32 i = 0; i < engine_shader::count; ++i)
     {
         auto& info = engine_shader_files[i];
-        full_path       = shaders_src_path;
+        full_path  = shaders_src_path;
         full_path += info.info.file_name;
 
         if (!std::filesystem::exists(full_path))
@@ -277,7 +287,7 @@ bool save_compiled_shaders(utl::vector<dxc_compiled_shader>& shaders)
         return false;
     }
 
-    for (auto& shader : shaders)
+    for (const auto& shader : shaders)
     {
         const D3D12_SHADER_BYTECODE byte_code{ shader.byte_code->GetBufferPointer(), shader.byte_code->GetBufferSize() };
         file.write((char*) &byte_code.BytecodeLength, sizeof(byte_code.BytecodeLength));
@@ -293,25 +303,25 @@ bool save_compiled_shaders(utl::vector<dxc_compiled_shader>& shaders)
 } // anonymous namespace
 
 
-scope<u8[]> compile_shader(shader_file_info info, const char* file_path)
+scope<u8[]> compile_shader(shader_file_info info, const char* file_path, lotus::utl::vector<std::wstring>& extra_args)
 {
     std::filesystem::path full_path(file_path);
     full_path += info.file_name;
-    if(!std::filesystem::exists(full_path)) return {};
+    if (!std::filesystem::exists(full_path))
+        return {};
 
-    shader_compiler compiler{};
-    dxc_compiled_shader compiled_shader{compiler.compile(info, full_path)};
+    shader_compiler           compiler{};
+    const dxc_compiled_shader compiled_shader{ compiler.compile(info, full_path, extra_args) };
 
-    if (compiled_shader.byte_code && compiled_shader.byte_code->GetBufferPointer() &&
-        compiled_shader.byte_code->GetBufferSize())
+    if (compiled_shader.byte_code && compiled_shader.byte_code->GetBufferPointer() && compiled_shader.byte_code->GetBufferSize())
     {
         static_assert(content::compiled_shader::hash_length == _countof(DxcShaderHash::HashDigest));
         const u64 buffer_size = sizeof(u64) + content::compiled_shader::hash_length + compiled_shader.byte_code->GetBufferSize();
-        scope<u8[]> buffer = create_scope<u8[]>(buffer_size);
+        scope<u8[]>             buffer = create_scope<u8[]>(buffer_size);
         utl::blob_stream_writer blob(buffer.get(), buffer_size);
         blob.write(compiled_shader.byte_code->GetBufferSize());
         blob.write(compiled_shader.hash.HashDigest, content::compiled_shader::hash_length);
-        blob.write((u8*)compiled_shader.byte_code->GetBufferPointer(), compiled_shader.byte_code->GetBufferSize());
+        blob.write((u8*) compiled_shader.byte_code->GetBufferPointer(), compiled_shader.byte_code->GetBufferSize());
 
         assert(blob.offset() == buffer_size);
         return buffer;
@@ -338,9 +348,12 @@ bool compile_shaders()
         if (!std::filesystem::exists(full_path))
             return false;
 
-        dxc_compiled_shader compiled_shader{ compiler.compile(info.info, full_path) };
+        utl::vector<std::wstring> extra_args{};
 
-        if (compiled_shader.byte_code && compiled_shader.byte_code->GetBufferPointer() && compiled_shader.byte_code->GetBufferSize())
+        dxc_compiled_shader compiled_shader{ compiler.compile(info.info, full_path, extra_args) };
+
+        if (compiled_shader.byte_code && compiled_shader.byte_code->GetBufferPointer() &&
+            compiled_shader.byte_code->GetBufferSize())
         {
             shaders.emplace_back(std::move(compiled_shader));
         } else

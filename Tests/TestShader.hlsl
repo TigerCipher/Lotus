@@ -62,10 +62,10 @@ VertexOut TestShaderVS(in uint VertexIdx : SV_VertexID)
     float4 position = float4(VertexPositions[VertexIdx], 1.0f);
     float4 worldPos = mul(PerObjectBuffer.World, position);
 
-#if ELEMENT_TYPE == ElementsTypeStaticNormal
+#if ELEMENTS_TYPE == ElementsTypeStaticNormal
     VertexElement element = Elements[VertexIdx];
     float2 nXY = element.Normal * InvIntervals - 1.0f;
-    float signs = (element.ColorTSign >> 24) & 0xff;
+    uint signs = (element.ColorTSign >> 24) & 0xff;
 
     float nsign = float(signs & 0x02) - 1;
     float3 normal = float3(nXY.x, nXY.y, sqrt(saturate(1.0f - dot(nXY, nXY))) * nsign);
@@ -75,10 +75,10 @@ VertexOut TestShaderVS(in uint VertexIdx : SV_VertexID)
     vsOut.WorldNormal = mul(float4(normal, 0.0f), PerObjectBuffer.InvWorld).xyz;
     vsOut.WorldTangent = 0.0f;
     vsOut.UV = 0.0f;
-#elif ELEMENT_TYPE == ElementsTypeStaticNormalTexture
+#elif ELEMENTS_TYPE == ElementsTypeStaticNormalTexture
     VertexElement element = Elements[VertexIdx];
     float2 nXY = element.Normal * InvIntervals - 1.0f;
-    float signs = (element.ColorTSign >> 24) & 0xff;
+    uint signs = (element.ColorTSign >> 24) & 0xff;
 
     float nsign = float(signs & 0x02) - 1;
     float3 normal = float3(nXY.x, nXY.y, sqrt(saturate(1.0f - dot(nXY, nXY))) * nsign);

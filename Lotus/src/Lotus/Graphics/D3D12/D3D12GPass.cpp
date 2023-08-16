@@ -51,6 +51,12 @@ constexpr f32 clear_value[4]{ 0.5f, 0.0f, 0.5f, 1.0f };
 constexpr f32 clear_value[4]{};
 #endif
 
+#if USE_STL_VECTOR
+    #define CONSTEXPR
+#else
+    #define CONSTEXPR constexpr
+#endif
+
 struct gpass_cache
 {
     utl::vector<id::id_type>   d3d12_render_item_ids;
@@ -83,11 +89,11 @@ struct gpass_cache
         return { root_signatures, material_types };
     }
 
-    [[nodiscard]] constexpr u32 size() const { return (u32) d3d12_render_item_ids.size(); }
+    [[nodiscard]] CONSTEXPR u32 size() const { return (u32) d3d12_render_item_ids.size(); }
 
-    constexpr void clear() { d3d12_render_item_ids.clear(); }
+    CONSTEXPR void clear() { d3d12_render_item_ids.clear(); }
 
-    constexpr void resize()
+    CONSTEXPR void resize()
     {
         const u64 items_count{ d3d12_render_item_ids.size() };
         const u64 new_buffer_size{ items_count * struct_size };
@@ -135,6 +141,8 @@ private:
 
     utl::vector<u8> m_buffer;
 } frame_cache;
+
+#undef CONSTEXPR
 
 bool create_buffers(vec2u size)
 {
@@ -242,8 +250,6 @@ void prepare_render_frame(const d3d12_frame_info& d3d12_info)
 }
 
 
-
-
 void set_root_parameters(id3d12_graphics_command_list* const cmd_list, u32 cache_index)
 {
     const gpass_cache& cache{ frame_cache };
@@ -318,8 +324,8 @@ void depth_prepass(id3d12_graphics_command_list* cmd_list, const d3d12_frame_inf
 
         set_root_parameters(cmd_list, i);
 
-        const D3D12_INDEX_BUFFER_VIEW& ibv{cache.index_buffer_views[i]};
-        const u32 index_count{ibv.SizeInBytes >> (ibv.Format == DXGI_FORMAT_R16_UINT ? 1 : 2)};
+        const D3D12_INDEX_BUFFER_VIEW& ibv{ cache.index_buffer_views[i] };
+        const u32                      index_count{ ibv.SizeInBytes >> (ibv.Format == DXGI_FORMAT_R16_UINT ? 1 : 2) };
 
         cmd_list->IASetIndexBuffer(&ibv);
         cmd_list->IASetPrimitiveTopology(cache.primitive_topologies[i]);

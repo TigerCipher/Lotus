@@ -339,9 +339,17 @@ id::id_type create_pso_if_needed(const u8* const stream_ptr, u64 aligned_stream_
     }
 }
 
+#pragma intrinsic(_BitScanForward)
+shader_type::type get_shader_type(u32 flag)
+{
+    assert(flag);
+    ulong index;
+    _BitScanForward(&index, flag);
+    return (shader_type::type) index;
+}
+
 pso_id create_pso(id::id_type material_id, D3D12_PRIMITIVE_TOPOLOGY primitive_topology, [[maybe_unused]] u32 elements_type)
 {
-
     constexpr u64 aligned_stream_size = math::align_size_up<sizeof(u64)>(sizeof(d3dx::d3d12_pipeline_state_subobject_stream));
     auto const    stream_ptr          = (u8* const) alloca(aligned_stream_size);
     ZeroMemory(stream_ptr, aligned_stream_size);
@@ -372,7 +380,8 @@ pso_id create_pso(id::id_type material_id, D3D12_PRIMITIVE_TOPOLOGY primitive_to
         {
             if (flags & (1 << i))
             {
-                const lotus::content::compiled_shader_ptr shader{ lotus::content::get_shader(material.shader_ids()[shader_idx]) };
+                const u32 key{ get_shader_type(flags & (1 << i)) == shader_type::vertex ? elements_type : invalid_id_u32 };
+                const lotus::content::compiled_shader_ptr shader{ lotus::content::get_shader(material.shader_ids()[shader_idx], key) };
                 assert(shader);
                 shaders[i].pShaderBytecode = shader->byte_code();
                 shaders[i].BytecodeLength  = shader->byte_code_size();

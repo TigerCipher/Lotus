@@ -54,7 +54,7 @@ bool load_engine_shaders()
         if (!result)
             break;
         shader = reinterpret_cast<const content::compiled_shader_ptr>(&engine_shaders_blob[offset]);
-        offset += sizeof(u64) + content::compiled_shader::hash_length + shader->byte_code_size();
+        offset += shader->buffer_size();
         ++idx;
     }
 

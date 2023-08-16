@@ -47,5 +47,5 @@ struct shader_file_info
     shader_type::type type;
 };
 
-scope<u8[]> compile_shader(shader_file_info info, const char* file_path);
+scope<u8[]> compile_shader(shader_file_info info, const char* file_path, lotus::utl::vector<std::wstring>& extra_args);
 bool compile_shaders();

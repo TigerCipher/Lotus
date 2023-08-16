@@ -27,6 +27,7 @@
 
 #if USE_STL_VECTOR
     #include <vector>
+    #include <algorithm>
 namespace lotus::utl
 {
 template<typename T>
