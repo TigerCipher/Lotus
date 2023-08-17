@@ -89,7 +89,7 @@ namespace LotusEditor.Content
     class GeometryImportSettings : ViewModelBase
     {
         private float _smoothingAngle;
-        public float SmoothingAngle { get => _smoothingAngle; set { if (_smoothingAngle == value) return; _smoothingAngle = value; OnPropertyChanged(nameof(SmoothingAngle)); } }
+        public float SmoothingAngle { get => _smoothingAngle; set { if (_smoothingAngle.IsEqual(value)) return; _smoothingAngle = value; OnPropertyChanged(nameof(SmoothingAngle)); } }
 
         private bool _calculateNormals;
         public bool CalculateNormals { get => _calculateNormals; set { if (_calculateNormals == value) return; _calculateNormals = value; OnPropertyChanged(nameof(CalculateNormals)); } }

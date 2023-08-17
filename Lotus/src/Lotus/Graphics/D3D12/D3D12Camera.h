@@ -36,12 +36,12 @@ public:
     void update();
 
     void up(vec3 up);
-    void field_of_view(f32 fov);
-    void aspect_ratio(f32 ratio);
-    void view_width(f32 width);
-    void view_height(f32 height);
-    void near_z(f32 near_z);
-    void far_z(f32 far_z);
+    constexpr void field_of_view(f32 fov);
+    constexpr void aspect_ratio(f32 ratio);
+    constexpr void view_width(f32 width);
+    constexpr void view_height(f32 height);
+    constexpr void near_z(f32 near_z);
+    constexpr void far_z(f32 far_z);
 
     [[nodiscard]] constexpr mat view() const { return m_view; }
     [[nodiscard]] constexpr mat projection() const { return m_projection; }

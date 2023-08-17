@@ -214,15 +214,92 @@ public:
         }
     }
 
+    constexpr bool has_lights() const { return m_owners.size() > 0; }
+
 private:
     utl::free_list<light_owner>                   m_owners;
     utl::vector<light_id>                         m_non_cullable_owners;
     utl::vector<hlsl::DirectionalLightParameters> m_non_cullable_lights;
 };
 
+class d3d12_light_buffer
+{
+public:
+    d3d12_light_buffer() = default;
+
+    CONSTEXPR void update_light_buffers(light_set& set, u64 light_set_key, u32 frame_index)
+    {
+        u32 sizes[light_buffer::count]{};
+        sizes[light_buffer::non_cullable_light] = set.non_cullable_light_count() * sizeof(hlsl::DirectionalLightParameters);
+
+        u32 current_sizes[light_buffer::count]{};
+        current_sizes[light_buffer::non_cullable_light] = m_buffers[light_buffer::non_cullable_light].buffer.size();
+
+        if (current_sizes[light_buffer::non_cullable_light] < sizes[light_buffer::non_cullable_light])
+        {
+            resize_buffer(light_buffer::non_cullable_light, sizes[light_buffer::non_cullable_light], frame_index);
+        }
+
+        set.non_cullable_lights((hlsl::DirectionalLightParameters* const) m_buffers[light_buffer::non_cullable_light].cpu_address,
+                                m_buffers[light_buffer::non_cullable_light].buffer.size());
+        // TODO: Cullable lights
+    }
+
+    constexpr void release()
+    {
+        for (auto& [buffer, cpu_address] : m_buffers)
+        {
+            buffer.release();
+            cpu_address = nullptr;
+        }
+    }
+
+    constexpr D3D12_GPU_VIRTUAL_ADDRESS non_cullable_lights() const
+    {
+        return m_buffers[light_buffer::non_cullable_light].buffer.gpu_address();
+    }
+
+private:
+    struct light_buffer
+    {
+        enum type : u32
+        {
+            non_cullable_light,
+            cullable_light,
+            culling_info,
+            count
+        };
+
+        d3d12_buffer buffer{};
+        u8*          cpu_address{ nullptr };
+    };
+
+    light_buffer m_buffers[light_buffer::count];
+    u64          m_current_light_set_key{ 0 };
+
+    void resize_buffer(light_buffer::type type, u32 size, [[maybe_unused]] u32 frame_index)
+    {
+        assert(type < light_buffer::count);
+        if (!size)
+            return;
+
+        m_buffers[type].buffer.release();
+        m_buffers[type].buffer = d3d12_buffer{ constant_buffer::get_default_init_info(size), true };
+        NAME_D3D_OBJ_INDEXED(m_buffers[type].buffer.buffer(), frame_index,
+                             type == light_buffer::non_cullable_light ? L"Non-Cullable Light Buffer"
+                             : type == light_buffer::cullable_light   ? L"Cullable Light Buffer"
+                                                                      : L"Light Culling Info Buffer");
+
+        D3D12_RANGE range{};
+        DX_CALL(m_buffers[type].buffer.buffer()->Map(0, &range, (void**) (&m_buffers[type].cpu_address)));
+        assert(m_buffers[type].cpu_address);
+    }
+};
+
 #undef CONSTEXPR
 
 std::unordered_map<u64, light_set> light_sets;
+d3d12_light_buffer                 light_buffers[frame_buffer_count];
 
 constexpr void set_is_enabled(light_set& set, light_id id, const void* const data, [[maybe_unused]] u32 size)
 {
@@ -298,6 +375,29 @@ static_assert(_countof(get_functions) == light_parameter::count);
 
 } // anonymous namespace
 
+bool initialize()
+{
+    return true;
+}
+
+void shutdown()
+{
+    // remove all light before shutting down graphics
+    assert([] {
+        bool has_lights{ false };
+        for (const auto& it : light_sets)
+        {
+            has_lights |= it.second.has_lights();
+        }
+        return !has_lights;
+    }());
+
+    for (auto& light_buffer : light_buffers)
+    {
+        light_buffer.release();
+    }
+}
+
 graphics::light create(light_init_info info)
 {
     assert(id::is_valid(info.entity_id));
@@ -306,12 +406,14 @@ graphics::light create(light_init_info info)
 
 void remove(light_id id, u64 light_set_key)
 {
+    assert(light_sets.count(light_set_key));
     light_sets[light_set_key].remove(id);
 }
 
 void set_parameter(light_id id, u64 light_set_key, light_parameter::parameter param, const void* const data, u32 data_size)
 {
     assert(data && data_size);
+    assert(light_sets.count(light_set_key));
     assert(param < light_parameter::count && set_functions[param] != dummy_set);
     set_functions[param](light_sets[light_set_key], id, data, data_size);
 }
@@ -319,6 +421,7 @@ void set_parameter(light_id id, u64 light_set_key, light_parameter::parameter pa
 void get_parameter(light_id id, u64 light_set_key, light_parameter::parameter param, void* const data, u32 data_size)
 {
     assert(data && data_size);
+    assert(light_sets.count(light_set_key));
     assert(param < light_parameter::count);
     get_functions[param](light_sets[light_set_key], id, data, data_size);
 }

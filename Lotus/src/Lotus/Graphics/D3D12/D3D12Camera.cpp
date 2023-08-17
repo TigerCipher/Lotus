@@ -38,7 +38,7 @@ void set_up_vector(d3d12_camera& camera, const void* const data, u32 size)
     camera.up(up_vector);
 }
 
-void set_field_of_view(d3d12_camera& camera, const void* const data, u32 size)
+constexpr void set_field_of_view(d3d12_camera& camera, const void* const data, u32 size)
 {
     assert(camera.projection_type() == graphics::camera::perspective);
     f32 fov = *(f32*) data;
@@ -46,40 +46,40 @@ void set_field_of_view(d3d12_camera& camera, const void* const data, u32 size)
     camera.field_of_view(fov);
 }
 
-void set_aspect_ratio(d3d12_camera& camera, const void* const data, u32 size)
+constexpr void set_aspect_ratio(d3d12_camera& camera, const void* const data, u32 size)
 {
     assert(camera.projection_type() == graphics::camera::perspective);
-    f32 aspect_ratio = *(f32*) data;
+    const f32 aspect_ratio = *(f32*) data;
     assert(sizeof(aspect_ratio) == size);
     camera.aspect_ratio(aspect_ratio);
 }
 
-void set_view_width(d3d12_camera& camera, const void* const data, u32 size)
+constexpr void set_view_width(d3d12_camera& camera, const void* const data, u32 size)
 {
     assert(camera.projection_type() == graphics::camera::orthographic);
-    f32 view_width = *(f32*) data;
+    const f32 view_width = *(f32*) data;
     assert(sizeof(view_width) == size);
     camera.view_width(view_width);
 }
 
-void set_view_height(d3d12_camera& camera, const void* const data, u32 size)
+constexpr void set_view_height(d3d12_camera& camera, const void* const data, u32 size)
 {
     assert(camera.projection_type() == graphics::camera::orthographic);
-    f32 view_height = *(f32*) data;
+    const f32 view_height = *(f32*) data;
     assert(sizeof(view_height) == size);
     camera.view_height(view_height);
 }
 
-void set_near_z(d3d12_camera& camera, const void* const data, u32 size)
+constexpr void set_near_z(d3d12_camera& camera, const void* const data, u32 size)
 {
-    f32 near_z = *(f32*) data;
+    const f32 near_z = *(f32*) data;
     assert(sizeof(near_z) == size);
     camera.near_z(near_z);
 }
 
-void set_far_z(d3d12_camera& camera, const void* const data, u32 size)
+constexpr void set_far_z(d3d12_camera& camera, const void* const data, u32 size)
 {
-    f32 far_z = *(f32*) data;
+    const f32 far_z = *(f32*) data;
     assert(sizeof(far_z) == size);
     camera.far_z(far_z);
 }
@@ -126,7 +126,7 @@ void get_up_vector(d3d12_camera& camera, void* const data, u32 size)
     math::store_float3(up_vector, camera.up());
 }
 
-void get_field_of_view(d3d12_camera& camera, void* const data, u32 size)
+constexpr void get_field_of_view(d3d12_camera& camera, void* const data, u32 size)
 {
     assert(camera.projection_type() == graphics::camera::perspective);
     f32* const fov = (f32* const) data;
@@ -134,7 +134,7 @@ void get_field_of_view(d3d12_camera& camera, void* const data, u32 size)
     *fov = camera.field_of_view();
 }
 
-void get_aspect_ratio(d3d12_camera& camera, void* const data, u32 size)
+constexpr void get_aspect_ratio(d3d12_camera& camera, void* const data, u32 size)
 {
     assert(camera.projection_type() == graphics::camera::perspective);
     f32* const aspect_ratio = (f32* const) data;
@@ -142,7 +142,7 @@ void get_aspect_ratio(d3d12_camera& camera, void* const data, u32 size)
     *aspect_ratio = camera.aspect_ratio();
 }
 
-void get_view_width(d3d12_camera& camera, void* const data, u32 size)
+constexpr void get_view_width(d3d12_camera& camera, void* const data, u32 size)
 {
     assert(camera.projection_type() == graphics::camera::orthographic);
     f32* const view_width = (f32* const) data;
@@ -150,7 +150,7 @@ void get_view_width(d3d12_camera& camera, void* const data, u32 size)
     *view_width = camera.view_width();
 }
 
-void get_view_height(d3d12_camera& camera, void* const data, u32 size)
+constexpr void get_view_height(d3d12_camera& camera, void* const data, u32 size)
 {
     assert(camera.projection_type() == graphics::camera::orthographic);
     f32* const view_height = (f32* const) data;
@@ -158,35 +158,35 @@ void get_view_height(d3d12_camera& camera, void* const data, u32 size)
     *view_height = camera.view_height();
 }
 
-void get_near_z(d3d12_camera& camera, void* const data, u32 size)
+constexpr void get_near_z(d3d12_camera& camera, void* const data, u32 size)
 {
     f32* const near_z = (f32* const) data;
     assert(sizeof(f32) == size);
     *near_z = camera.near_z();
 }
 
-void get_far_z(d3d12_camera& camera, void* const data, u32 size)
+constexpr void get_far_z(d3d12_camera& camera, void* const data, u32 size)
 {
     f32* const far_z = (f32* const) data;
     assert(sizeof(f32) == size);
     *far_z = camera.far_z();
 }
 
-void get_projection_type(d3d12_camera& camera, void* const data, u32 size)
+constexpr void get_projection_type(d3d12_camera& camera, void* const data, u32 size)
 {
-    graphics::camera::type* const type = (graphics::camera::type* const) data;
+    auto* const type = (graphics::camera::type* const) data;
     assert(sizeof(graphics::camera::type) == size);
     *type = camera.projection_type();
 }
 
-void get_entity_id(d3d12_camera& camera, void* const data, u32 size)
+constexpr void get_entity_id(d3d12_camera& camera, void* const data, u32 size)
 {
-    id::id_type* const entity_id = (id::id_type* const) data;
+    auto* const entity_id = (id::id_type* const) data;
     assert(sizeof(id::id_type) == size);
     *entity_id = camera.entity_id();
 }
 
-void dummy_set(d3d12_camera&, const void* const, u32) {}
+constexpr void dummy_set(d3d12_camera&, const void* const, u32) {}
 
 using set_function = void (*)(d3d12_camera&, const void* const, u32);
 using get_function = void (*)(d3d12_camera&, void* const, u32);
@@ -258,21 +258,21 @@ void d3d12_camera::up(vec3 up)
     m_is_dirty = true;
 }
 
-void d3d12_camera::field_of_view(f32 fov)
+constexpr void d3d12_camera::field_of_view(f32 fov)
 {
     assert(m_type == graphics::camera::perspective);
     m_fov      = fov;
     m_is_dirty = true;
 }
 
-void d3d12_camera::aspect_ratio(f32 ratio)
+constexpr void d3d12_camera::aspect_ratio(f32 ratio)
 {
     assert(m_type == graphics::camera::perspective);
     m_aspect_ratio = ratio;
     m_is_dirty     = true;
 }
 
-void d3d12_camera::view_width(f32 width)
+constexpr void d3d12_camera::view_width(f32 width)
 {
     assert(width);
     assert(m_type == graphics::camera::orthographic);
@@ -280,7 +280,7 @@ void d3d12_camera::view_width(f32 width)
     m_is_dirty   = true;
 }
 
-void d3d12_camera::view_height(f32 height)
+constexpr void d3d12_camera::view_height(f32 height)
 {
     assert(height);
     assert(m_type == graphics::camera::orthographic);
@@ -288,13 +288,13 @@ void d3d12_camera::view_height(f32 height)
     m_is_dirty    = true;
 }
 
-void d3d12_camera::near_z(f32 near_z)
+constexpr void d3d12_camera::near_z(f32 near_z)
 {
     m_near_z   = near_z;
     m_is_dirty = true;
 }
 
-void d3d12_camera::far_z(f32 far_z)
+constexpr void d3d12_camera::far_z(f32 far_z)
 {
     m_far_z    = far_z;
     m_is_dirty = true;
