@@ -29,6 +29,7 @@
 #include "D3D12GPass.h"
 #include "D3D12PostProcess.h"
 #include "D3D12Upload.h"
+#include "D3D12Light.h"
 #include "Shaders/SharedTypes.h"
 #include "Util/Logger.h"
 
@@ -320,16 +321,18 @@ d3d12_frame_info get_d3d12_frame_info(const frame_info& info, constant_buffer& c
     math::store_float4x4a(&data.InvViewProjection, camera.inverse_view_projection());
     math::store_float3(&data.CameraPosition, camera.position());
     math::store_float3(&data.CameraDirection, camera.direction());
-    data.ViewWidth  = (f32) surface.width();
-    data.ViewHeight = (f32) surface.height();
-    data.DeltaTime  = delta_time;
+    data.ViewWidth            = (f32) surface.width();
+    data.ViewHeight           = (f32) surface.height();
+    data.NumDirectionalLights = light::non_cullable_light_count(info.light_set_key);
+    data.DeltaTime            = delta_time;
 
     hlsl::GlobalShaderData* const shader_data{ cbuffer.allocate<hlsl::GlobalShaderData>() };
     // TODO: cbuffer might be full
     memcpy(shader_data, &data, sizeof(hlsl::GlobalShaderData));
 
-    const d3d12_frame_info d3d12_info{ &info,       &camera,   cbuffer.gpu_address(shader_data), surface.width(), surface.height(),
-                                       frame_index, delta_time };
+    const d3d12_frame_info d3d12_info{ &info,           &camera,          cbuffer.gpu_address(shader_data),
+                                       surface.width(), surface.height(), frame_index,
+                                       delta_time };
 
     return d3d12_info;
 }
@@ -434,7 +437,8 @@ bool initialize()
         return failed_init();
 
     // Initialize various graphics api sub modules
-    if (!(shaders::initialize() && gpass::initialize() && fx::initialize() && upload::initialize() && content::initialize()))
+    if (!(shaders::initialize() && gpass::initialize() && fx::initialize() && upload::initialize() && content::initialize() &&
+          light::initialize()))
         return failed_init();
 
     NAME_D3D_OBJ(main_device, L"MAIN_DEVICE");
@@ -457,6 +461,7 @@ void shutdown()
     }
 
     // Shutdown the render submodules
+    light::shutdown();
     content::shutdown();
     upload::shutdown();
     fx::shutdown();
@@ -616,6 +621,8 @@ void render_surface(surface_id id, frame_info info)
     gpass::depth_prepass(cmd_list, d3d12_info);
 
     // Geometry and lighting pass
+    light::update_light_buffers(d3d12_info);
+
     gpass::add_transitions_gpass(barriers);
     barriers.apply(cmd_list);
     gpass::set_render_targets_gpass(cmd_list);

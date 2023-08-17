@@ -55,6 +55,8 @@ ConstantBuffer<PerObjectData> PerObjectBuffer : register(b1, space0);
 StructuredBuffer<float3> VertexPositions : register(t0, space0);
 StructuredBuffer<VertexElement> Elements : register(t1, space0);
 
+StructuredBuffer<DirectionalLightParameters> DirectionalLights : register(t3, space0);
+
 VertexOut TestShaderVS(in uint VertexIdx : SV_VertexID)
 {
     VertexOut vsOut;
@@ -89,7 +91,7 @@ VertexOut TestShaderVS(in uint VertexIdx : SV_VertexID)
     vsOut.WorldTangent = 0.0f;
     vsOut.UV = 0.0f;
 #else
-    #undef ELEMENTS_TYPE
+#undef ELEMENTS_TYPE
     vsOut.HomogeneousPosition = mul(PerObjectBuffer.WorldViewProjection, position);
     vsOut.WorldPosition = worldPos.xyz;
     vsOut.WorldNormal = 0.0f;
@@ -104,7 +106,33 @@ VertexOut TestShaderVS(in uint VertexIdx : SV_VertexID)
 PixelOut TestShaderPS(in VertexOut psIn)
 {
     PixelOut psOut;
-    psOut.Color = float4(psIn.WorldNormal, 1.f);
+    
+    float3 normal = normalize(psIn.WorldNormal);
+    float3 viewDir = normalize(GlobalData.CameraPosition - psIn.WorldPosition);
+    
+    float3 color = 0;
+    
+    for (uint i = 0; i < GlobalData.NumDirectionalLights; ++i)
+    {
+        DirectionalLightParameters light = DirectionalLights[i];
+        
+        float3 lightDir = light.Direction;
+        
+        if (abs(lightDir.z - 1.0f) < 0.001f)
+        {
+            lightDir = GlobalData.CameraDirection;
+        }
+        
+        float diffuse = max(dot(normal, -lightDir), 0.0f);
+        float3 reflection = reflect(lightDir, normal);
+        float specular = pow(max(dot(viewDir, reflection), 0.0f), 16) * 0.5f;
+        
+        float3 lightColor = light.Color * light.Intensity;
+        color += (diffuse + specular) * lightColor;
+    }
+    
+    float3 ambient = 10 / 255.0f;
+    psOut.Color = saturate(float4(color + ambient, 1.0f));
 
     return psOut;
 }

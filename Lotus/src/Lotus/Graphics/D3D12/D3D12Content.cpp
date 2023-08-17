@@ -293,6 +293,7 @@ id::id_type create_root_signature(material_type::type type, shader_flags::flags 
         parameters[params::element_buffer].as_srv(buffer_visibility, 1);
         // TODO: Make visible to any stage that needs to sample textures
         parameters[params::srv_indices].as_srv(D3D12_SHADER_VISIBILITY_PIXEL, 2);
+        parameters[params::directional_lights].as_srv(D3D12_SHADER_VISIBILITY_PIXEL, 3);
         parameters[params::per_object_data].as_cbv(data_visibility, 1);
 
         root_sig = d3dx::d3d12_root_signature_desc{ &parameters[0], params::count, get_root_signature_flags(flags) }.create();
