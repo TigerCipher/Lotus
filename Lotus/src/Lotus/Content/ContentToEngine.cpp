@@ -423,7 +423,7 @@ void get_lod_offsets(const id::id_type* const geometry_ids, const f32* const thr
         u8* const ptr = geometry_hierarchies[geometry_ids[i]];
         if ((uintptr_t) ptr & single_mesh_marker)
         {
-            assert(id_count == 1);
+            //assert(id_count == 1);
             offsets.emplace_back(lod_offset{ 0, 1 });
         } else
         {

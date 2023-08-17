@@ -374,7 +374,7 @@ namespace LotusEditor.Content
 
             // Testing purposes only
 
-            using (var fs = new FileStream(@"..\..\Tests\model.model", FileMode.Create))
+            using (var fs = new FileStream(@"..\..\bin\model.model", FileMode.Create))
             {
                 fs.Write(data, 0, data.Length);
             }
