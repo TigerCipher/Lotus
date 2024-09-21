@@ -24,6 +24,7 @@
 #include <Lotus/Components/Entity.h>
 #include <Lotus/Components/Transform.h>
 #include <Lotus/Components/Script.h>
+#include <Lotus/API/Input.h>
 
 using namespace lotus;
 
@@ -110,3 +111,54 @@ private:
 };
 
 LOTUS_REGISTER_SCRIPT(wibbly_wobbly_script);
+
+
+class camera_script : public script::entity_script
+{
+public:
+    explicit camera_script(game_entity::entity entity) : script::entity_script{ entity }
+    {
+        m_input.add_handler(input::input_source::mouse, this, &camera_script::mouse_move);
+        vec3 dir = orientation();
+        f32 theta = DirectX::XMScalarACos(dir.y);
+        f32 phi = std::atan2(-dir.z, dir.x);
+        vec3 rot = {theta - math::half_pi, phi + math::half_pi, 0.0f};
+        m_spherical = DirectX::XMLoadFloat3(&rot);
+    }
+
+    void on_start() override {}
+    void update(f32 delta) override
+    {
+    }
+
+private:
+
+    void mouse_move(input::input_source::type type, input::input_code::code code, const input::input_value& mouse_pos)
+    {
+        if(code == input::input_code::mouse_position)
+        {
+            input::input_value value;
+            input::get(input::input_source::mouse, input::input_code::mouse_left, value);
+            if(value.current.z == 0.0f) return;
+
+            const f32 scale = 0.005f;
+            const f32 dx = (mouse_pos.current.x - mouse_pos.previous.x) * scale;
+            const f32 dy = (mouse_pos.current.y - mouse_pos.previous.y) * scale;
+
+            vec3 spherical;
+            DirectX::XMStoreFloat3(&spherical, m_spherical);
+            spherical.x += dy;
+            spherical.y -= dx;
+            spherical.x = math::clamp(spherical.x, 0.0001f - math::half_pi, math::half_pi - 0.0001f);
+            m_spherical = XMLoadFloat3(&spherical);
+            vec quat = DirectX::XMQuaternionRotationRollPitchYawFromVector(m_spherical);
+            vec4 rot_quat;
+            XMStoreFloat4(&rot_quat, quat);
+            set_rotation(rot_quat);
+        }
+    }
+    
+    input::input_system<camera_script> m_input;
+    vec m_spherical;
+};
+LOTUS_REGISTER_SCRIPT(camera_script);

@@ -65,6 +65,7 @@ constexpr f32 dx_pi = DirectX::XM_PI;
 namespace lotus::math
 {
 constexpr f32 pi      = 3.1415926535897932384626433832795f;
+constexpr f32 half_pi = 0.5f * pi;
 constexpr f32 two_pi  = 2.0f * pi;
 constexpr f32 epsilon = 1e-5f;
 

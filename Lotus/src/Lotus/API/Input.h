@@ -209,7 +209,8 @@ class input_system final : public detail::input_system_base
 public:
     using input_callback_t   = void   (T::*)(input_source::type, input_code::code, const input_value&);
     using binding_callback_t = void (T::*)(u64, const input_value&);
-    void                            add_handler(input_source::type type, T* instance, input_callback_t callback)
+
+    void add_handler(input_source::type type, T* instance, input_callback_t callback)
     {
         assert(instance && callback && type < input_source::count);
         auto& collection = m_input_callbacks[type];
