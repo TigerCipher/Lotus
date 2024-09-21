@@ -22,6 +22,8 @@
 // ------------------------------------------------------------------------------
 #include "Platform.h"
 
+#include "Input/InputWin32.h"
+
 namespace lotus::platform
 {
 
@@ -55,7 +57,7 @@ window_info& get_from_handle(const window_handle handle)
     return get_from_id(id);
 }
 
-LRESULT CALLBACK internal_window_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK internal_window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
     switch (msg)
     {
@@ -69,11 +71,13 @@ LRESULT CALLBACK internal_window_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         break;
     }
     case WM_DESTROY: get_from_handle(hwnd).closed = true; break;
-    case WM_SIZE: resized = (wParam != SIZE_MINIMIZED); break;
+    case WM_SIZE: resized = (wparam != SIZE_MINIMIZED); break;
     default: break;
     }
 
-    if (resized && GetAsyncKeyState(VK_LBUTTON) >= 0)
+    input::process_input_message(hwnd, msg, wparam, lparam);
+
+    if (resized && GetKeyState(VK_LBUTTON) >= 0)
     {
         window_info& info = get_from_handle(hwnd);
         assert(info.hwnd);
@@ -82,7 +86,7 @@ LRESULT CALLBACK internal_window_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
     }
 
     LONG_PTR longptr = GetWindowLongPtr(hwnd, 0);
-    return longptr ? ((window_proc) longptr)(hwnd, msg, wParam, lParam) : DefWindowProc(hwnd, msg, wParam, lParam);
+    return longptr ? ((window_proc) longptr)(hwnd, msg, wparam, lparam) : DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
 

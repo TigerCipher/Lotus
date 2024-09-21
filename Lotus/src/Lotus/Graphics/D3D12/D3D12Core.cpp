@@ -33,7 +33,7 @@
 #include "Shaders/SharedTypes.h"
 #include "Util/Logger.h"
 
-#define ENABLE_GPU_VALIDATION 1
+#define ENABLE_GPU_VALIDATION 0
 
 
 extern "C" {

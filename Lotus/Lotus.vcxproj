@@ -210,6 +210,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Lotus\API\Input.h" />
     <ClInclude Include="src\Lotus\API\Light.h">
       <SubType>
       </SubType>
@@ -252,6 +253,8 @@
     </ClInclude>
     <ClInclude Include="src\Lotus\Graphics\GraphicsPlatformInterface.h" />
     <ClInclude Include="src\Lotus\Graphics\Renderer.h" />
+    <ClInclude Include="src\Lotus\Input\Input.h" />
+    <ClInclude Include="src\Lotus\Input\InputWin32.h" />
     <ClInclude Include="src\Lotus\Platform\Platform.h" />
     <ClInclude Include="src\Lotus\Platform\Window.h" />
     <ClInclude Include="src\Lotus\API\GameEntity.h" />
@@ -285,6 +288,8 @@
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Shaders.cpp" />
     <ClCompile Include="src\Lotus\Graphics\D3D12\D3D12Surface.cpp" />
     <ClCompile Include="src\Lotus\Graphics\Renderer.cpp" />
+    <ClCompile Include="src\Lotus\Input\Input.cpp" />
+    <ClCompile Include="src\Lotus\Input\InputWin32.cpp" />
     <ClCompile Include="src\Lotus\Platform\Platform.cpp" />
     <ClCompile Include="src\Lotus\Util\Logger.cpp" />
   </ItemGroup>
