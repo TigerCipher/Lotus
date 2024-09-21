@@ -119,16 +119,46 @@ public:
     explicit camera_script(game_entity::entity entity) : script::entity_script{ entity }
     {
         m_input.add_handler(input::input_source::mouse, this, &camera_script::mouse_move);
+
+        vec3 pos = position();
+        m_desired_pos = m_pos = DirectX::XMLoadFloat3(&pos);
+        
         vec3 dir = orientation();
         f32 theta = DirectX::XMScalarACos(dir.y);
         f32 phi = std::atan2(-dir.z, dir.x);
         vec3 rot = {theta - math::half_pi, phi + math::half_pi, 0.0f};
-        m_spherical = DirectX::XMLoadFloat3(&rot);
+        m_spherical = m_desired_spherical = DirectX::XMLoadFloat3(&rot);
     }
 
     void on_start() override {}
     void update(f32 delta) override
     {
+        m_dt = delta;
+
+        vec3 move{};
+        
+        input::input_value value;
+        constexpr input::input_source::type kb = input::input_source::keyboard;
+        input::get(kb, input::input_code::key_w, value); move.z += value.current.x;
+        input::get(kb, input::input_code::key_s, value); move.z -= value.current.x;
+        input::get(kb, input::input_code::key_a, value); move.x += value.current.x;
+        input::get(kb, input::input_code::key_d, value); move.x -= value.current.x;
+        input::get(kb, input::input_code::key_q, value); move.y -= value.current.x;
+        input::get(kb, input::input_code::key_e, value); move.y += value.current.x;
+
+        if(!math::is_equal(move, 0.0f))
+        {
+            using namespace DirectX;
+            vec4 rot = rotation();
+            vec d = XMVector3Rotate(XMLoadFloat3(&move) * 0.2f, XMLoadFloat4(&rot));
+            m_desired_pos += d;
+            m_move_pos = true;
+        }
+        
+        if(m_move_rotation || m_move_pos)
+        {
+            seek_camera();
+        }
     }
 
 private:
@@ -139,26 +169,66 @@ private:
         {
             input::input_value value;
             input::get(input::input_source::mouse, input::input_code::mouse_left, value);
-            if(value.current.z == 0.0f) return;
+            if (value.current.z == 0.0f)
+                return;
 
-            const f32 scale = 0.005f;
+            constexpr f32 scale = 0.005f;
             const f32 dx = (mouse_pos.current.x - mouse_pos.previous.x) * scale;
             const f32 dy = (mouse_pos.current.y - mouse_pos.previous.y) * scale;
 
             vec3 spherical;
-            DirectX::XMStoreFloat3(&spherical, m_spherical);
+            DirectX::XMStoreFloat3(&spherical, m_desired_spherical);
             spherical.x += dy;
             spherical.y -= dx;
             spherical.x = math::clamp(spherical.x, 0.0001f - math::half_pi, math::half_pi - 0.0001f);
-            m_spherical = XMLoadFloat3(&spherical);
-            vec quat = DirectX::XMQuaternionRotationRollPitchYawFromVector(m_spherical);
+            m_desired_spherical = XMLoadFloat3(&spherical);
+            m_move_rotation = true;
+        }
+    }
+
+    void seek_camera()
+    {
+        using namespace DirectX;
+        vec orient = m_desired_spherical - m_spherical;
+        vec pos = m_desired_pos - m_pos;
+
+        
+        m_move_rotation = XMVectorGetX(XMVector3Length(orient)) > 1e-4f;
+        m_move_pos = XMVectorGetX(XMVector3Length(pos)) > 1e-4f;
+
+        const f32 scale = 0.2f * m_dt / 0.016667f;
+
+        if(m_move_pos)
+        {
+            m_pos += (pos * scale);
+            vec3 new_pos;
+            XMStoreFloat3(&new_pos, m_pos);
+            set_position(new_pos);
+        }
+
+        if(m_move_rotation)
+        {
+            m_spherical += orient * scale;
+            vec3 new_rot;
+            XMStoreFloat3(&new_rot, m_spherical);
+            new_rot.x = math::clamp(new_rot.x, 0.0001f - math::half_pi, math::half_pi - 0.0001f);
+            m_spherical = XMLoadFloat3(&new_rot);
+            
+            vec quat = XMQuaternionRotationRollPitchYawFromVector(m_spherical);
             vec4 rot_quat;
             XMStoreFloat4(&rot_quat, quat);
             set_rotation(rot_quat);
         }
+
     }
     
     input::input_system<camera_script> m_input;
     vec m_spherical;
+    vec m_desired_spherical;
+    vec m_pos;
+    vec m_desired_pos;
+    bool m_move_rotation{};
+    bool m_move_pos{};
+    f32 m_dt{};
 };
 LOTUS_REGISTER_SCRIPT(camera_script);

@@ -69,6 +69,24 @@ constexpr f32 half_pi = 0.5f * pi;
 constexpr f32 two_pi  = 2.0f * pi;
 constexpr f32 epsilon = 1e-5f;
 
+
+constexpr bool is_equal(f32 a, f32 b, f32 eps = epsilon)
+{
+    f32 diff = a - b;
+    if(diff < 0.0f) diff = -diff;
+    return diff < eps;
+}
+
+constexpr bool is_equal(vec2 v, f32 scalar)
+{
+    return is_equal(v.x, scalar) && is_equal(v.y, scalar);
+}
+
+constexpr bool is_equal(vec3 v, f32 scalar)
+{
+    return is_equal(v.x, scalar) && is_equal(v.y, scalar) && is_equal(v.z, scalar);
+}
+
 template<typename T>
 [[nodiscard]] constexpr T clamp(T value, T min, T max)
 {
