@@ -37,6 +37,7 @@
 #include "Lotus/Components/Entity.h"
 #include "Lotus/Components/Transform.h"
 #include "Lotus/Components/Script.h"
+#include "Lotus/Input/Input.h"
 
 #if TEST_RENDERER
 
@@ -303,12 +304,44 @@ bool test_initialize()
 
     create_render_items();
     generate_lights();
+
+    input::input_source source{};
+    source.binding = string_hash()("move");
+    source.source_type = input::input_source::keyboard;
+    source.code = input::input_code::key_a;
+    source.multiplier = 1.0f;
+    source.axis = input::axis::x;
+    input::bind(source);
+
+    source.code = input::input_code::key_d;
+    source.multiplier = -1.0f;
+    input::bind(source);
+
+    source.code = input::input_code::key_w;
+    source.multiplier = 1.0f;
+    source.axis = input::axis::z;
+    input::bind(source);
+
+    source.code = input::input_code::key_s;
+    source.multiplier = -1.0f;
+    input::bind(source);
+
+    source.code = input::input_code::key_q;
+    source.multiplier = -1.0f;
+    source.axis = input::axis::y;
+    input::bind(source);
+
+    source.code = input::input_code::key_e;
+    source.multiplier = 1.0f;
+    input::bind(source);
+    
     is_restarting = false;
     return true;
 }
 
 void test_shutdown()
 {
+    input::unbind(string_hash()("move"));
     remove_lights();
     destroy_render_items();
     join_test_workers();
@@ -334,7 +367,7 @@ bool EngineTest::Init()
 void EngineTest::Run()
 {
     timer.begin();
-    // std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     script::update_all(timer.delta_average());
     for (u32 i = 0; i < num_windows; ++i)
     {
